@@ -1,22 +1,13 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import "@material-tailwind/react/tailwind.css";
+import Login from "./pages/Login";
 
 const App = () => {
-  const [helloWorld, setHelloWorld] = useState("");
-
-  const getHelloWorldHandler = async () => {
-    const response = await axios.get("http://localhost:8080/");
-    setHelloWorld(response.data.msg);
-  };
-
-  useEffect(() => {
-    getHelloWorldHandler();
-  }, []);
-
   return (
-    <div className="App">
-      <h1>{helloWorld}</h1>
-    </div>
+    // <div className="App">
+    //   <h1 className="text-red-700">helloWorld</h1>
+    // </div>
+    <Login />
   );
 };
 
