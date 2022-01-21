@@ -1,12 +1,12 @@
 {
-  "name": "pmo-management-system",
+  "name": "server",
   "version": "1.0.0",
-  "description": "Automation of FYP tasks.",
+  "description": "",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "start": "nodemon server.js"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {

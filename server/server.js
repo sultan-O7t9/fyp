@@ -1,7 +1,10 @@
 //Imports
-import express from "express";
-import cors from "cors";
-import dotenv, { config } from "dotenv";
+// import express from "express";
+// import cors from "cors";
+// import dotenv, { config } from "dotenv";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
 //Init
 const app = express();
