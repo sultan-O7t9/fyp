@@ -1,0 +1,5 @@
+.btnPosition {
+  position: absolute;
+  transform: translateY(-6%);
+  right: 10%;
+}
