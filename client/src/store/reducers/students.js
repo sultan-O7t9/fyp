@@ -1,4 +1,4 @@
-import Student from "../models/Student";
+import Student from "../../models/Student";
 import { IMPORT_STUDENTS } from "../actions/students";
 
 const initialState = {

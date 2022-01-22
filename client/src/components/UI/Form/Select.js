@@ -6,7 +6,7 @@ import { Select as MuiSelect } from "@mui/material";
 
 export default function Select(props) {
   const { label, options, onSelect, multiple, disabled } = props;
-  const [value, setValue] = useState([]);
+  const [value, setValue] = useState(multiple ? [] : "");
 
   const optionSelectHandler = event => {
     if (multiple && event.target.value.length > 3) {

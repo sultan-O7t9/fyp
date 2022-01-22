@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Table from "../../components/UI/Table";
 import TableCell from "../../components/UI/Table/TableCell";
 
@@ -12,7 +13,14 @@ const GROUPS = [
 ];
 
 const AllGroups = () => {
-  const [groups, setGroups] = useState([...GROUPS]);
+  // const [groups, setGroups] = useState([...GROUPS]);
+  const groups = useSelector(state => state.groups.groups);
+
+  // const students = useSelector(state => state.students.students);
+
+  // useEffect(() => {
+  //   console.log(students);
+  // }, [students]);
 
   return (
     <div>
@@ -22,6 +30,8 @@ const AllGroups = () => {
           <div className="grid grid-cols-1 px-4 mb-16">
             <Table
               tableHeading="FYP Groups SE 18"
+              isEmpty={groups && groups.length === 0}
+              placeholder={"No Groups Found"}
               tableHeads={["Group Id", "Members", "Title", "Supervisor"]}
             >
               {groups && groups.length

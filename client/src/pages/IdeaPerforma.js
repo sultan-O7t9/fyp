@@ -9,6 +9,14 @@ import Textarea from "@material-tailwind/react/Textarea";
 import FormPage from "../layouts/FormPage";
 import Select from "../components/UI/Form/Select";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
+// import { Backdrop } from "@mui/material";
+import Modal from "../components/UI/Modal";
+import BackDrop from "../components/BackDrop";
+import { Paragraph } from "@material-tailwind/react";
+import { createGroup } from "../store/actions/groups";
+import { useHistory } from "react-router-dom";
 
 const SUPERVISORS = [
   { id: 1, name: "Muhammad Ejaz" },
@@ -17,18 +25,15 @@ const SUPERVISORS = [
   { id: 4, name: "Muhammad Ikram ul Haq" },
 ];
 
-const STUDENTS = [
-  { rollNo: "18094198-048", name: "Ranya Muqadas" },
-  { rollNo: "18094198-075", name: "Fiza Ansar" },
-  { rollNo: "18094198-077", name: "Ammad Bajwa" },
-  { rollNo: "18094198-079", name: "Sultan Muhammad" },
-  { rollNo: "18094198-082", name: "Umer Naqeeb" },
-  { rollNo: "18094198-089", name: "Ali Ikram" },
-  { rollNo: "18094198-096", name: "Afham Hanif" },
-  { rollNo: "18094198-118", name: "Muneeb Arfan" },
-];
+const IdeaPerforma = () => {
+  const students = useSelector(state => state.students.students);
+  const dispatch = useDispatch();
 
-export default function IdeaPerforma() {
+  const history = useHistory();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   const [members, setMembers] = useState([]);
   const [leader, setLeader] = useState({});
   const [supervisor, setSupervisor] = useState("");
@@ -36,38 +41,42 @@ export default function IdeaPerforma() {
   const [description, setDescription] = useState("");
 
   const selectMembersHandler = event => {
+    console.log("Members", event.target.value);
     setMembers(event.target.value);
   };
   const selectLeaderHandler = event => {
+    console.log("Leader", event.target.value);
     setLeader(event.target.value);
   };
   const selectSupervisorHandler = event => {
+    console.log("Supervisor", event.target.value);
     setSupervisor(event.target.value);
   };
 
-  const selectTeamOptions = STUDENTS.map(student => {
+  const selectTeamOptions = students.map(student => {
     return {
       id: student.rollNo,
-      value: student,
+      value: student.rollNo,
       label: student.name.split(" ")[0] + " - " + student.rollNo.split("-")[1],
     };
   });
 
   const submitIdeaHandler = event => {
     event.preventDefault();
+    setIsLoading(true);
     const data = {
+      leader: leader,
       members: members,
-      leader: leader.rollNo,
-      supervisor: supervisor.name,
-      title: title,
+      supervisor: supervisor,
+      projectTitle: title,
       description: description,
     };
     console.log(data);
-    setMembers([]);
-    setLeader({});
-    setSupervisor("");
-    setTitle("");
-    setDescription("");
+    dispatch(createGroup(data));
+    setTimeout(() => {
+      setIsLoading(false);
+      setShowModal(true);
+    }, 5000);
   };
 
   return (
@@ -106,12 +115,10 @@ export default function IdeaPerforma() {
                 label="Leader"
                 onSelect={selectLeaderHandler}
                 options={members.map(member => ({
-                  id: member.rollNo,
+                  id: member,
                   value: member,
-                  label:
-                    member.name.split(" ")[0] +
-                    " - " +
-                    member.rollNo.split("-")[1],
+                  label: students.find(student => student.rollNo === member)
+                    .name,
                 }))}
               />
               <div className="w-full py-3"></div>
@@ -121,7 +128,7 @@ export default function IdeaPerforma() {
                 onSelect={selectSupervisorHandler}
                 options={SUPERVISORS.map(supervisor => ({
                   id: supervisor.id,
-                  value: supervisor,
+                  value: supervisor.name,
                   label: supervisor.name,
                 }))}
               />
@@ -163,9 +170,35 @@ export default function IdeaPerforma() {
             >
               <Icon name="save" size="sm" /> Submit
             </Button>
+            <BackDrop open={isLoading || showModal} onClick={() => {}}>
+              {isLoading && <LoadingSpinner />}
+              <Modal
+                showModal={showModal}
+                setShowModal={setShowModal}
+                title={"Group has been created"}
+                actions={[
+                  {
+                    label: "OK",
+                    color: "red",
+                    onClick: () => {
+                      setShowModal(false);
+                      history.push("/dashboard/groups");
+                    },
+                  },
+                ]}
+              >
+                <Paragraph color="blueGray">
+                  The Group has been created successfully.
+                  {<br />}
+                  Check your e-mail for new account credentials.
+                </Paragraph>
+              </Modal>
+            </BackDrop>
           </form>
         </CardBody>
       </Card>
     </FormPage>
   );
-}
+};
+
+export default IdeaPerforma;
