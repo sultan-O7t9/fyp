@@ -4,14 +4,10 @@ import Sidebar from "../../components/UI/Sidebar";
 
 const Dashboard = props => {
   const { children } = props;
-
   return (
     <>
       <Sidebar />
-      <div className="md:ml-64">
-        {children}
-        {/* <Footer /> */}
-      </div>
+      <div className="md:ml-64">{children}</div>
     </>
   );
 };

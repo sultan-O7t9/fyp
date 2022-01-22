@@ -7,10 +7,12 @@ import {
   Heading5,
   InputIcon,
 } from "@material-tailwind/react";
-import React from "react";
+import React, { useState } from "react";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 import Auth from "../layouts/Auth/Auth";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
   return (
     <Auth>
       <Card>
@@ -39,15 +41,20 @@ const Login = () => {
           </div>
         </CardBody>
         <CardFooter>
-          <div className="flex justify-center bg-bb">
-            <Button
-              color="lightBlue"
-              buttonType="filled"
-              size="lg"
-              ripple="dark"
-            >
-              Log In
-            </Button>
+          <div className="flex relative justify-center bg-bb">
+            {loading ? (
+              <LoadingSpinner size="lg" />
+            ) : (
+              <Button
+                onClick={() => setLoading(true)}
+                color="lightBlue"
+                buttonType="filled"
+                size="lg"
+                ripple="dark"
+              >
+                Log In
+              </Button>
+            )}
           </div>
         </CardFooter>
       </Card>

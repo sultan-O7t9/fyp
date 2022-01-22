@@ -5,11 +5,12 @@ import Dropdown from "@material-tailwind/react/Dropdown";
 import DropdownItem from "@material-tailwind/react/DropdownItem";
 import { NavItem } from "@material-tailwind/react";
 
-export default function AdminNavbar({ showSidebar, setShowSidebar }) {
+const AdminNavbar = props => {
+  const { showSidebar, setShowSidebar } = props;
   const location = useLocation().pathname;
 
   return (
-    <nav className="bg-light-blue-500 md:ml-64 py-6 px-3">
+    <nav className="bg-primary md:ml-64 py-6 px-3">
       <div className="container max-w-full mx-auto flex items-center justify-between md:pr-8 md:pl-10">
         <div className="md:hidden">
           <Button
@@ -78,4 +79,6 @@ export default function AdminNavbar({ showSidebar, setShowSidebar }) {
       </div>
     </nav>
   );
-}
+};
+
+export default AdminNavbar;

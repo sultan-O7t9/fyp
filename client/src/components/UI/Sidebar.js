@@ -4,7 +4,7 @@ import Icon from "@material-tailwind/react/Icon";
 import H6 from "@material-tailwind/react/Heading6";
 import { useState } from "react";
 
-export default function Sidebar() {
+const Sidebar = () => {
   const [showSidebar, setShowSidebar] = useState("-left-64");
   return (
     <>
@@ -36,6 +36,28 @@ export default function Sidebar() {
                   Dashboard
                 </NavLink>
               </li>
+              <li className="rounded-lg mb-4">
+                <NavLink
+                  to="/dashboard/groups"
+                  exact
+                  className="flex items-center gap-4 text-sm text-gray-700 font-light px-4 py-3 rounded-lg"
+                  activeClassName="bg-gradient-to-tr from-light-blue-500 to-light-blue-700 text-white shadow-md"
+                >
+                  <Icon name="group" size="2xl" />
+                  Groups
+                </NavLink>
+              </li>
+              <li className="rounded-lg mb-4">
+                <NavLink
+                  to="/dashboard/students"
+                  exact
+                  className="flex items-center gap-4 text-sm text-gray-700 font-light px-4 py-3 rounded-lg"
+                  activeClassName="bg-gradient-to-tr from-light-blue-500 to-light-blue-700 text-white shadow-md"
+                >
+                  <Icon name="person" size="2xl" />
+                  Students
+                </NavLink>
+              </li>
             </ul>
 
             <ul className="flex-col min-w-full flex list-none absolute bottom-0">
@@ -55,4 +77,6 @@ export default function Sidebar() {
       </div>
     </>
   );
-}
+};
+
+export default Sidebar;

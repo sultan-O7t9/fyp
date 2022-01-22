@@ -1,6 +1,9 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    colors: {
+      primary: "RGB(3, 169, 245)",
+    },
     extend: {
       backgroundImage: () => ({
         "login-background":
@@ -8,5 +11,6 @@ module.exports = {
       }),
     },
   },
+
   plugins: [],
 };
