@@ -8,11 +8,33 @@ import {
   InputIcon,
 } from "@material-tailwind/react";
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import Auth from "../layouts/Auth/Auth";
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const history = useHistory();
+
+  const loginHandler = () => {
+    if (email === "" || password === "") {
+      alert("Please fill all the fields");
+      return;
+    }
+    setIsLoading(true);
+    const data = {
+      email: email,
+      password: password,
+    };
+    console.log(data);
+    setTimeout(() => {
+      setIsLoading(false);
+      history.push("/dashboard");
+    }, 2000);
+  };
+
   return (
     <Auth>
       <Card>
@@ -25,7 +47,11 @@ const Login = () => {
         <CardBody>
           <div className="mb-12 px-4 bg-bb">
             <InputIcon
+              required={true}
+              disabled={isLoading}
               type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               color="lightBlue"
               placeholder="Email Address"
               iconName="email"
@@ -33,7 +59,11 @@ const Login = () => {
           </div>
           <div className="mb-8 px-4">
             <InputIcon
+              required={true}
+              disabled={isLoading}
               type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               color="lightBlue"
               placeholder="Password"
               iconName="lock"
@@ -42,11 +72,11 @@ const Login = () => {
         </CardBody>
         <CardFooter>
           <div className="flex relative justify-center bg-bb">
-            {loading ? (
-              <LoadingSpinner size="lg" />
+            {isLoading ? (
+              <LoadingSpinner />
             ) : (
               <Button
-                onClick={() => setLoading(true)}
+                onClick={loginHandler}
                 color="lightBlue"
                 buttonType="filled"
                 size="lg"

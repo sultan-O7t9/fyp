@@ -1,26 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import Table from "../../components/UI/Table";
 import TableCell from "../../components/UI/Table/TableCell";
 
-const GROUPS = [
-  {
-    id: "SE_18_1",
-    members: ["18094198-048", "18094198-079", "18094198-089"],
-    projectTitle: "PMO Management System",
-    supervisor: "Muhammad Ejaz",
-  },
-];
-
 const AllGroups = () => {
-  // const [groups, setGroups] = useState([...GROUPS]);
-  const groups = useSelector(state => state.groups.groups);
-
-  // const students = useSelector(state => state.students.students);
-
-  // useEffect(() => {
-  //   console.log(students);
-  // }, [students]);
+  const groups = useSelector(state => state.students.groups);
 
   return (
     <div>

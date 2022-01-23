@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@material-tailwind/react/Button";
 import Icon from "@material-tailwind/react/Icon";
 import Card from "@material-tailwind/react/Card";
@@ -15,7 +15,7 @@ import LoadingSpinner from "../components/UI/LoadingSpinner";
 import Modal from "../components/UI/Modal";
 import BackDrop from "../components/BackDrop";
 import { Paragraph } from "@material-tailwind/react";
-import { createGroup } from "../store/actions/groups";
+import { createGroup } from "../store/actions/students";
 import { useHistory } from "react-router-dom";
 
 const SUPERVISORS = [
@@ -27,6 +27,10 @@ const SUPERVISORS = [
 
 const IdeaPerforma = () => {
   const students = useSelector(state => state.students.students);
+  // useEffect(() => {
+  //   console.log(students);
+  // }, [students]);
+
   const dispatch = useDispatch();
 
   const history = useHistory();
@@ -53,16 +57,18 @@ const IdeaPerforma = () => {
     setSupervisor(event.target.value);
   };
 
-  const selectTeamOptions = students.map(student => {
+  const teamOptions = students.map(student => {
     return {
       id: student.rollNo,
+      disabled: !!student.groupId,
       value: student.rollNo,
-      label: student.name.split(" ")[0] + " - " + student.rollNo.split("-")[1],
+      label: student.rollNo + " (" + student.name.split(" ")[0] + ")",
     };
   });
 
   const submitIdeaHandler = event => {
     event.preventDefault();
+    console.log(students);
     setIsLoading(true);
     const data = {
       leader: leader,
@@ -103,10 +109,11 @@ const IdeaPerforma = () => {
             <div className="w-full flex flex-col ">
               <Select
                 required
+                disabled={students.length === 0}
                 multiple={true}
                 label="Team"
                 onSelect={selectMembersHandler}
-                options={selectTeamOptions}
+                options={teamOptions}
               />
               <div className="w-full py-3"></div>
               <Select
@@ -114,17 +121,26 @@ const IdeaPerforma = () => {
                 disabled={members.length === 0}
                 label="Leader"
                 onSelect={selectLeaderHandler}
-                options={members.map(member => ({
-                  id: member,
-                  value: member,
-                  label: students.find(student => student.rollNo === member)
-                    .name,
-                }))}
+                options={members.map(member => {
+                  return {
+                    id: member,
+                    value: member,
+                    label:
+                      students.find(student => student.rollNo === member)
+                        .rollNo +
+                      " (" +
+                      students
+                        .find(student => student.rollNo === member)
+                        .name.split(" ")[0] +
+                      ")",
+                  };
+                })}
               />
               <div className="w-full py-3"></div>
               <Select
                 required
                 label="Supervisor"
+                disabled={members.length === 0}
                 onSelect={selectSupervisorHandler}
                 options={SUPERVISORS.map(supervisor => ({
                   id: supervisor.id,
@@ -143,13 +159,13 @@ const IdeaPerforma = () => {
                   required
                   value={title}
                   onChange={event => setTitle(event.target.value)}
-                  color="purple"
+                  color="lightBlue"
                   placeholder="Title"
                 />
               </div>
               <div className="w-full lg:w-4/12 pr-4 mb-10 font-light">
                 <Textarea
-                  color="purple"
+                  color="lightBlue"
                   value={description}
                   onChange={event => setDescription(event.target.value)}
                   minLength="20"
@@ -187,11 +203,8 @@ const IdeaPerforma = () => {
                   },
                 ]}
               >
-                <Paragraph color="blueGray">
-                  The Group has been created successfully.
-                  {<br />}
-                  Check your e-mail for new account credentials.
-                </Paragraph>
+                <p color="blueGray">The Group has been created successfully.</p>
+                <p>Check your e-mail for new account credentials.</p>
               </Modal>
             </BackDrop>
           </form>

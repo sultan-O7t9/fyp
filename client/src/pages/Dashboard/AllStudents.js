@@ -1,46 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ImportFromExcel from "../../components/ImportFromExcel";
 import Table from "../../components/UI/Table";
 import TableCell from "../../components/UI/Table/TableCell";
-import { importStudents } from "../../store/actions/students";
-// import TableNavButton from "../../components/UI/Table/TableNavButton";
-
-// const STUDENTS = [
-//   {
-//     rollNo: "18094198-079",
-//     name: "Sultan Muhammad",
-//     department: "SE",
-//     batch: "18",
-//     email: "18094198-079@uog.edu.pk",
-//   },
-//   {
-//     rollNo: "18094198-089",
-//     name: "Ali Ikram",
-//     department: "SE",
-//     batch: "18",
-//     email: "18094198-089@uog.edu.pk",
-//   },
-//   {
-//     rollNo: "18094198-048",
-//     name: "Ranya Muqadas",
-//     department: "SE",
-//     batch: "18",
-//     email: "18094198-048@uog.edu.pk",
-//   },
-// ];
+import { fetchStudents, importStudents } from "../../store/actions/students";
 
 const AllStudents = () => {
   const students = useSelector(state => state.students.students);
+
   const dispatch = useDispatch();
-  // const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchStudents());
+  }, [dispatch]);
 
   const importExcelHandler = data => {
     //Map Excel Data to Students Array
     data.shift();
     //Some arrays had 0 length, so we need to remove them
     const filteredData = data.filter(student => student.length > 0);
-    console.log(filteredData);
     const tempStudents = filteredData.map(student => {
       return {
         rollNo: student[0],
@@ -50,17 +28,14 @@ const AllStudents = () => {
         email: student[0] + "@uog.edu.pk",
       };
     });
-    // setStudents([...tempStudents]);
+    tempStudents.sort(
+      (a, b) => a.rollNo.split("-")[1] - b.rollNo.split("-")[1]
+    );
     dispatch(importStudents(tempStudents));
   };
   const nav = (
     <div className="w-full flex flex-row justify-start">
       <ImportFromExcel onImportFromExcel={importExcelHandler} />
-      {/* <TableNavButton
-        icon={"edit"}
-        tooltip={"Edit a Student"}
-        onClick={() => console.log("Editing")}
-      />*/}
     </div>
   );
 
@@ -76,7 +51,7 @@ const AllStudents = () => {
               nav={nav}
               isEmpty={students && students.length === 0}
               placeholder={"No Students Found"}
-              tableHeads={["Roll No ", "Name", "Department", "Email"]}
+              tableHeads={["Roll No ", "Name", "Department", "Email", "Group"]}
             >
               {students && students.length
                 ? students.map(student => (
@@ -87,6 +62,11 @@ const AllStudents = () => {
                         {student.department} {student.batch}
                       </TableCell>
                       <TableCell>{student.email}</TableCell>
+                      <TableCell>
+                        <span className="font-medium">
+                          {student.groupId ? student.groupId : "None"}
+                        </span>
+                      </TableCell>
                     </tr>
                   ))
                 : null}

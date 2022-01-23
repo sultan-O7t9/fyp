@@ -27,6 +27,7 @@ const Modal = ({ showModal, actions, title, children }) => {
           {actions &&
             actions.map(action => (
               <Button
+                key={action.color + action.label}
                 color={action.color}
                 buttonType="filled"
                 size="regular"

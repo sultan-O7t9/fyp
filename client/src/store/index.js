@@ -1,10 +1,10 @@
-import { combineReducers, createStore } from "redux";
-import groupsReducer from "./reducers/groups";
+import { applyMiddleware, combineReducers, createStore } from "redux";
+import ReduxThunk from "redux-thunk";
 import studentsReducer from "./reducers/students";
+
 const rootReducer = combineReducers({
   students: studentsReducer,
-  groups: groupsReducer,
 });
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 export default store;
