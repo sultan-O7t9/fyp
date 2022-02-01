@@ -1,11 +1,9 @@
 import React from "react";
-import Card from "@material-tailwind/react/Card";
-import CardHeader from "@material-tailwind/react/CardHeader";
-import CardBody from "@material-tailwind/react/CardBody";
-// import ImportFromExcel from "../../ImportFromExcel";
+
+import { Card, CardHeader, CardBody, Heading4 } from "@material-tailwind/react";
+
 import TableHead from "./TableHead";
 import TableNavbar from "./TableNavbar";
-import { Heading4 } from "@material-tailwind/react";
 
 const Table = props => {
   const { tableHeading, tableHeads, children, nav, placeholder, isEmpty } =

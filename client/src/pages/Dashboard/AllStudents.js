@@ -10,9 +10,9 @@ const AllStudents = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(fetchStudents());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchStudents());
+  // }, [dispatch]);
 
   const importExcelHandler = data => {
     //Map Excel Data to Students Array

@@ -1,12 +1,17 @@
 import React, { useRef } from "react";
-import Button from "@material-tailwind/react/Button";
-import Icon from "@material-tailwind/react/Icon";
-import Tooltips from "@material-tailwind/react/Tooltips";
-import TooltipsContent from "@material-tailwind/react/TooltipsContent";
+
+import {
+  Button,
+  Icon,
+  Tooltips,
+  TooltipsContent,
+} from "@material-tailwind/react";
 
 const TableNavButton = props => {
   const { icon, tooltip, onClick } = props;
+
   const buttonRef = useRef();
+
   return (
     <div className="mr-4">
       <Button

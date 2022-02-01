@@ -1,22 +1,18 @@
-import React, { useEffect } from "react";
-import Button from "@material-tailwind/react/Button";
-import Icon from "@material-tailwind/react/Icon";
-import Card from "@material-tailwind/react/Card";
-import CardHeader from "@material-tailwind/react/CardHeader";
-import CardBody from "@material-tailwind/react/CardBody";
-import Input from "@material-tailwind/react/Input";
-import Textarea from "@material-tailwind/react/Textarea";
-import FormPage from "../layouts/FormPage";
-import Select from "../components/UI/Form/Select";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LoadingSpinner from "../components/UI/LoadingSpinner";
-// import { Backdrop } from "@mui/material";
-import Modal from "../components/UI/Modal";
-import BackDrop from "../components/BackDrop";
-import { Paragraph } from "@material-tailwind/react";
-import { createGroup } from "../store/actions/students";
 import { useHistory } from "react-router-dom";
+import {
+  Button,
+  Icon,
+  Card,
+  CardHeader,
+  CardBody,
+  Input,
+  Textarea,
+} from "@material-tailwind/react";
+import { BackDrop, LoadingSpinner, Modal, Select } from "../components/UI";
+import { FormPageLayout } from "../layouts";
+import { createGroup } from "../store/actions/students";
 
 const SUPERVISORS = [
   { id: 1, name: "Muhammad Ejaz" },
@@ -27,10 +23,6 @@ const SUPERVISORS = [
 
 const IdeaPerforma = () => {
   const students = useSelector(state => state.students.students);
-  // useEffect(() => {
-  //   console.log(students);
-  // }, [students]);
-
   const dispatch = useDispatch();
 
   const history = useHistory();
@@ -57,15 +49,6 @@ const IdeaPerforma = () => {
     setSupervisor(event.target.value);
   };
 
-  const teamOptions = students.map(student => {
-    return {
-      id: student.rollNo,
-      disabled: !!student.groupId,
-      value: student.rollNo,
-      label: student.rollNo + " (" + student.name.split(" ")[0] + ")",
-    };
-  });
-
   const submitIdeaHandler = event => {
     event.preventDefault();
     console.log(students);
@@ -82,23 +65,24 @@ const IdeaPerforma = () => {
     setTimeout(() => {
       setIsLoading(false);
       setShowModal(true);
-    }, 5000);
+    }, 2000);
   };
 
+  const teamOptions = students.map(student => {
+    return {
+      id: student.rollNo,
+      disabled: !!student.groupId,
+      value: student.rollNo,
+      label: student.rollNo + " (" + student.name.split(" ")[0] + ")",
+    };
+  });
+
   return (
-    <FormPage>
+    <FormPageLayout>
       <Card>
         <CardHeader color="purple" contentPosition="none">
           <div className="w-full flex items-center justify-between">
             <h2 className="text-white text-2xl">FYP Project Titles</h2>
-            {/* <Button
-              color="transparent"
-              buttonType="link"
-              size="lg"
-              style={{ padding: 0 }}
-            >
-              Settings
-            </Button> */}
           </div>
         </CardHeader>
         <CardBody>
@@ -210,7 +194,7 @@ const IdeaPerforma = () => {
           </form>
         </CardBody>
       </Card>
-    </FormPage>
+    </FormPageLayout>
   );
 };
 
