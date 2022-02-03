@@ -1,19 +1,25 @@
 {
-  "name": "server",
+  "name": "pmo-management-system",
   "version": "1.0.0",
-  "description": "",
+  "description": "PMO Management System is a FYP project for the University of Gujrat to develop a web application for managing PMO activities.",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "client-install": "cd client && npm install",
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
-  "author": "",
+  "author": "Sultan Muhammad",
   "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
+  "devDependencies": {
     "dotenv": "^10.0.0",
-    "express": "^4.17.2",
-    "mysql": "^2.18.1",
     "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "concurrently": "^7.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.2"
   }
 }
