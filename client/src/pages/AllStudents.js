@@ -1,6 +1,7 @@
-import { Link, List, ListItem, TableCell, TableRow } from "@mui/material";
+import { List, ListItem, TableCell, TableRow } from "@mui/material";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
+import Link from "../components/Link";
 import Main from "../components/Main";
 
 const DATA = {
@@ -42,9 +43,7 @@ const DataBody = () => {
         <List>
           {row.members.map(member => (
             <ListItem style={{ padding: 0 }} key={member}>
-              <Link href="#" style={{ textDecoration: "none" }}>
-                {member}
-              </Link>
+              <Link to="#">{member}</Link>
             </ListItem>
           ))}
         </List>

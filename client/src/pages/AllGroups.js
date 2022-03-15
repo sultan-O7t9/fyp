@@ -1,6 +1,8 @@
-import { Link, List, ListItem, TableCell, TableRow } from "@mui/material";
+import { List, ListItem, TableCell, TableRow } from "@mui/material";
+import axios from "axios";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
+import Link from "../components/Link";
 import Main from "../components/Main";
 
 const DATA = {
@@ -42,7 +44,7 @@ const DataBody = () => {
         <List>
           {row.members.map(member => (
             <ListItem style={{ padding: 0 }} key={member}>
-              <Link href="#" style={{ textDecoration: "none" }}>
+              <Link to="#" style={{ textDecoration: "none" }}>
                 {member}
               </Link>
             </ListItem>
@@ -59,7 +61,21 @@ const AllGroups = () => {
   return (
     <ContainerFluid
       title="Groups"
-      appbarActions={[{ name: "Download as excel", onClick: () => {} }]}
+      appbarActions={[
+        {
+          name: "Download as excel",
+          onClick: async () => {
+            try {
+              const res = await axios.get(
+                "http://localhost:5000/api/auth/test"
+              );
+              console.log(res.data);
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+      ]}
     >
       <Main>
         <DataTable DataHead={DataHead} DataBody={DataBody} />

@@ -1,14 +1,13 @@
 import { useState } from "react";
-import ContainerFluid from "../components/ContainerFluid";
 import Sidebar from "../components/Sidebar";
 import { Box } from "@mui/material";
 import MainAppbar from "../components/MainAppbar";
 import { BG } from "../utils/Theme";
 
 const navLinks = [
-  { name: "Dashboard", path: "/dashboard", icon: "dashboard" },
-  { name: "Groups", path: "/dashboard/groups", icon: "group" },
-  { name: "Students", path: "/dashboard/students", icon: "person" },
+  { name: "Dashboard", path: "/", icon: "dashboard" },
+  { name: "Groups", path: "/groups", icon: "group" },
+  { name: "Students", path: "/students", icon: "person" },
 ];
 
 const MainLayout = props => {
