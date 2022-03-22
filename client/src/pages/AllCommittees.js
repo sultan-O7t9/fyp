@@ -2,6 +2,7 @@ import {
   Backdrop,
   Button,
   CircularProgress,
+  IconButton,
   List,
   ListItem,
   TableCell,
@@ -17,7 +18,8 @@ import ExportAsExcel from "../components/ExportAsExcel";
 import Link from "../components/Link";
 import Main from "../components/Main";
 import ManageCommittee from "./ManageCommittee";
-
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 const DATA = {
   heads: ["Committee ID", "Members", "Groups"],
   data: [
@@ -46,7 +48,16 @@ const DataHead = ({ heads }) => {
   );
 };
 
-const DataBody = ({ data }) => {
+const DataBody = ({ data, editCommittee, setData }) => {
+  const deleteCommittee = async id => {
+    const response = await axios.delete(
+      `http://localhost:5000/api/committee/delete/${id}`
+    );
+    if (response.data.delete) {
+      setData(data => data.filter(committee => committee.id !== id));
+    }
+  };
+
   return (
     data &&
     data.map((row, index) => (
@@ -54,15 +65,12 @@ const DataBody = ({ data }) => {
         <TableCell>{row.id}</TableCell>
         {/* <TableCell>{row.members}</TableCell> */}
         <TableCell>
-          {row.members && row.members.length > 0 ? (
+          {row.FacultyMembers && row.FacultyMembers.length > 0 ? (
             <List>
-              {row.members.map(member => (
-                <ListItem
-                  style={{ padding: 0 }}
-                  key={member + new Date().getTime()}
-                >
+              {row.FacultyMembers.map(member => (
+                <ListItem style={{ padding: 0 }} key={member.id}>
                   <Link to="#" style={{ textDecoration: "none" }}>
-                    {member}
+                    {member.name}
                   </Link>
                 </ListItem>
               ))}
@@ -72,15 +80,12 @@ const DataBody = ({ data }) => {
           )}
         </TableCell>
         <TableCell>
-          {row.groups && row.groups.length > 0 ? (
+          {row.Groups && row.Groups.length > 0 ? (
             <List>
-              {row.groups.map(group => (
-                <ListItem
-                  style={{ padding: 0 }}
-                  key={group + new Date().getTime()}
-                >
+              {row.Groups.map(group => (
+                <ListItem style={{ padding: 0 }} key={group.id}>
                   <Link to="#" style={{ textDecoration: "none" }}>
-                    {group}
+                    {group.name}
                   </Link>
                 </ListItem>
               ))}
@@ -89,10 +94,26 @@ const DataBody = ({ data }) => {
             <Typography variant="body2">None</Typography>
           )}
         </TableCell>
-        <TableCell>
-          <Button variant="contained" color="primary" size="small">
-            Edit
-          </Button>
+        <TableCell align="right">
+          <IconButton
+            onClick={() => {
+              editCommittee(row);
+            }}
+            color="primary"
+            variant="outlined"
+          >
+            <EditIcon />
+          </IconButton>
+
+          <IconButton
+            onClick={() => {
+              deleteCommittee(row.id);
+            }}
+            color="error"
+            variant="outlined"
+          >
+            <DeleteIcon />
+          </IconButton>
         </TableCell>
         {/* <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell> */}
       </TableRow>
@@ -102,29 +123,52 @@ const DataBody = ({ data }) => {
 
 const AllCommittees = () => {
   const [heads, setHeads] = useState(["Committee ID", "Members", "Groups", ""]);
-  //   const [body, setBody] = useState([]);
-  //   const [isLoading, setIsLoading] = useState(false);
+  const [showAddCommittee, setShowAddCommittee] = useState(false);
+  const [body, setBody] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  //   useEffect(() => {
-  //     setIsLoading(true);
+  useEffect(() => {
+    setIsLoading(true);
 
-  //     axios
-  //       .get("http://localhost:5000/api/group/get-all")
-  //       .then(res => {
-  //         setBody(res.data.groups);
-  //       })
-  //       .catch(err => {
-  //         console.log(err);
-  //       })
-  //       .finally(() => {
-  //         setIsLoading(false);
-  //       });
-  //   }, []);
+    axios
+      .get("http://localhost:5000/api/committee/get-all")
+      .then(res => {
+        console.log(res.data);
+        setBody(res.data.committees);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [showAddCommittee]);
 
-  return <ManageCommittee />;
+  // return <ManageCommittee />;
+
+  const addCommitteeHandler = committee => {
+    console.log(committee);
+    setShowAddCommittee(committee ? committee : true);
+  };
+
+  if (isLoading)
+    return (
+      <Backdrop
+        sx={{ color: "#fff", zIndex: theme => theme.zIndex.drawer + 1 }}
+        open={true}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
 
   return (
     <ContainerFluid>
+      {showAddCommittee ? (
+        <ManageCommittee
+          committee={showAddCommittee}
+          setDisplay={setShowAddCommittee}
+        />
+      ) : null}
       <Main styles={{ padding: "1.5rem" }}>
         <Box
           sx={{ marginBottom: "3rem" }}
@@ -136,14 +180,24 @@ const AllCommittees = () => {
             <Typography variant="h3">Committees</Typography>
           </Box>
           <Box>
-            <Button variant="contained" color="primary">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={addCommitteeHandler}
+            >
               Add Committee
             </Button>
           </Box>
         </Box>
         <DataTable
           DataHead={() => <DataHead heads={heads} />}
-          DataBody={() => <DataBody data={DATA.data} />}
+          DataBody={() => (
+            <DataBody
+              editCommittee={addCommitteeHandler}
+              data={body}
+              setData={setBody}
+            />
+          )}
         />
       </Main>
     </ContainerFluid>

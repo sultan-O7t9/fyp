@@ -63,7 +63,7 @@ module.exports.getAllSupervisors = async (req, res) => {
           ),
         },
       },
-      attributes: ["id", "name", "email"],
+      attributes: ["id", "name", "email", "committeeId"],
     });
     res.json({
       message: "Supervisors retrieved successfully",

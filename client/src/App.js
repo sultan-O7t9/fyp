@@ -79,7 +79,7 @@ const App = () => {
 
   return (
     <Switch>
-      <Route exact path="/committees" component={AllCommittees} />
+      {/* <Route exact path="/committees" component={AllCommittees} /> */}
       <Route exact path="/login" component={Login} />
       <Route exact path="/register" component={Register} />
       {roles && roles.includes("STUDENT") ? (

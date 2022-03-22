@@ -152,6 +152,7 @@ module.exports.getAllGroupsOfADepartment = async (req, res) => {
         });
         return {
           id: group.dataValues.name,
+          committeeId: group.dataValues.committeeId,
           project: group.dataValues.project,
           members: group.dataValues.members,
           supervisor: supervisor.dataValues.name,

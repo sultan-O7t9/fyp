@@ -78,12 +78,18 @@ Department.hasMany(Student, {
 Department.hasMany(Group, {
   foreignKey: "departmentId",
 });
+Department.hasMany(Committee, {
+  foreignKey: "departmentId",
+});
 
 Project.hasOne(Group, {
   foreignKey: "projectId",
 });
 
 Committee.hasMany(Group, {
+  foreignKey: "committeeId",
+});
+Committee.hasMany(Student, {
   foreignKey: "committeeId",
 });
 
@@ -118,4 +124,6 @@ module.exports = {
   Department,
   Batch,
   Token,
+  Project,
+  Committee,
 };
