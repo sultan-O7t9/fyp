@@ -1,7 +1,12 @@
 import { Box } from "@mui/system";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import ContainerFluid from "../components/ContainerFluid";
 import ItemCard from "../components/ItemCard";
 import Main from "../components/Main";
+import jwt_decode from "jwt-decode";
+import { Redirect } from "react-router-dom";
+
 const Deliverables = [
   {
     id: 1,
@@ -23,7 +28,16 @@ const Deliverables = [
   },
 ];
 const Dashboard = () => {
-  return (
+  const token = useSelector(state => state.auth.accessToken);
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    const userRole = jwt_decode(token).role;
+    console.log(userRole);
+    setRole(userRole);
+  }, [token]);
+
+  return !role.includes("STUDENT") ? (
     <ContainerFluid title="Dasboard">
       <Main>
         <Box sx={{ padding: "3rem" }}>
@@ -39,6 +53,8 @@ const Dashboard = () => {
         </Box>
       </Main>
     </ContainerFluid>
+  ) : (
+    <Redirect to="/register-group" />
   );
 };
 

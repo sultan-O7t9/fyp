@@ -1,18 +1,24 @@
 import axios from "axios";
-import React from "react";
-import { useDispatch } from "react-redux";
+import jwt_decode from "jwt-decode";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./layouts/MainLayout";
+import AllCommittees from "./pages/AllCommittees";
 import AllGroups from "./pages/AllGroups";
 import AllStudents from "./pages/AllStudents";
 import Dashboard from "./pages/Dashboard";
 import DeliverableDetail from "./pages/DeliverableDetail";
 import GroupDetail from "./pages/GroupDetail";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import RegisterGroup from "./pages/RegisterGroup";
 import { logoutUser, readUser, refreshAuthToken } from "./store/actions/auth";
 
 const App = () => {
+  const [roles, setRoles] = useState([]);
+  const token = useSelector(state => state.auth.accessToken);
   const history = useHistory();
   const dispatch = useDispatch();
   dispatch(readUser());
@@ -58,23 +64,52 @@ const App = () => {
             dispatch(logoutUser());
             history.replace("/login");
           });
-      }
+      } else return Promise.reject(error);
     }
   );
 
+  useEffect(() => {
+    if (token) {
+      const data = jwt_decode(token);
+      if (data.hasOwnProperty("role")) {
+        setRoles(data.role);
+      }
+    }
+  }, [token]);
+
   return (
     <Switch>
+      <Route exact path="/committees" component={AllCommittees} />
       <Route exact path="/login" component={Login} />
-      <MainLayout>
-        <ProtectedRoute exact path="/" component={Dashboard} />
-        <ProtectedRoute exact path="/groups" component={AllGroups} />
-        <ProtectedRoute exact path="/groups/:id" component={GroupDetail} />
-        <ProtectedRoute exact path="/students" component={AllStudents} />
+      <Route exact path="/register" component={Register} />
+      {roles && roles.includes("STUDENT") ? (
         <ProtectedRoute
           exact
-          path="/deliverable/:id"
-          component={DeliverableDetail}
+          path="/register-group"
+          component={RegisterGroup}
         />
+      ) : null}
+      <MainLayout>
+        <ProtectedRoute exact path="/" component={Dashboard} />
+        {(roles && roles.includes("PMO")) ||
+        (roles && roles.includes("SUPERVISOR")) ||
+        (roles && roles.includes("EVALUATOR")) ? (
+          <>
+            <ProtectedRoute exact path="/groups" component={AllGroups} />
+            <ProtectedRoute exact path="/groups/:id" component={GroupDetail} />
+            <ProtectedRoute exact path="/students" component={AllStudents} />
+            <ProtectedRoute
+              exact
+              path="/committees"
+              component={AllCommittees}
+            />
+            <ProtectedRoute
+              exact
+              path="/deliverable/:id"
+              component={DeliverableDetail}
+            />
+          </>
+        ) : null}
       </MainLayout>
     </Switch>
   );

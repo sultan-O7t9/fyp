@@ -28,6 +28,8 @@ const Student = require("./Student")(sequelize, DataTypes);
 const Department = require("./Department")(sequelize, DataTypes);
 const Batch = require("./Batch")(sequelize, DataTypes);
 const Token = require("./Token")(sequelize, DataTypes);
+const Project = require("./Project")(sequelize, DataTypes);
+const Committee = require("./Committee")(sequelize, DataTypes);
 // const PMO= require("./PMO")(sequelize, DataTypes);
 
 // //Associate the model with other models
@@ -65,13 +67,28 @@ Department.hasMany(Batch, {
   //Each Department can have many Batches
   foreignKey: "departmentId",
 });
-FacultyMember.hasOne(Token, {
-  //Each User has one Token
-  foreignKey: "userId",
+Batch.hasMany(Student, {
+  foreignKey: "batchId",
 });
-Student.hasOne(Token, {
-  //Each User has one Token
-  foreignKey: "userId",
+
+Department.hasMany(Student, {
+  foreignKey: "departmentId",
+});
+
+Department.hasMany(Group, {
+  foreignKey: "departmentId",
+});
+
+Project.hasOne(Group, {
+  foreignKey: "projectId",
+});
+
+Committee.hasMany(Group, {
+  foreignKey: "committeeId",
+});
+
+Committee.hasMany(FacultyMember, {
+  foreignKey: "committeeId",
 });
 
 // FacultyMember.hasOne(Department, {

@@ -17,24 +17,12 @@ export const readUser = () => {
 };
 
 //
-export const loginUser = (email, password) => {
+export const loginUser = data => {
   return async dispatch => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
-      console.log(response.data);
-      dispatch({
-        type: SAVE_USER,
-        payload: response.data,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch({
+      type: SAVE_USER,
+      payload: data,
+    });
   };
 };
 export const refreshAuthToken = (accessToken, refreshToken) => {
@@ -52,13 +40,8 @@ export const refreshAuthToken = (accessToken, refreshToken) => {
 
 export const logoutUser = () => {
   return async dispatch => {
-    try {
-      // await axios.post("http://localhost:5000/api/auth/logout");
-      dispatch({
-        type: DELETE_USER,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch({
+      type: DELETE_USER,
+    });
   };
 };

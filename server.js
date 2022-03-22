@@ -11,8 +11,11 @@ dotenv.config();
 require("./models");
 
 //Routes
-app.use("/api/auth", require("./routes/auth.route"));
-app.use("/api/student", require("./routes/student.route"));
+app.use("/api/faculty", require("./routes/faculty.routes"));
+app.use("/api/auth", require("./routes/auth.routes"));
+app.use("/api/student", require("./routes/student.routes"));
+app.use("/api/group", require("./routes/group.routes"));
+app.use("/api/dept", require("./routes/department.routes"));
 
 const port = process.env.PORT || 8080;
 

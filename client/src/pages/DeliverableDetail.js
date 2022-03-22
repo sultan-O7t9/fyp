@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button, Card, TableCell, TableRow, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import ContainerFluid from "../components/ContainerFluid";
@@ -41,12 +42,24 @@ const DataHead = () => {
 };
 
 const DataBody = () => {
+  const [filter, setFilter] = useState(null);
+  const filters = [
+    { text: "Submitted", id: 1 },
+    { text: "Verified", id: 2 },
+    { text: "Rejected", id: 3 },
+    { text: "Revised", id: 4 },
+  ];
   return (
     <>
       <TableRow>
         <TableCell>Filter</TableCell>
         <TableCell colSpan={4}>
-          <Select />
+          <Select
+            label="Filter"
+            value={filter}
+            setValue={setFilter}
+            items={filters}
+          />
         </TableCell>
       </TableRow>
       {DATA.data.map((row, index) => (

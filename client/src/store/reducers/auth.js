@@ -8,7 +8,6 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         accessToken: localStorage.getItem("accessToken"),
-        refreshToken: localStorage.getItem("refreshToken"),
       };
     case SAVE_USER:
       const accessToken = action.payload.accessToken;

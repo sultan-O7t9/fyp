@@ -4,6 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       batchCode: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
+        allowNull: false,
       },
     },
     {

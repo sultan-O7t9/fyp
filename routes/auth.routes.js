@@ -1,5 +1,6 @@
 const {
   loginUser,
+  logoutUser,
   registerFaculty,
   createRoles,
   refreshAccessToken,
@@ -9,8 +10,8 @@ const verifyToken = require("../utils/verifyToken");
 const Router = require("express").Router();
 
 Router.post("/login", loginUser);
+Router.post("/logout", verifyToken, logoutUser);
 Router.post("/refresh", refreshAccessToken);
-Router.post("/register", registerFaculty);
 Router.post("/role", createRoles);
 Router.get("/test", verifyToken, (req, res) => {
   console.log(req.user);

@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       rollNo: {
         type: DataTypes.STRING,
+        primaryKey: true,
         allowNull: false,
         unique: true,
       },

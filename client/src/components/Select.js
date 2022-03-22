@@ -1,33 +1,45 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import { Select as MuiSelect } from "@mui/material";
 
-export default function Select() {
-  const [age, setAge] = React.useState("");
-
+const Select = props => {
+  const { value, setValue, label, items, ...restProps } = props;
   const handleChange = event => {
-    setAge(event.target.value);
+    console.log(event.target.value, value);
+
+    setValue(event.target.value);
   };
 
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Status</InputLabel>
+        {label ? (
+          <InputLabel id="demo-simple-select-label">{label}</InputLabel>
+        ) : null}
         <MuiSelect
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={age}
-          label="Age"
+          value={value}
+          label={label}
+          defaultValue={"None"}
           onChange={handleChange}
+          {...restProps}
         >
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
+          {items && items.length
+            ? items.map(item => (
+                <MenuItem
+                  key={item.id}
+                  value={item.value ? item.value : item.id}
+                >
+                  {item.text}
+                </MenuItem>
+              ))
+            : null}
         </MuiSelect>
       </FormControl>
     </Box>
   );
-}
+};
+export default Select;

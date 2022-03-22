@@ -1,9 +1,11 @@
-import { Box, Button, Card, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { BG } from "../utils/Theme";
+// import { BG } from "../utils/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../store/actions/auth";
+import Styles from "./auth.styles";
+import axios from "axios";
 
 const Login = () => {
   const history = useHistory();
@@ -11,51 +13,55 @@ const Login = () => {
   const accessToken = useSelector(state => state.auth.accessToken);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (accessToken) history.replace("/");
   }, [accessToken, history]);
 
-  const loginHandler = () => {
-    dispatch(loginUser(email, password));
-    history.replace("/");
+  const loginHandler = async () => {
+    setError(null);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        { email, password }
+      );
+      dispatch(loginUser(response.data));
+      console.log(response.data);
+
+      history.replace("/");
+    } catch (error) {
+      //  Generate an alert here.
+      console.log(error.response?.data?.message);
+      setError(error.response?.data?.message);
+    }
   };
 
   return (
-    <Box
-      style={{
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: BG,
-      }}
-    >
-      <Card
-        style={{
-          display: "flex",
-          padding: "1.5rem 1rem",
-          flexDirection: "column",
-          minWidth: "25.5rem",
-        }}
-      >
-        <Typography variant="h5" style={{ marginBottom: "3.25rem" }}>
+    <Box style={Styles.container}>
+      <Card style={Styles.card}>
+        <Typography variant="h5" style={Styles.heading}>
           Log In
         </Typography>
         <TextField
-          style={{ marginBottom: "1rem" }}
+          style={Styles.input}
           placeholder="Email"
           onChange={e => setEmail(e.target.value)}
         />
         <TextField
-          style={{ marginBottom: "1rem" }}
+          style={Styles.input}
           placeholder="Password"
           onChange={e => setPassword(e.target.value)}
         />
-        <Button size="large" variant="contained" onClick={loginHandler}>
+        <Button
+          size="large"
+          style={Styles.input}
+          variant="contained"
+          onClick={loginHandler}
+        >
           Log in
         </Button>
+        {error ? <Alert severity="error">{error}</Alert> : null}
       </Card>
     </Box>
   );

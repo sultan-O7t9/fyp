@@ -5,9 +5,12 @@ const {
   Role,
   Student,
   Token,
+  Group,
 } = require("../models");
 require("dotenv").config();
 const jwt_decode = require("jwt-decode");
+const sequelize = require("sequelize");
+const res = require("express/lib/response");
 
 const createAccessToken = user =>
   jwt.sign(user, process.env.JWT_SECRET, {
@@ -16,6 +19,8 @@ const createAccessToken = user =>
 
 const createRefreshToken = user =>
   jwt.sign(user, process.env.JWT_REFRESH_SECRET);
+
+const refreshTokens = [];
 
 module.exports.createRoles = async (req, res) => {
   try {
@@ -35,35 +40,9 @@ module.exports.createRoles = async (req, res) => {
   }
 };
 
-module.exports.registerFaculty = async (req, res) => {
-  const { email, password, name, department, roles } = req.body;
-  try {
-    const facultyMember = await FacultyMember.create({
-      email,
-      password,
-      name,
-      department,
-    });
-    await roles.forEach(async role => {
-      await Faculty_Role.create({
-        facultyId: facultyMember.id,
-        roleId: role,
-      });
-    });
-    res.json({
-      message: "Faculty Member registered successfully",
-      facultyMember,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error registering Faculty Member",
-      error,
-    });
-  }
-};
-
 module.exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body);
   try {
     const user = {};
     if (email.includes("@")) {
@@ -75,40 +54,70 @@ module.exports.loginUser = async (req, res) => {
       });
       if (facultyMember) {
         user.id = facultyMember.dataValues.id;
-        user.role = "faculty";
+        // user.role = ["PMO","SUPERVISOR","EVALUATOR"]
+        const userRoles = await Faculty_Role.findAll({
+          where: {
+            facultyId: facultyMember.id,
+          },
+        });
+        const roleNames = await Role.findAll({
+          where: {
+            id: {
+              [sequelize.Op.in]: userRoles.map(
+                userRole => userRole.dataValues.roleId
+              ),
+            },
+          },
+        });
+        user.role = roleNames.map(role => role.dataValues.title);
       } else {
-        throw new Error("Email or password is incorrect");
+        throw new Error("Invalid Email or Password");
+      }
+    } else if (email.includes("_")) {
+      const group = await Group.findOne({
+        where: {
+          name: email,
+          password: password,
+        },
+      });
+      if (group) {
+        user.id = group.dataValues.id;
+        user.role = "group";
+      } else {
+        throw new Error("Invalid Email or Password");
       }
     } else {
       const student = await Student.findOne({
         where: {
           rollNo: email,
           password: password,
+          groupId: null,
         },
+        attributes: ["name", "rollNo", "departmentId"],
       });
       if (student) {
-        console.log(student.dataValues.id);
-        user.id = student.dataValues.id;
-        user.role = "student";
+        console.log(student.dataValues);
+        user.id = student.dataValues.rollNo;
+        user.role = ["STUDENT"];
       } else {
-        throw new Error("Email or password is incorrect");
+        return res.status(400).json({ message: "Invalid Email or Password" });
       }
     }
+    console.log(user);
     const accessToken = createAccessToken(user);
     const refreshToken = createRefreshToken(user);
-    const existedToken = await Token.findOne({
-      where: {
-        userId: user.id,
-        userRole: user.role,
-      },
-    });
-    if (existedToken) await existedToken.destroy();
+    // const existedToken = await Token.findOne({
+    //   where: {
+    //     userId: user.id,
+    //     userRole: user.role,
+    //   },
+    // });
+    // if (existedToken) await existedToken.destroy();
     const token = await Token.create({
       refreshToken,
-      userId: user.id,
-      userRole: user.role,
     });
     console.log(user);
+    refreshTokens.push(refreshToken);
     res.status(200).json({
       login: true,
       accessToken,
@@ -116,7 +125,7 @@ module.exports.loginUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(400).json({
+    res.status(400).send({
       login: false,
       message: error.message,
     });
@@ -136,15 +145,19 @@ module.exports.refreshAccessToken = async (req, res) => {
       const refreshToken = await Token.findOne({
         where: {
           refreshToken: token,
-          userRole: role,
         },
       });
+      // const refreshToken = refreshTokens.find(
+      //   refreshToken => refreshToken === token
+      // );
       if (refreshToken) {
         jwt.verify(token, process.env.JWT_REFRESH_SECRET, async (err, user) => {
           err && console.log(err);
           try {
             const { iat, exp, ...userData } = user;
+            console.log(userData);
             await refreshToken.destroy();
+            // refreshTokens.filter(refreshToken => refreshToken !== token);
 
             const newAccessToken = jwt.sign(userData, process.env.JWT_SECRET, {
               expiresIn: "1m",
@@ -153,9 +166,8 @@ module.exports.refreshAccessToken = async (req, res) => {
 
             const newToken = await Token.create({
               refreshToken: newRefreshToken,
-              userId: userData.id,
-              userRole: userData.role,
             });
+            // refreshTokens.push(newRefreshToken);
             console.log("refreshed");
             res.status(200).json({
               accessToken: newAccessToken,
@@ -177,4 +189,24 @@ module.exports.refreshAccessToken = async (req, res) => {
   } else {
     return res.status(403).json({ message: "Invalid Refresh Token" });
   }
+};
+
+module.exports.logoutUser = async (req, res) => {
+  const { token } = req.body;
+  if (token) {
+    try {
+      const refreshToken = await Token.findOne({
+        where: {
+          refreshToken: token,
+        },
+      });
+      if (refreshToken) await refreshToken.destroy();
+    } catch (error) {
+      res.status(500).json({
+        message: "Error logging out",
+        error,
+      });
+    }
+  }
+  res.status(200).send({ logout: true });
 };

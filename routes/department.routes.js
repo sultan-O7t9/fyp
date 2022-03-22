@@ -1,8 +1,8 @@
-const { createStudent } = require("../controllers/student.controller");
+const { getAllDepartments } = require("../controllers/department.controller");
 const verifyToken = require("../utils/verifyToken");
 
 const Router = require("express").Router();
 
-Router.post("/create", verifyToken, createStudent);
+Router.get("/get-all", getAllDepartments);
 
 module.exports = Router;
