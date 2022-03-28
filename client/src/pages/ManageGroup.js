@@ -170,23 +170,31 @@ const ManageGroup = props => {
     setLeader(leader);
   };
 
-  const teamItems = students
-    .map(student => {
-      return {
-        id: student.rollNo,
-        value: student.rollNo,
-        text: student.rollNo,
-      };
-    })
-    .concat(
-      group.members.map(member => {
+  const teamItems = group.hasOwnProperty("id")
+    ? students
+        .map(student => {
+          return {
+            id: student.rollNo,
+            value: student.rollNo,
+            text: student.rollNo,
+          };
+        })
+        .concat(
+          group.members.map(member => {
+            return {
+              id: member.rollNo,
+              value: member.rollNo,
+              text: member.rollNo,
+            };
+          })
+        )
+    : students.map(student => {
         return {
-          id: member.rollNo,
-          value: member.rollNo,
-          text: member.rollNo,
+          id: student.rollNo,
+          value: student.rollNo,
+          text: student.rollNo,
         };
-      })
-    );
+      });
 
   const editGroupHandler = async () => {
     try {
