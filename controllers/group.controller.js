@@ -1,12 +1,205 @@
 require("dotenv").config();
 
-const { Group, Student, Department, FacultyMember } = require("../models");
+const {
+  Group,
+  Student,
+  Department,
+  FacultyMember,
+  Project,
+} = require("../models");
 const sequelize = require("sequelize");
 var crypto = require("crypto");
 const { sendMail } = require("../utils/sendMails");
 
-module.exports.createGroup = async (req, res) => {
+module.exports.getGroupByStudent = async (req, res) => {
+  const studentId = req.user.id;
   try {
+    const student = await Student.findOne({
+      where: {
+        rollNo: studentId,
+      },
+    });
+    const group = await Group.findOne({
+      where: {
+        id: student.dataValues.groupId,
+      },
+    });
+    res.json({
+      message: "Group fetched successfully",
+      group: {
+        id: group.dataValues.name,
+        members: group.dataValues.members,
+        // leader:group.dataValues.leader,
+        supervisor: group.dataValues.supervisorId,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Error getting group",
+      error: err,
+    });
+  }
+};
+
+module.exports.deleteGroup = async (req, res) => {
+  const groupId = req.params.id;
+  try {
+    const group = await Group.findOne({
+      where: {
+        name: groupId,
+      },
+    });
+    const students = await Student.findAll({
+      where: {
+        groupId: group.dataValues.id,
+      },
+    });
+    await Promise.all(
+      students.map(async student => {
+        await student.update({
+          groupId: null,
+          leader: false,
+        });
+      })
+    );
+
+    await Group.destroy({
+      where: {
+        name: groupId,
+      },
+    });
+    res.json({ delete: true, message: "Group deleted successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Error deleting group",
+      error: err,
+    });
+  }
+};
+
+module.exports.editGroup = async (req, res) => {
+  const { members, leader, supervisor, id } = req.body;
+  console.log(req.body);
+  // return res.status(200);
+  try {
+    const group = await Group.findOne({
+      where: {
+        name: id,
+      },
+    });
+    const students = await Student.findAll({
+      where: {
+        groupId: group.dataValues.id,
+      },
+    });
+    await Promise.all(
+      students.map(async student => {
+        await student.update({
+          groupId: null,
+          leader: false,
+        });
+      })
+    );
+
+    // students.forEach(async student => {
+    //   await student.update({
+    //     groupId: null,
+    //   });
+    // });
+
+    const currentSupervisor = await FacultyMember.findOne({
+      where: {
+        id: group.dataValues.supervisorId,
+      },
+    });
+
+    const newMembers = await Student.findAll({
+      where: {
+        rollNo: {
+          [sequelize.Op.in]: members,
+        },
+      },
+    });
+    await Promise.all(
+      newMembers.map(async member => {
+        await member.update({
+          groupId: group.dataValues.id,
+          leader: member.dataValues.rollNo === leader,
+        });
+        console.log(member.dataValues);
+      })
+    );
+
+    const groupLeader = newMembers.find(
+      member => member.dataValues.rollNo === leader
+    );
+    await groupLeader.update({
+      leader: true,
+    });
+
+    if (currentSupervisor.dataValues.id != req.body.supervisor) {
+      await currentSupervisor.update({
+        groupId: null,
+      });
+      const newSupervisor = await FacultyMember.findOne({
+        where: {
+          id: req.body.supervisor,
+        },
+      });
+      await group.update({
+        supervisorId: newSupervisor.dataValues.id,
+      });
+
+      // newMembers.forEach(async member => {
+      //   await member.update({
+      //     groupId: group.id,
+      //   });
+      // });
+      res.json({
+        message: "Group updated successfully",
+        group: {
+          id: group.dataValues.name,
+          members: newMembers.map(student => ({
+            rollNo: student.dataValues.rollNo,
+            name: student.dataValues.name,
+          })),
+          leader: leader,
+          supervisor: newSupervisor.dataValues.id,
+        },
+      });
+    } else {
+      res.json({
+        message: "Group updated successfully",
+        group: {
+          id: group.dataValues.name,
+          members: members,
+          leader: leader,
+          supervisor: supervisor,
+        },
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Error updating group",
+      error: err,
+    });
+  }
+};
+
+module.exports.createGroup = async (req, res) => {
+  const { id, role } = req.user;
+
+  try {
+    if (role.includes("STUDENT")) {
+      if (!req.body.members.includes(id)) {
+        return res.status(400).json({
+          message: "You are not part of the group",
+        });
+      }
+    }
     const members = await Student.findAll({
       where: {
         rollNo: {
@@ -66,11 +259,11 @@ module.exports.createGroup = async (req, res) => {
         })
       );
 
-      await members.map(async member => {
-        await member.update({
-          password: null,
-        });
-      });
+      // await members.map(async member => {
+      //   await member.update({
+      //     password: null,
+      //   });
+      // });
 
       //TODO:
       //Sign in as supervisor
@@ -80,6 +273,7 @@ module.exports.createGroup = async (req, res) => {
       //If reject set supervisorId to null and send email to students for choosing supervisor again.
 
       res.json({
+        register: true,
         message: "Group created successfully",
         group,
       });
@@ -135,7 +329,11 @@ module.exports.getAllGroupsOfADepartment = async (req, res) => {
           },
         });
         if (group.dataValues.projectId) {
-          const project = await group.getProject();
+          const project = await Project.findOne({
+            where: {
+              id: group.dataValues.projectId,
+            },
+          });
           group.dataValues.project = project.dataValues.title;
         } else {
           group.dataValues.project = null;

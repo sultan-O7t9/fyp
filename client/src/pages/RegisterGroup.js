@@ -4,6 +4,7 @@ import Select from "../components/Select";
 import MainAppbar from "../components/MainAppbar";
 import Styles from "./auth.styles";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 const RegisterGroup = () => {
   const [students, setStudents] = useState([]);
@@ -11,6 +12,7 @@ const RegisterGroup = () => {
   const [members, setMembers] = useState([]);
   const [leader, setLeader] = useState("");
   const [supervisor, setSupervisor] = useState("");
+  const history = useHistory();
 
   useEffect(() => {
     axios
@@ -56,12 +58,22 @@ const RegisterGroup = () => {
   });
 
   const registerGroupHandler = async () => {
-    const result = await axios.post("http://localhost:5000/api/group/create", {
-      members: members,
-      leader: leader,
-      supervisor: supervisor,
-    });
-    console.log(result);
+    try {
+      const result = await axios.post(
+        "http://localhost:5000/api/group/create",
+        {
+          members: members,
+          leader: leader,
+          supervisor: supervisor,
+        }
+      );
+      console.log(result);
+      if (result.data.register) {
+        history.replace("/register-project");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

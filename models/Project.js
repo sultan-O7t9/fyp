@@ -1,3 +1,13 @@
+const typeItems = ["research", "development"];
+const techItems = ["object oriented", "structured"];
+const platformItems = [
+  "web",
+  "distributed",
+  "desktop",
+  "setup configurations",
+  "other",
+];
+
 module.exports = (sequelize, DataTypes) => {
   const Project = sequelize.define(
     "Project",
@@ -12,6 +22,33 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      type: {
+        type: DataTypes.STRING,
+
+        // validate: {
+        //   isIn: {
+        //     args: [typeItems],
+        //     msg: "Invalid type",
+        //   },
+        // },
+      },
+      dev_tech: {
+        type: DataTypes.STRING,
+        // validate: {
+        //   isIn: {
+        //     args: [techItems],
+        //   },
+        // },
+      },
+      platform: {
+        type: DataTypes.STRING,
+        // validate: {
+        //   isIn: {
+        //     args: [platformItems],
+        //   },
+        // },
+      },
+
       status: {
         type: DataTypes.STRING,
         defaultValue: "accepted",

@@ -19,19 +19,29 @@ var crypto = require("crypto");
 
 module.exports.getStudents = async (req, res) => {
   const userId = req.user.id;
+
   console.log(req.user);
   try {
-    const user = await Student.findOne({
-      where: {
-        rollNo: userId,
-      },
-    });
+    let user;
+    if (typeof userId === "number") {
+      user = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+    } else {
+      user = await Student.findOne({
+        where: {
+          rollNo: userId,
+        },
+      });
+    }
     const students = await Student.findAll({
       where: {
         departmentId: user.dataValues.departmentId,
         groupId: null,
       },
-      attributes: ["name", "rollNo"],
+      attributes: ["name", "rollNo", "leader"],
     });
     res.json({
       message: "Students retrieved successfully",

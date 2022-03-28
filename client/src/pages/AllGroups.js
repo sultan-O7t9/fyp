@@ -1,5 +1,6 @@
 import {
   Backdrop,
+  Button,
   CircularProgress,
   List,
   ListItem,
@@ -17,6 +18,7 @@ import GroupsDataBody from "../components/GroupsDataBody";
 import GroupsDataHead from "../components/GroupsDataHead";
 import Link from "../components/Link";
 import Main from "../components/Main";
+import ManageGroup from "./ManageGroup";
 
 // const DATA = {
 //   heads: ["Group ID", "Members", "Project Title", "Supervisor"],
@@ -48,9 +50,11 @@ const AllGroups = () => {
     "Members",
     "Project Title",
     "Supervisor",
+    "",
   ]);
   const [body, setBody] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showManageGroup, setShowManageGroup] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -66,7 +70,11 @@ const AllGroups = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [showManageGroup]);
+
+  const editGroupHandler = group => {
+    setShowManageGroup(group ? group : true);
+  };
 
   if (isLoading)
     return (
@@ -80,6 +88,9 @@ const AllGroups = () => {
 
   return (
     <ContainerFluid>
+      {showManageGroup ? (
+        <ManageGroup group={showManageGroup} setDisplay={setShowManageGroup} />
+      ) : null}
       <Main styles={{ padding: "1.5rem" }}>
         <Box
           sx={{ marginBottom: "3rem" }}
@@ -90,7 +101,7 @@ const AllGroups = () => {
           <Box>
             <Typography variant="h3">Groups</Typography>
           </Box>
-          <Box>
+          <Box style={{ display: "flex", flexDirection: "column" }}>
             <ExportAsExcel
               label="Export Groups"
               data={[
@@ -103,11 +114,25 @@ const AllGroups = () => {
                 ]),
               ]}
             />
+            <Button
+              style={{ marginTop: ".5rem" }}
+              variant="contained"
+              color="primary"
+              onClick={() => editGroupHandler()}
+            >
+              Add Group
+            </Button>
           </Box>
         </Box>
         <DataTable
           DataHead={() => <GroupsDataHead heads={heads} />}
-          DataBody={() => <GroupsDataBody data={body} />}
+          DataBody={() => (
+            <GroupsDataBody
+              data={body}
+              setData={setBody}
+              editGroup={editGroupHandler}
+            />
+          )}
         />
       </Main>
     </ContainerFluid>

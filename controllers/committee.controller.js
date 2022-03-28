@@ -116,29 +116,53 @@ module.exports.createCommittee = async (req, res) => {
         title: "EVALUATOR",
       },
     });
-    members.forEach(async member => {
-      await Faculty_Role.create({
-        facultyId: member.dataValues.id,
-        roleId: evaluatorRole.dataValues.id,
-      });
-    });
+    await Promise.all(
+      members.map(async member => {
+        await Faculty_Role.create({
+          facultyId: member.dataValues.id,
+          roleId: evaluatorRole.dataValues.id,
+        });
+      })
+    );
 
-    groups.forEach(group => {
-      group.update({
-        committeeId: comittee.id,
-      });
-    });
-    students.forEach(student => {
-      student.update({
-        committeeId: comittee.id,
-      });
-    });
+    await Promise.all(
+      groups.map(async group => {
+        await group.update({
+          committeeId: comittee.dataValues.id,
+        });
+      })
+    );
 
-    members.forEach(member => {
-      member.update({
-        committeeId: comittee.id,
-      });
-    });
+    // groups.forEach(group => {
+    //   group.update({
+    //     committeeId: comittee.id,
+    //   });
+    // });
+    await Promise.all(
+      students.map(async student => {
+        await student.update({
+          committeeId: comittee.dataValues.id,
+        });
+      })
+    );
+    // students.forEach(student => {
+    //   student.update({
+    //     committeeId: comittee.id,
+    //   });
+    // });
+
+    await Promise.all(
+      members.map(async member => {
+        await member.update({
+          committeeId: comittee.dataValues.id,
+        });
+      })
+    );
+    // members.forEach(member => {
+    //   member.update({
+    //     committeeId: comittee.id,
+    //   });
+    // });
 
     res.json({
       message: "Committee created successfully",
@@ -167,11 +191,18 @@ module.exports.updateCommittee = async (req, res) => {
         committeeId: req.body.committeeId,
       },
     });
-    groups.forEach(async group => {
-      await group.update({
-        committeeId: null,
-      });
-    });
+    await Promise.all(
+      groups.map(async group => {
+        await group.update({
+          committeeId: null,
+        });
+      })
+    );
+    // groups.forEach(async group => {
+    //   await group.update({
+    //     committeeId: null,
+    //   });
+    // });
 
     // console.log(newGroups);
 
@@ -180,22 +211,38 @@ module.exports.updateCommittee = async (req, res) => {
         committeeId: req.body.committeeId,
       },
     });
-    students.forEach(async student => {
-      await student.update({
-        committeeId: null,
-      });
-    });
+    await Promise.all(
+      students.map(async student => {
+        await student.update({
+          committeeId: null,
+        });
+      })
+    );
+
+    // students.forEach(async student => {
+    //   await student.update({
+    //     committeeId: null,
+    //   });
+    // });
 
     const members = await FacultyMember.findAll({
       where: {
         committeeId: req.body.committeeId,
       },
     });
-    members.forEach(async member => {
-      await member.update({
-        committeeId: null,
-      });
-    });
+    await Promise.all(
+      members.map(async member => {
+        await member.update({
+          committeeId: null,
+        });
+      })
+    );
+
+    // members.forEach(async member => {
+    //   await member.update({
+    //     committeeId: null,
+    //   });
+    // });
     const evaluatorRole = await Role.findOne({
       where: {
         title: "EVALUATOR",
@@ -210,9 +257,15 @@ module.exports.updateCommittee = async (req, res) => {
         roleId: evaluatorRole.dataValues.id,
       },
     });
-    membersRole.forEach(async memberRole => {
-      await memberRole.destroy();
-    });
+    await Promise.all(
+      membersRole.map(async memberRole => {
+        await memberRole.destroy();
+      })
+    );
+
+    // membersRole.forEach(async memberRole => {
+    //   await memberRole.destroy();
+    // });
 
     const newMembers = await FacultyMember.findAll({
       where: {
@@ -221,17 +274,32 @@ module.exports.updateCommittee = async (req, res) => {
         },
       },
     });
-    newMembers.forEach(async member => {
-      await member.update({
-        committeeId: req.body.committeeId,
-      });
-    });
-    newMembers.forEach(async member => {
-      await Faculty_Role.create({
-        facultyId: member.dataValues.id,
-        roleId: evaluatorRole.dataValues.id,
-      });
-    });
+    await Promise.all(
+      newMembers.map(async newMember => {
+        await newMember.update({
+          committeeId: req.body.committeeId,
+        });
+      })
+    );
+    // newMembers.forEach(async member => {
+    //   await member.update({
+    //     committeeId: req.body.committeeId,
+    //   });
+    // });
+    await Promise.all(
+      newMembers.map(async newMember => {
+        await Faculty_Role.create({
+          facultyId: newMember.dataValues.id,
+          roleId: evaluatorRole.dataValues.id,
+        });
+      })
+    );
+    // newMembers.forEach(async member => {
+    //   await Faculty_Role.create({
+    //     facultyId: member.dataValues.id,
+    //     roleId: evaluatorRole.dataValues.id,
+    //   });
+    // });
 
     const newGroups = await Group.findAll({
       where: {
@@ -240,11 +308,18 @@ module.exports.updateCommittee = async (req, res) => {
         },
       },
     });
-    newGroups.forEach(async group => {
-      await group.update({
-        committeeId: req.body.committeeId,
-      });
-    });
+    await Promise.all(
+      newGroups.map(async newGroup => {
+        await newGroup.update({
+          committeeId: req.body.committeeId,
+        });
+      })
+    );
+    // newGroups.forEach(async group => {
+    //   await group.update({
+    //     committeeId: req.body.committeeId,
+    //   });
+    // });
     const newStudents = await Student.findAll({
       where: {
         groupId: {
@@ -252,11 +327,18 @@ module.exports.updateCommittee = async (req, res) => {
         },
       },
     });
-    newStudents.forEach(async student => {
-      await student.update({
-        committeeId: req.body.committeeId,
-      });
-    });
+    await Promise.all(
+      newStudents.map(async newStudent => {
+        await newStudent.update({
+          committeeId: req.body.committeeId,
+        });
+      })
+    );
+    // newStudents.forEach(async student => {
+    //   await student.update({
+    //     committeeId: req.body.committeeId,
+    //   });
+    // });
 
     res.json({
       message: "Committee updated successfully",
@@ -287,31 +369,53 @@ module.exports.deleteCommittee = async (req, res) => {
         committeeId: req.params.id,
       },
     });
-    groups.forEach(async group => {
-      await group.update({
-        committeeId: null,
-      });
-    });
+    await Promise.all(
+      groups.map(async group => {
+        await group.update({
+          committeeId: null,
+        });
+      })
+    );
+    // groups.forEach(async group => {
+    //   await group.update({
+    //     committeeId: null,
+    //   });
+    // });
     const students = await Student.findAll({
       where: {
         committeeId: req.params.id,
       },
     });
-    students.forEach(async student => {
-      await student.update({
-        committeeId: null,
-      });
-    });
+    await Promise.all(
+      students.map(async student => {
+        await student.update({
+          committeeId: null,
+        });
+      })
+    );
+
+    // students.forEach(async student => {
+    //   await student.update({
+    //     committeeId: null,
+    //   });
+    // });
     const members = await FacultyMember.findAll({
       where: {
         committeeId: req.params.id,
       },
     });
-    members.forEach(async member => {
-      await member.update({
-        committeeId: null,
-      });
-    });
+    await Promise.all(
+      members.map(async member => {
+        await member.update({
+          committeeId: null,
+        });
+      })
+    );
+    // members.forEach(async member => {
+    //   await member.update({
+    //     committeeId: null,
+    //   });
+    // });
     const evaluatorRole = await Role.findOne({
       where: {
         title: "EVALUATOR",
@@ -325,9 +429,15 @@ module.exports.deleteCommittee = async (req, res) => {
         roleId: evaluatorRole.dataValues.id,
       },
     });
-    membersRole.forEach(async memberRole => {
-      await memberRole.destroy();
-    });
+    await Promise.all(
+      membersRole.map(async memberRole => {
+        await memberRole.destroy();
+      })
+    );
+
+    // membersRole.forEach(async memberRole => {
+    //   await memberRole.destroy();
+    // });
     await committee.destroy();
     res.json({
       delete: true,

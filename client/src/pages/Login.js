@@ -27,7 +27,7 @@ const Login = () => {
         { email, password }
       );
       dispatch(loginUser(response.data));
-      console.log(response.data);
+      // console.log(response.data);
 
       history.replace("/");
     } catch (error) {

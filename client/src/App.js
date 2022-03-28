@@ -14,6 +14,7 @@ import GroupDetail from "./pages/GroupDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RegisterGroup from "./pages/RegisterGroup";
+import SubmitProjectTitle from "./pages/SubmitProjectTitle";
 import { logoutUser, readUser, refreshAuthToken } from "./store/actions/auth";
 
 const App = () => {
@@ -83,11 +84,18 @@ const App = () => {
       <Route exact path="/login" component={Login} />
       <Route exact path="/register" component={Register} />
       {roles && roles.includes("STUDENT") ? (
-        <ProtectedRoute
-          exact
-          path="/register-group"
-          component={RegisterGroup}
-        />
+        <>
+          <ProtectedRoute
+            exact
+            path="/register-group"
+            component={RegisterGroup}
+          />
+          <ProtectedRoute
+            exact
+            path="/register-project"
+            component={SubmitProjectTitle}
+          />
+        </>
       ) : null}
       <MainLayout>
         <ProtectedRoute exact path="/" component={Dashboard} />

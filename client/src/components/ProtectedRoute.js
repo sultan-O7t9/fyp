@@ -5,7 +5,6 @@ import { Redirect, Route } from "react-router-dom";
 function ProtectedRoute(props) {
   const { component: Component, ...restProps } = props;
   const accessToken = useSelector(state => state.auth.accessToken);
-  console.log("access", accessToken);
 
   return (
     <Route
