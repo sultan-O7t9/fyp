@@ -49,7 +49,7 @@ const Login = () => {
           onChange={e => setEmail(e.target.value)}
         />
         <TextField
-          style={Styles.input}
+          style={Styles.input} type="password"
           placeholder="Password"
           onChange={e => setPassword(e.target.value)}
         />
