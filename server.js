@@ -1,3 +1,15 @@
+// FIXME: create a new page, group details that show every info about a group, edit group and delete group butotn is shown there.🤔
+// if the role is authorized then he will be able to edit/del the group at that page, otherwise only show info at that page.😋
+// TODO: supervisor dashboard
+// show all deliverables just like pmo
+// when clicked on one show groups list in asc order of their submission
+// Supervisor clicks on one, dropdown menu of versions displays, supervior selects one, it gets downloaded.
+// supervisor changes the submission status to verified (dully signed stuff irl)
+// otherwise supervisor can change the status to revised
+// student uploads new version and so on.😵
+
+// After that Late submission mails and Evaluation stuff. 🤦🏻‍♂️
+
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
