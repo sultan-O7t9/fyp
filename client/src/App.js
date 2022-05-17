@@ -119,6 +119,39 @@ const App = () => {
           </>
         ) : null}
       </MainLayout>
+      <Route
+        path="/"
+        component={() => (
+          <div
+            style={{
+              display: "flex",
+              minHeight: "300px",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <h1
+              style={{
+                fontFamily: "sans-serif",
+                color: "purple",
+                fontSize: "4rem",
+              }}
+            >
+              Error 404
+            </h1>
+            <h3
+              style={{
+                fontFamily: "sans-serif",
+                color: "purple",
+                fontSize: "2.5rem",
+              }}
+            >
+              Page not found
+            </h3>
+          </div>
+        )}
+      />
     </Switch>
   );
 };

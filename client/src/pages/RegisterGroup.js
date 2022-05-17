@@ -69,7 +69,7 @@ const RegisterGroup = () => {
       );
       console.log(result);
       if (result.data.register) {
-        history.replace("/register-project");
+        history.push("/register-project");
       }
     } catch (err) {
       console.log(err);
@@ -119,6 +119,8 @@ const RegisterGroup = () => {
           <Button
             size="large"
             variant="contained"
+            disabled={!members.length || !supervisor || !leader}
+            s
             onClick={registerGroupHandler}
           >
             Submit

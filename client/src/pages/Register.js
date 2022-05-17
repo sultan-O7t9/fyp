@@ -73,11 +73,13 @@ const Register = () => {
         <TextField
           style={Styles.input}
           placeholder="@uog.edu.pk"
+          type="email"
           onChange={e => setEmail(e.target.value)}
         />
         <TextField
           style={Styles.input}
           placeholder="Password"
+          type="password"
           onChange={e => setPassword(e.target.value)}
         />
         <Select

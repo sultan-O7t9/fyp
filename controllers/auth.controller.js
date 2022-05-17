@@ -40,6 +40,30 @@ module.exports.createRoles = async (req, res) => {
   }
 };
 
+module.exports.assignRole = async (req, res) => {
+  const { facultyId, roleId } = req.body;
+  try {
+    const pmoRole = await Role.findOne({
+      where: {
+        title: "PMO",
+      },
+    });
+    const role = await Faculty_Role.create({
+      facultyId,
+      roleId,
+    });
+    res.json({
+      message: "Role assigned successfully",
+      role,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error assigning role",
+      error,
+    });
+  }
+};
+
 module.exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
