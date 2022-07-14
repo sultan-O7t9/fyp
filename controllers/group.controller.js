@@ -6,6 +6,7 @@ const {
   Department,
   FacultyMember,
   Project,
+  Admin,
 } = require("../models");
 const sequelize = require("sequelize");
 var crypto = require("crypto");
@@ -309,7 +310,42 @@ class GroupController {
     }
   };
 
-  static getAllGroupsOfADepartment = async (req, res) => {
+  static getGroupsByDepartment = async (req, res) => {
+    const { id, deptId } = req.body;
+    console.log(req.body);
+
+    try {
+      const admin = await Admin.findOne({
+        where: {
+          id,
+        },
+      });
+      console.log(admin);
+      if (admin) {
+        const groups = await Group.findAll({
+          where: {
+            departmentId: deptId,
+          },
+        });
+        res.json({
+          message: "Groups fetched successfully",
+          groups,
+        });
+      } else {
+        res.status(400).json({
+          message: "You are not an admin",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting groups",
+        error,
+      });
+    }
+  };
+
+  static getAllGroupsByFacultyDepartment = async (req, res) => {
     const userId = req.user.id;
     try {
       const facultyMember = await FacultyMember.findOne({

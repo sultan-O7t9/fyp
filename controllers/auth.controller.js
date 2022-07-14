@@ -6,6 +6,7 @@ const {
   Student,
   Token,
   Group,
+  Admin,
 } = require("../models");
 require("dotenv").config();
 const jwt_decode = require("jwt-decode");
@@ -59,6 +60,45 @@ module.exports.assignRole = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error assigning role",
+      error,
+    });
+  }
+};
+
+module.exports.adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+  console.log("BODY", req.body);
+
+  try {
+    const admin = await Admin.findOne({
+      where: {
+        email: email,
+        password: password,
+      },
+    });
+    console.log(admin);
+    if (admin) {
+      const user = { id: admin.id, role: "HOD" };
+      const accessToken = createAccessToken(user);
+      const refreshToken = createRefreshToken(user);
+      const token = await Token.create({
+        refreshToken,
+      });
+      console.log(refreshToken, accessToken);
+      refreshTokens.push(refreshToken);
+
+      res.status(200).json({
+        login: true,
+        accessToken,
+        refreshToken,
+      });
+    } else {
+      throw new Error("Invalid Email or Password");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error logging in",
       error,
     });
   }

@@ -28,6 +28,7 @@ app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/student", require("./routes/student.routes"));
 app.use("/api/group", require("./routes/group.routes"));
 app.use("/api/dept", require("./routes/department.routes"));
+app.use("/api/role", require("./routes/role.routes"));
 app.use("/api/committee", require("./routes/committee.routes"));
 app.use("/api/project", require("./routes/project.routes"));
 

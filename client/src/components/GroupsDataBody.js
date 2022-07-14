@@ -1,11 +1,20 @@
-import { IconButton, List, ListItem, TableCell, TableRow } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  TableCell,
+  TableRow,
+} from "@mui/material";
 import axios from "axios";
 import React from "react";
 import Link from "./Link";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { useHistory } from "react-router-dom";
 
 const GroupsDataBody = ({ data, setData, editGroup }) => {
+  const history = useHistory();
   const deleteGroup = async id => {
     const response = await axios.delete(
       `http://localhost:5000/api/group/delete/${id}`
@@ -57,6 +66,15 @@ const GroupsDataBody = ({ data, setData, editGroup }) => {
           >
             <DeleteIcon />
           </IconButton>
+        </TableCell>
+        <TableCell align="right">
+          <Button
+            onClick={() => {
+              history.push("/groups/" + row.id.split("_")[2]);
+            }}
+          >
+            Show Details
+          </Button>
         </TableCell>
       </TableRow>
     ))

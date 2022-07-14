@@ -30,6 +30,7 @@ const Batch = require("./Batch")(sequelize, DataTypes);
 const Token = require("./Token")(sequelize, DataTypes);
 const Project = require("./Project")(sequelize, DataTypes);
 const Committee = require("./Committee")(sequelize, DataTypes);
+const Admin = require("./Admin")(sequelize, DataTypes);
 // const PMO= require("./PMO")(sequelize, DataTypes);
 
 // //Associate the model with other models
@@ -117,6 +118,7 @@ module.exports = {
   sequelize,
   Sequelize,
   FacultyMember,
+  Admin,
   Role,
   Faculty_Role,
   Group,
