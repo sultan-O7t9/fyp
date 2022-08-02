@@ -1,14 +1,27 @@
-import { List, ListItem, TableCell, TableRow, Typography } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Button,
+  List,
+  ListItem,
+  TableCell,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
 import Link from "../components/Link";
 import Main from "../components/Main";
 import MenuButton from "../components/MenuButton";
+import { useHistory } from "react-router-dom";
 
 const DataHead = () => null;
 
 const DataBody = () => {
+  const role = localStorage.getItem("USER_ROLE");
+  const history = useHistory();
+  const [modal, setModal] = useState(false);
   return (
     <>
       <TableRow>
@@ -76,6 +89,17 @@ const DataBody = () => {
         <TableCell>
           <MenuButton />
         </TableCell>
+        {role === "SUPERVISOR" || role == "EVALUATOR" ? (
+          <TableCell>
+            <Button
+              onClick={() => {
+                history.push("/groups/proposal/12");
+              }}
+            >
+              Show Details
+            </Button>
+          </TableCell>
+        ) : null}
       </TableRow>
       <TableRow>
         <TableCell>
@@ -84,6 +108,17 @@ const DataBody = () => {
         <TableCell>
           <MenuButton />
         </TableCell>
+        {role === "SUPERVISOR" || role == "EVALUATOR" ? (
+          <TableCell>
+            <Button
+              onClick={() => {
+                history.push("/groups/proposal/12");
+              }}
+            >
+              Show Details
+            </Button>
+          </TableCell>
+        ) : null}
       </TableRow>
       <TableRow>
         <TableCell>
@@ -91,6 +126,53 @@ const DataBody = () => {
         </TableCell>
         <TableCell>
           <MenuButton />
+        </TableCell>
+        {role === "SUPERVISOR" || role == "EVALUATOR" ? (
+          <TableCell>
+            <Button
+              onClick={() => {
+                history.push("/groups/proposal/12");
+              }}
+            >
+              Show Details
+            </Button>
+          </TableCell>
+        ) : null}
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Typography variant="h6">
+            7th Semester Marks (Sub-section total: 20)
+          </Typography>
+          <Typography>Meetings, project progress</Typography>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <TextField type="password" placeholder="Marks" />
+        </TableCell>
+        <TableCell>
+          <Button variant="contained" color="primary">
+            Save{" "}
+          </Button>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Typography variant="h6">
+            8th Semester Marks (Sub-section total: 20)
+          </Typography>
+          <Typography>Meetings, project progress</Typography>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <TextField placeholder="Marks" />
+        </TableCell>
+        <TableCell>
+          <Button variant="contained" color="primary">
+            Save{" "}
+          </Button>
         </TableCell>
       </TableRow>
     </>

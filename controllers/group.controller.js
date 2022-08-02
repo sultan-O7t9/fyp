@@ -1,5 +1,9 @@
 require("dotenv").config();
 
+const fs = require("fs");
+const { promisify } = require("util");
+const pipeline = promisify(require("stream").pipeline);
+
 const {
   Group,
   Student,
@@ -366,6 +370,11 @@ class GroupController {
               id: group.dataValues.supervisorId,
             },
           });
+          const department = await Department.findOne({
+            where: {
+              id: group.dataValues.departmentId,
+            },
+          });
           if (group.dataValues.projectId) {
             const project = await Project.findOne({
               where: {
@@ -386,12 +395,76 @@ class GroupController {
               leader: member.dataValues.leader,
             };
           });
+
           return {
             id: group.dataValues.name,
             committeeId: group.dataValues.committeeId,
             project: group.dataValues.project,
             members: group.dataValues.members,
             supervisor: supervisor.dataValues.name,
+            bookletsStatus: group.dataValues.bookletsStatus,
+            department: department.dataValues.name,
+          };
+        })
+      );
+
+      res.json({
+        message: "Groups fetched successfully",
+        groups: detailedGroups,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting groups",
+        error,
+      });
+    }
+  };
+
+  static getAllGroups = async (req, res) => {
+    try {
+      const groups = await Group.findAll();
+      const detailedGroups = await Promise.all(
+        groups.map(async group => {
+          const supervisor = await FacultyMember.findOne({
+            where: {
+              id: group.dataValues.supervisorId,
+            },
+          });
+          const department = await Department.findOne({
+            where: {
+              id: group.dataValues.departmentId,
+            },
+          });
+          if (group.dataValues.projectId) {
+            const project = await Project.findOne({
+              where: {
+                id: group.dataValues.projectId,
+              },
+            });
+            group.dataValues.project = project.dataValues.title;
+          } else {
+            group.dataValues.project = null;
+          }
+          //Get members
+          const members = await group.getStudents();
+          group.dataValues.members = members.map(member => {
+            return {
+              rollNo: member.dataValues.rollNo,
+              name: member.dataValues.name,
+              email: member.dataValues.email,
+              leader: member.dataValues.leader,
+            };
+          });
+
+          return {
+            id: group.dataValues.name,
+            committeeId: group.dataValues.committeeId,
+            project: group.dataValues.project,
+            members: group.dataValues.members,
+            supervisor: supervisor.dataValues.name,
+            bookletsStatus: group.dataValues.bookletsStatus,
+            department: department.dataValues.name,
           };
         })
       );
@@ -410,6 +483,49 @@ class GroupController {
   };
 
   static approveGroupRequest = async (req, res) => {};
+
+  static uploadFile = async (req, res) => {
+    const { file } = req;
+    try {
+      console.log(file);
+      if (file.detectedFileExtension != ".pdf") new Error("Invalid file type");
+      const fileName = `123.pdf`;
+      // await pipeline(
+      //   file.buffer,
+      //   fs.createWriteStream(`${__dirname}/../uploads/${fileName}`)
+      // );
+      const filePath = `${__dirname}/../uploads/${fileName}`;
+      fs.writeFileSync(filePath, file.buffer, err => {
+        if (err) throw err;
+      });
+
+      res.json({
+        message: "File uploaded successfully as " + fileName,
+        upload: true,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error uploading file",
+        error,
+        upload: false,
+      });
+    }
+  };
+  static downloadFile = async (req, res) => {
+    const fileName = req.body.name;
+    try {
+      const filePath = `${__dirname}/../uploads/${fileName}`;
+      res.download(filePath);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error downloading file",
+        error,
+        download: false,
+      });
+    }
+  };
 }
 
 module.exports = GroupController;

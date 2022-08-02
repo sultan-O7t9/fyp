@@ -45,16 +45,23 @@ import ManageGroup from "./ManageGroup";
 // };
 
 const AllGroups = () => {
+  const isPMO = localStorage.getItem("USER_ROLE") === "PMO";
   const [heads, setHeads] = useState([
     "Group ID",
     "Members",
     "Project Title",
     "Supervisor",
+    "Booklets Status",
     "",
   ]);
+
   const [body, setBody] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showManageGroup, setShowManageGroup] = useState(false);
+  useEffect(() => {
+    if (!isPMO)
+      setHeads(["Group ID", "Members", "Project Title", "Booklets Status", ""]);
+  }, [isPMO]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -128,6 +135,7 @@ const AllGroups = () => {
           DataHead={() => <GroupsDataHead heads={heads} />}
           DataBody={() => (
             <GroupsDataBody
+              isPMO={isPMO}
               data={body}
               setData={setBody}
               editGroup={editGroupHandler}

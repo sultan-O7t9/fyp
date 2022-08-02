@@ -4,17 +4,29 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UploadFile from "./components/UploadFile";
 import MainLayout from "./layouts/MainLayout";
+import AdminAllGroups from "./pages/AdminAllGroups";
+import AdminLogin from "./pages/AdminLogin";
+import AdminManageDept from "./pages/AdminManageDept";
+import AdminManageFaculty from "./pages/AdminManageFaculty";
 import AllCommittees from "./pages/AllCommittees";
 import AllGroups from "./pages/AllGroups";
 import AllStudents from "./pages/AllStudents";
+import D2SubmissionPage from "./pages/D2SubmissionPage";
+import D3SubmissionPage from "./pages/D3SubmissionPage";
 import Dashboard from "./pages/Dashboard";
 import DeliverableDetail from "./pages/DeliverableDetail";
+import GroupDashboard from "./pages/GroupDashboard";
 import GroupDetail from "./pages/GroupDetail";
 import Login from "./pages/Login";
+import ProposalSubmissionPage from "./pages/ProposalSubmissionPage";
 import Register from "./pages/Register";
 import RegisterGroup from "./pages/RegisterGroup";
 import SubmitProjectTitle from "./pages/SubmitProjectTitle";
+import SupervisorDocumentation from "./pages/SupervisorDocumentation";
+import SupervisorFinalDeliverable from "./pages/SupervisorFinalDeliverable";
+import SupervisorProposal from "./pages/SupervisorProposal";
 import { logoutUser, readUser, refreshAuthToken } from "./store/actions/auth";
 
 const App = () => {
@@ -72,7 +84,10 @@ const App = () => {
   useEffect(() => {
     if (token) {
       const data = jwt_decode(token);
+      console.log(data);
+      localStorage.setItem("USER_ID", data.id);
       if (data.hasOwnProperty("role")) {
+        localStorage.setItem("USER_ROLE", data.role);
         setRoles(data.role);
       }
     }
@@ -81,44 +96,66 @@ const App = () => {
   return (
     <Switch>
       {/* <Route exact path="/committees" component={AllCommittees} /> */}
+      <Route exact path="/file" component={UploadFile} />
       <Route exact path="/login" component={Login} />
+      <Route exact path="/admin" component={AdminLogin} />
       <Route exact path="/register" component={Register} />
-      {roles && roles.includes("STUDENT") ? (
-        <>
-          <ProtectedRoute
-            exact
-            path="/register-group"
-            component={RegisterGroup}
-          />
-          <ProtectedRoute
-            exact
-            path="/register-project"
-            component={SubmitProjectTitle}
-          />
-        </>
-      ) : null}
       <MainLayout>
-        <ProtectedRoute exact path="/" component={Dashboard} />
-        {(roles && roles.includes("PMO")) ||
-        (roles && roles.includes("SUPERVISOR")) ||
-        (roles && roles.includes("EVALUATOR")) ? (
-          <>
-            <ProtectedRoute exact path="/groups" component={AllGroups} />
-            <ProtectedRoute exact path="/groups/:id" component={GroupDetail} />
-            <ProtectedRoute exact path="/students" component={AllStudents} />
-            <ProtectedRoute
-              exact
-              path="/committees"
-              component={AllCommittees}
-            />
-            <ProtectedRoute
-              exact
-              path="/deliverable/:id"
-              component={DeliverableDetail}
-            />
-          </>
-        ) : null}
+        <Route exact path="/admin/faculty" component={AdminManageFaculty} />
+        <Route exact path="/admin/dept" component={AdminManageDept} />
+        <Route exact path="/admin/groups" component={AdminAllGroups} />
+        <Route exact path="/main/student" component={GroupDashboard} />
+        <Route exact path="/main/proposal" component={ProposalSubmissionPage} />
+        <Route exact path="/main/d2" component={D2SubmissionPage} />
+        <Route exact path="/main/d3" component={D3SubmissionPage} />
+        <Route exact path="/groups" component={AllGroups} />
+        <Route exact path="/groups/:id" component={GroupDetail} />
+        <Route
+          exact
+          path="/groups/proposal/:id"
+          component={SupervisorProposal}
+        />
+        <Route
+          exact
+          path="/groups/d2/:id"
+          component={SupervisorDocumentation}
+        />
+        <Route
+          exact
+          path="/groups/d3/:id"
+          component={SupervisorFinalDeliverable}
+        />
       </MainLayout>
+      {/* {roles && roles.includes("STUDENT") ? ( */}
+      {/* <> */}
+      <ProtectedRoute exact path="/register-group" component={RegisterGroup} />
+      <ProtectedRoute
+        exact
+        path="/register-project"
+        component={SubmitProjectTitle}
+      />
+      {/* </>
+      ) : null} */}
+      {/* <MainLayout> */}
+      <ProtectedRoute exact path="/" component={Dashboard} />
+      {/* {
+          // (roles && roles.includes("PMO")) ||
+          // (roles && roles.includes("SUPERVISOR")) ||
+          // (roles && roles.includes("EVALUATOR")) ||
+          true ? (
+            <> */}
+
+      <Route exact path="/students" component={AllStudents} />
+      <ProtectedRoute exact path="/committees" component={AllCommittees} />
+      <ProtectedRoute
+        exact
+        path="/deliverable/:id"
+        component={DeliverableDetail}
+      />
+      {/* </>
+          ) : null
+        } */}
+      {/* </MainLayout> */}
       <Route
         path="/"
         component={() => (

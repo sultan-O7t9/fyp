@@ -1,12 +1,27 @@
-const { Department, Admin } = require("../models");
+const { Department, Admin, FacultyMember } = require("../models");
 
 class DepratmentController {
   static getAllDepartments = async (req, res) => {
     try {
       const departments = await Department.findAll();
+
+      const detailedDepartments = await Promise.all(
+        departments.map(async department => {
+          const pmo = await FacultyMember.findOne({
+            where: {
+              pmoOfDepartmentId: department.id,
+            },
+          });
+          return {
+            ...department.dataValues,
+            pmo: pmo.dataValues.name,
+            pmoId: pmo.dataValues.id,
+          };
+        })
+      );
       res.json({
         message: "Departments fetched successfully",
-        departments,
+        departments: detailedDepartments,
       });
     } catch (error) {
       console.log(error);

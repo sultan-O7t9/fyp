@@ -3,6 +3,7 @@ import {
   IconButton,
   List,
   ListItem,
+  Switch,
   TableCell,
   TableRow,
 } from "@mui/material";
@@ -13,7 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useHistory } from "react-router-dom";
 
-const GroupsDataBody = ({ data, setData, editGroup }) => {
+const GroupsDataBody = ({ data, setData, editGroup, isPMO }) => {
   const history = useHistory();
   const deleteGroup = async id => {
     const response = await axios.delete(
@@ -45,28 +46,45 @@ const GroupsDataBody = ({ data, setData, editGroup }) => {
           </List>
         </TableCell>
         <TableCell>{row.project ? row.project : "None"}</TableCell>
-        <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell>
-        <TableCell align="right">
-          <IconButton
-            onClick={() => {
-              editGroup(row);
-            }}
-            color="primary"
-            variant="outlined"
-          >
-            <EditIcon />
-          </IconButton>
+        {isPMO ? (
+          <>
+            <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell>
+            <TableCell>
+              <Switch />
+            </TableCell>
+            <TableCell align="right">
+              <IconButton
+                onClick={() => {
+                  editGroup(row);
+                }}
+                color="primary"
+                variant="outlined"
+              >
+                <EditIcon />
+              </IconButton>
 
-          <IconButton
-            onClick={() => {
-              deleteGroup(row.id);
-            }}
-            color="error"
-            variant="outlined"
-          >
-            <DeleteIcon />
-          </IconButton>
-        </TableCell>
+              <IconButton
+                onClick={() => {
+                  deleteGroup(row.id);
+                }}
+                color="error"
+                variant="outlined"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </TableCell>
+          </>
+        ) : (
+          <TableCell>
+            <p
+              style={{
+                color: row.bookletsStatus === "Approved" ? "green" : "red",
+              }}
+            >
+              {row.bookletsStatus}
+            </p>
+          </TableCell>
+        )}
         <TableCell align="right">
           <Button
             onClick={() => {

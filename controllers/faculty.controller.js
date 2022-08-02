@@ -71,22 +71,29 @@ class FacultyController {
   static assignPMO = async (req, res) => {
     const { id, facultyId, deptId } = req.body;
     try {
-      const admin = await Admin.findOne({
-        where: {
-          id: id,
-        },
-      });
-      console.log(admin);
-      if (admin) {
-        if (id != admin.id) {
-          throw new Error("Invalid Admin Id");
-        }
+      // const admin = await Admin.findOne({
+      //   where: {
+      //     id: id,
+      //   },
+      // });
+      // console.log(admin);
+      // if (admin) {
+      if (true) {
+        // if (id != admin.id) {
+        //   throw new Error("Invalid Admin Id");
+        // }
         const faculty = await FacultyMember.findOne({
           where: {
             id: facultyId,
           },
         });
         console.log(faculty);
+        const havePMO = await FacultyMember.findOne({
+          where: {
+            pmoOfDepartmentId: deptId,
+          },
+        });
+
         const dept = await Department.findOne({
           where: {
             id: deptId,
@@ -94,14 +101,27 @@ class FacultyController {
         });
         if (!dept) throw new Error("Invalid Department Id");
         if (faculty) {
-          faculty.update({
-            pmoOfDepartmentId: dept.id,
-          });
           const pmoRole = await Role.findOne({
             where: {
               title: "PMO",
             },
           });
+          if (havePMO) {
+            await havePMO.update({
+              pmoOfDepartmentId: null,
+            });
+            const preRole = await Faculty_Role.findOne({
+              where: {
+                facultyId: havePMO.id,
+                roleId: pmoRole.id,
+              },
+            });
+            await preRole.destroy();
+          }
+          await faculty.update({
+            pmoOfDepartmentId: dept.id,
+          });
+
           const facultyRole = await Faculty_Role.create({
             facultyId: faculty.id,
             roleId: pmoRole.id,
@@ -109,6 +129,7 @@ class FacultyController {
 
           res.json({
             message: "PMO assigned successfully",
+            assign: true,
             faculty,
           });
         } else {
@@ -193,18 +214,23 @@ class FacultyController {
   //       });
   // }
   static removeFaculty = async (req, res) => {
-    const { id, facultyId } = req.body;
+    const facultyId = req.params.id;
+
+    console.log(facultyId);
 
     try {
-      const admin = await Admin.findOne({
-        where: {
-          id: id,
-        },
-      });
-      if (admin) {
-        if (id != admin.id) {
-          throw new Error("Invalid Admin Id");
-        }
+      // const admin = await Admin.findOne({
+      //   where: {
+      //     id: id,
+      //   },
+      // });
+
+      // if (admin)
+
+      if (true) {
+        // if (id != admin.id) {
+        //   throw new Error("Invalid Admin Id");
+        // }
         const faculty = await FacultyMember.findOne({
           where: {
             id: facultyId,
@@ -255,34 +281,41 @@ class FacultyController {
       res.status(500).json({
         message: "Error getting Faculties",
         error,
+        delete: false,
       });
     }
   };
   static registerFaculty = async (req, res) => {
-    const { email, password, name, departmentId, roles, role, id } = req.body;
+    const { email, password, name, department, roles, role, id, departmentId } =
+      req.body;
 
+    console.log(req.body);
     try {
-      const admin = await Admin.findOne({
-        where: {
-          id: id,
-        },
-      });
-      if (admin) {
-        if (id != admin.id) {
-          throw new Error("Invalid Admin Id");
-        }
+      // const admin = await Admin.findOne({
+      //   where: {
+      //     id: id,
+      //   },
+      // });
+      // if (admin)
+      if (true) {
+        // if (id != admin.id) {
+        //   throw new Error("Invalid Admin Id");
+        // }
 
         const defaultRole = await Role.findOne({
           where: {
             title: "SUPERVISOR",
           },
         });
+        console.log(defaultRole.dataValues);
         // const tempRoles = facultyRoles.map(role => role.dataValues.title);
         const dept = await Department.findOne({
           where: {
             id: departmentId,
           },
         });
+        console.log("On DEPT");
+        console.log("DEPT", dept.dataValues);
         if (!dept) throw new Error("Invalid Department Id");
         const facultyMember = await FacultyMember.create({
           email,
@@ -337,8 +370,19 @@ class FacultyController {
             ),
           },
         },
-        attributes: ["id", "name", "email", "committeeId"],
+        attributes: ["id", "name", "email", "committeeId", "departmentId"],
       });
+      await Promise.all(
+        supervisors.map(async supervisor => {
+          const department = await Department.findOne({
+            where: {
+              id: supervisor.dataValues.departmentId,
+            },
+          });
+          supervisor.dataValues.department = department.dataValues.name;
+          return supervisor;
+        })
+      );
       res.json({
         message: "Supervisors retrieved successfully",
         supervisors,
@@ -347,6 +391,63 @@ class FacultyController {
       console.log(err);
       res.status(500).json({
         message: "Error getting supervisors",
+        error: err,
+      });
+    }
+  };
+
+  static getAllSupervisorsList = async (req, res) => {
+    // res.send(req.body);
+    try {
+      const faculty = await FacultyMember.findAll({
+        where: {
+          pmoOfDepartmentId: null,
+        },
+      });
+      res.json({
+        message: "Supervisors retrieved successfully",
+        faculty,
+        fetched: true,
+      });
+    } catch (error) {
+      res.json({
+        error: error,
+        fetched: false,
+        message: "Unable to fetch supervisors",
+      });
+    }
+  };
+
+  static updateFaculty = async (req, res) => {
+    const { id, name, email, password, departmentId, committeeId } = req.body;
+    try {
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: id,
+        },
+      });
+      if (faculty) {
+        await faculty.update({
+          name: name ? name : faculty.dataValues.name,
+          password: password ? password : faculty.dataValues.password,
+          departmentId: departmentId
+            ? departmentId
+            : faculty.dataValues.departmentId,
+          committeeId: committeeId
+            ? committeeId
+            : faculty.dataValues.committeeId,
+        });
+        res.json({
+          message: "Faculty updated successfully",
+          faculty,
+        });
+      } else {
+        throw new Error("Invalid Faculty Id");
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error updating faculty",
         error: err,
       });
     }

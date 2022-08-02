@@ -16,13 +16,13 @@ const Deliverables = [
   },
   {
     id: 2,
-    title: "Project Proposal",
+    title: "Documentation and 30% Code",
     description: "Project Idea & Proposal",
     percentage: "4 out of 10",
   },
   {
     id: 3,
-    title: "Project Proposal",
+    title: "Working System",
     description: "Project Idea & Proposal",
     percentage: "4 out of 10",
   },
