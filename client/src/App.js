@@ -125,6 +125,8 @@ const App = () => {
           path="/groups/d3/:id"
           component={SupervisorFinalDeliverable}
         />
+        <Route exact path="/" component={Dashboard} />
+        <Route exact path="/deliverable/:id" component={DeliverableDetail} />
       </MainLayout>
       {/* {roles && roles.includes("STUDENT") ? ( */}
       {/* <> */}
@@ -137,7 +139,7 @@ const App = () => {
       {/* </>
       ) : null} */}
       {/* <MainLayout> */}
-      <ProtectedRoute exact path="/" component={Dashboard} />
+      {/* <ProtectedRoute exact path="/" component={Dashboard} /> */}
       {/* {
           // (roles && roles.includes("PMO")) ||
           // (roles && roles.includes("SUPERVISOR")) ||
@@ -146,12 +148,13 @@ const App = () => {
             <> */}
 
       <Route exact path="/students" component={AllStudents} />
-      <ProtectedRoute exact path="/committees" component={AllCommittees} />
-      <ProtectedRoute
+      {/* <ProtectedRoute exact path="/committees" component={AllCommittees} /> */}
+      <Route exact path="/committees" component={AllCommittees} />
+      {/* <ProtectedRoute
         exact
         path="/deliverable/:id"
         component={DeliverableDetail}
-      />
+      /> */}
       {/* </>
           ) : null
         } */}

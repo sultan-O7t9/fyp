@@ -29,10 +29,10 @@ const AdminLogin = () => {
           password,
         }
       );
-      dispatch(loginUser(response.data));
+      // dispatch(loginUser(response.data));
       // console.log(response.data);
 
-      history.replace("/");
+      history.replace("/admin/faculty");
     } catch (error) {
       //  Generate an alert here.
       console.log(error.response?.data?.message);

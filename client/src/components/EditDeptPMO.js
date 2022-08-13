@@ -85,7 +85,7 @@ const EditDeptPMO = props => {
   useEffect(() => {
     // setDeptPMO(pmo);
     axios
-      .get(`http://localhost:5000/api/faculty/get-supervisors`, {
+      .get(`http://localhost:5000/api/faculty/get-supervisors-only`, {
         name: dept.name,
       })
       .then(res => {

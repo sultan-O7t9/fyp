@@ -4,5 +4,5 @@ const Project = require("../controllers/project.controller");
 const Router = require("express").Router();
 
 Router.post("/create", verifyToken, Project.createProject);
-
+// Router.post("/")
 module.exports = Router;

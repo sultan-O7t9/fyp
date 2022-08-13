@@ -6,6 +6,8 @@ import DataTable from "../components/DataTable";
 import Main from "../components/Main";
 import MenuButton from "../components/MenuButton";
 import Select from "../components/Select";
+import UploadFile from "../components/UploadFile";
+import axios from "axios";
 
 const DATA = {
   heads: [
@@ -79,48 +81,106 @@ const DataBody = () => {
 };
 
 const DeliverableDetail = () => {
+  const [file, setFile] = useState({});
+  const [name, setName] = useState("");
+  const [showUploadModal, setShowUploadModal] = useState(false);
+
+  const handleSubmitFile = async e => {
+    e.preventDefault();
+    const data = new FormData();
+    data.append("file", file);
+    data.append("deliverableId", 1);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/deliverable/template-file",
+        data
+      );
+      console.log(res.data);
+      if (res.data.upload) setShowUploadModal(false);
+      setName(res.data.file);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // const handleDownloadFile = async e => {
+  //   e.preventDefault();
+  //   try {
+  //     const res = await axios.post(
+  //       "http://localhost:5000/api/group/download-file/",
+  //       { name: name }
+  //     );
+  //     console.log(res.data);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  const uploadTemplateFile = () => {
+    console.log("Uploading template file");
+    setShowUploadModal(true);
+  };
+
   return (
-    <ContainerFluid title="Deliverable 1">
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h3">Project Proposal</Typography>
-            <Typography variant="subtitle1">Project Idea & Proposal</Typography>
+    <>
+      {showUploadModal ? (
+        <UploadFile
+          setFile={setFile}
+          file={file}
+          handleSubmitFile={handleSubmitFile}
+          setDisplay={setShowUploadModal}
+        />
+      ) : null}
+
+      <ContainerFluid title="Deliverable 1">
+        <Main styles={{ padding: "1.5rem" }}>
+          <Box
+            sx={{ marginBottom: "3rem" }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h3">Project Proposal</Typography>
+              <Typography variant="subtitle1">
+                Project Idea & Proposal
+              </Typography>
+            </Box>
+            <Box>
+              <Button variant="contained" color="primary">
+                Settings
+              </Button>
+            </Box>
           </Box>
-          <Box>
-            <Button variant="contained" color="primary">
-              Settings
-            </Button>
-          </Box>
-        </Box>
-        <Card
-          variant="outlined"
-          style={{
-            marginBottom: "2rem",
-            padding: "1rem 2rem",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Box>
-            <Typography variant="h6">Template File</Typography>
-            <Button variant="text">FYP_Proposal_Template.docx</Button>
-          </Box>
-          <Box>
-            <Button variant="contained" color="primary">
-              Upload
-            </Button>
-          </Box>
-        </Card>
-        <DataTable DataHead={DataHead} DataBody={DataBody} />
-      </Main>
-    </ContainerFluid>
+          <Card
+            variant="outlined"
+            style={{
+              marginBottom: "2rem",
+              padding: "1rem 2rem",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <Typography variant="h6">Template File</Typography>
+              <Button variant="text">{name}</Button>
+            </Box>
+            <Box>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={uploadTemplateFile}
+              >
+                Upload
+              </Button>
+            </Box>
+          </Card>
+          <DataTable DataHead={DataHead} DataBody={DataBody} />
+        </Main>
+      </ContainerFluid>
+    </>
   );
 };
 

@@ -395,6 +395,53 @@ class FacultyController {
       });
     }
   };
+  static getAllSupervisorsOnly = async (req, res) => {
+    // res.send(req.body);
+    try {
+      const role = await Role.findOne({
+        where: {
+          title: "SUPERVISOR",
+        },
+      });
+      const supervisorsIds = await Faculty_Role.findAll({
+        where: {
+          roleId: role.id,
+        },
+      });
+      const supervisors = await FacultyMember.findAll({
+        where: {
+          pmoOfDepartmentId: null,
+          id: {
+            [sequelize.Op.in]: supervisorsIds.map(
+              supervisor => supervisor.dataValues.facultyId
+            ),
+          },
+        },
+        attributes: ["id", "name", "email", "committeeId", "departmentId"],
+      });
+      await Promise.all(
+        supervisors.map(async supervisor => {
+          const department = await Department.findOne({
+            where: {
+              id: supervisor.dataValues.departmentId,
+            },
+          });
+          supervisor.dataValues.department = department.dataValues.name;
+          return supervisor;
+        })
+      );
+      res.json({
+        message: "Supervisors retrieved successfully",
+        supervisors,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error getting supervisors",
+        error: err,
+      });
+    }
+  };
 
   static getAllSupervisorsList = async (req, res) => {
     // res.send(req.body);

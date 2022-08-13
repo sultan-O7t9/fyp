@@ -116,6 +116,11 @@ const EditDeptPMO = props => {
     // );
     // console.log(res.data.assign);
     // setDisplay(false);
+    const result = await axios.post("http://localhost:5000/api/dept/create", {
+      name: dept,
+    });
+    console.log(result.data.dept);
+    if (result.data.create) setDisplay(false);
   };
 
   return (
@@ -139,7 +144,7 @@ const EditDeptPMO = props => {
                 value={dept}
                 onChange={e => setDept(e.target.value)}
               />
-              <Select
+              {/* <Select
                 required
                 // style={{ width: "100%" }}
                 multiple={false}
@@ -147,7 +152,7 @@ const EditDeptPMO = props => {
                 value={deptPMO}
                 setValue={selectPMOHandler}
                 items={selectFacultyItems}
-              />
+              /> */}
             </Box>
           </Box>
           {/* <Box style={{ margin: "2rem 0.5rem" }}>
@@ -181,7 +186,7 @@ const EditDeptPMO = props => {
             <Button
               variant="contained"
               color="primary"
-              disabled={deptPMO.length === 0}
+              disabled={dept.length === 0}
               onClick={submitPMOHandler}
             >
               Save

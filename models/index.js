@@ -31,6 +31,8 @@ const Token = require("./Token")(sequelize, DataTypes);
 const Project = require("./Project")(sequelize, DataTypes);
 const Committee = require("./Committee")(sequelize, DataTypes);
 const Admin = require("./Admin")(sequelize, DataTypes);
+const Deliverable = require("./Deliverable")(sequelize, DataTypes);
+const Version = require("./Version")(sequelize, DataTypes);
 // const PMO= require("./PMO")(sequelize, DataTypes);
 
 // //Associate the model with other models
@@ -98,6 +100,20 @@ Committee.hasMany(FacultyMember, {
   foreignKey: "committeeId",
 });
 
+Project.hasMany(Version, {
+  foreignKey: "projectId",
+});
+Deliverable.hasMany(Version, {
+  foreignKey: "deliverableId",
+});
+Group.hasMany(Version, {
+  foreignKey: "groupId",
+});
+// FacultyMember.hasMany(Deliverable, {
+//   foreignKey: "facultyId",
+// }
+// );
+// Deliverable.hasMany
 // FacultyMember.hasOne(Department, {
 //   //Each FacultyMember can have one Department
 //   foreignKey: "departmentId",
@@ -124,6 +140,7 @@ module.exports = {
   Group,
   Student,
   Department,
+  Deliverable,
   Batch,
   Token,
   Project,

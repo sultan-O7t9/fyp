@@ -70,7 +70,7 @@ const ManageFaculty = props => {
         faculty.hasOwnProperty("email") &&
         faculty.hasOwnProperty("department")
       ) {
-        const res = await axios.put(
+        const res = await axios.patch(
           "http://localhost:5000/api/faculty/update",
           {
             id: faculty.id,

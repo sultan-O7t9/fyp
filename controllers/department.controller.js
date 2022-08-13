@@ -14,8 +14,8 @@ class DepratmentController {
           });
           return {
             ...department.dataValues,
-            pmo: pmo.dataValues.name,
-            pmoId: pmo.dataValues.id,
+            pmo: pmo ? pmo.dataValues.name : null,
+            pmoId: pmo ? pmo.dataValues.id : null,
           };
         })
       );
@@ -32,24 +32,26 @@ class DepratmentController {
     }
   };
   static createDepartment = async (req, res) => {
-    const { id, name } = req.body;
+    const { name } = req.body;
     try {
-      const admin = await Admin.findOne({
-        where: {
-          id: id,
-        },
-      });
-      console.log(admin);
-      if (admin) {
-        if (id != admin.id) {
-          throw new Error("Invalid Admin Id");
-        }
+      // const admin = await Admin.findOne({
+      //   where: {
+      //     id: id,
+      //   },
+      // });
+      // console.log(admin);
+      // if (admin) {
+      if (true) {
+        // if (id != admin.id) {
+        //   throw new Error("Invalid Admin Id");
+        // }
         const dept = await Department.create({
           name,
         });
         res.json({
           message: "Department created successfully",
           dept,
+          create: true,
         });
       } else
         res.status(400).json({
@@ -60,6 +62,7 @@ class DepratmentController {
       res.status(500).json({
         message: "Error getting departments",
         error,
+        create: false,
       });
     }
   };

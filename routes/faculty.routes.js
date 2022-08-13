@@ -8,6 +8,7 @@ const verifyToken = require("../utils/verifyToken");
 const Router = require("express").Router();
 
 Router.get("/get-supervisors", Faculty.getAllSupervisors);
+Router.get("/get-supervisors-only", Faculty.getAllSupervisorsOnly);
 Router.get("/get-supervisor-all", Faculty.getAllSupervisorsList);
 
 Router.post("/register", Faculty.registerFaculty);
