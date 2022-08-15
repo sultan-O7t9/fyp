@@ -13,13 +13,7 @@ import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
 const DATA = {
-  heads: [
-    "Group ID",
-    "Project Title",
-    "Submission Date",
-    "Verification Status",
-    " ",
-  ],
+  heads: ["Group ID", "Project Title", "Submission"],
   data: [
     {
       id: "SE_18_1",
@@ -47,42 +41,86 @@ const DataHead = () => {
 };
 
 const DataBody = () => {
-  const [filter, setFilter] = useState(null);
-  const filters = [
-    { text: "Submitted", id: 1 },
-    { text: "Verified", id: 2 },
-    { text: "Rejected", id: 3 },
-    { text: "Revised", id: 4 },
-  ];
+  const [submissionsData, setSubmissionsData] = useState([]);
+  const params = useParams();
+  const deliverableId = params.id;
+  // const [filter, setFilter] = useState(null);
+  // const filters = [
+  //   { text: "Submitted", id: 1 },
+  //   { text: "Verified", id: 2 },
+  //   { text: "Rejected", id: 3 },
+  //   { text: "Revised", id: 4 },
+  // ];
+  const userId = localStorage.getItem("USER_ID");
+  //Get all submissions of the deliverabale
+
+  useEffect(() => {
+    console.log(userId);
+    console.log(deliverableId);
+    const getSubmissions = async () => {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/deliverable/get-grp-submission-dept",
+          {
+            deliverableId,
+            userId,
+          }
+        );
+        console.log(res.data);
+        setSubmissionsData(res.data.submissions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSubmissions();
+  }, [userId, deliverableId]);
+
+  const downloadSubmission = async (e, file) => {
+    e.preventDefault();
+    try {
+      let url = "http://localhost:5000/" + file;
+      console.log(url);
+      let win = window.open(url, "_blank");
+      win.focus();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       <TableRow>
-        <TableCell>Filter</TableCell>
         <TableCell colSpan={3}>
-          <Select
-            label="Filter"
-            value={filter}
-            setValue={setFilter}
-            items={filters}
-          />
-        </TableCell>
-        <TableCell>
-          <Box>
+          {/* <Box>
             <Button variant="contained" type="submit">
               Send Mail
             </Button>
-          </Box>
+          </Box> */}
         </TableCell>
       </TableRow>
-      {DATA.data.map((row, index) => (
-        <TableRow key={index}>
-          <TableCell>{row.id}</TableCell>
+      {submissionsData.map((row, index) => (
+        <TableRow key={row.id}>
+          <TableCell>{row.name}</TableCell>
           {/* <TableCell>{row.members}</TableCell> */}
-          <TableCell>{row.title}</TableCell>
-          <TableCell>{row.submitted_on}</TableCell>
-          <TableCell>{row.status}</TableCell>
           <TableCell>
-            <MenuButton />
+            {row.project.hasOwnProperty("title") ? row.project.title : "None"}
+          </TableCell>
+          {/* <TableCell>{"__STATUS HERE__"}</TableCell> */}
+          <TableCell>
+            {row.hasOwnProperty("submission") && row.submission.name ? (
+              <form
+                onSubmit={e => {
+                  downloadSubmission(e, row.submission.name);
+                }}
+                className="form"
+              >
+                <Button variant="text" type="submit">
+                  {row.submission.name}
+                </Button>
+              </form>
+            ) : (
+              <Typography variant="body">None</Typography>
+            )}
           </TableCell>
         </TableRow>
       ))}
@@ -176,7 +214,7 @@ const DeliverableDetail = props => {
         />
       ) : null}
 
-      <ContainerFluid title="Deliverable 1">
+      <ContainerFluid>
         <Main styles={{ padding: "1.5rem" }}>
           <Box
             sx={{ marginBottom: "3rem" }}

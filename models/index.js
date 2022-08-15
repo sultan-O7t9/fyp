@@ -172,6 +172,8 @@ module.exports = {
   Version,
   Batch,
   Token,
+  Evaluation,
+  EvaluationType,
   Project,
   Committee,
 };

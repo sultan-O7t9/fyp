@@ -24,6 +24,11 @@ Router.post(
 Router.post("/get-template-file", Deliverable.downloadTemplateFile);
 Router.post("/get-grp-submission", Deliverable.getGroupDeliverableSubmission);
 Router.post(
+  "/get-grp-submission-dept",
+  Deliverable.getGroupsDeliverableSubmissionByDept
+);
+
+Router.post(
   "/submit-grp-submission",
   upload.single("file"),
   Deliverable.submitGroupDeliverableSubmission

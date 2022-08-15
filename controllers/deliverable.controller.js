@@ -14,7 +14,10 @@ const {
   FacultyMember,
   Deliverable,
   Version,
+  Group,
+  Project,
 } = require("../models");
+const { Op } = require("sequelize");
 
 class DeliverableController {
   static getAllDeliverables = async (req, res) => {
@@ -218,6 +221,125 @@ class DeliverableController {
       res.json({
         message: "Versions fetched successfully",
         versions,
+        get: true,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting versions",
+        error,
+        get: false,
+      });
+    }
+  };
+  static getGroupDeliverableSubmission = async (req, res) => {
+    const { deliverableId, groupId } = req.body;
+    try {
+      // console.log(deliverableId, groupId);
+      // try{}
+      const versions = await Version.findAll({
+        where: {
+          deliverableId,
+          groupId,
+        },
+      });
+      console.log(versions.dataValues);
+
+      res.json({
+        message: "Versions fetched successfully",
+        versions,
+        get: true,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting versions",
+        error,
+        get: false,
+      });
+    }
+  };
+  static getGroupsDeliverableSubmissionByDept = async (req, res) => {
+    const { deliverableId, userId } = req.body;
+    try {
+      // console.log(deliverableId, groupId);
+      // try{}
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      const deptId = faculty.dataValues.departmentId;
+      const groups = await Group.findAll({
+        where: {
+          departmentId: deptId,
+        },
+      });
+      //   console.log(Op.in);
+      //   const projects = await Project.findAll({
+      //     where: {
+      //       id: Op.in(groups.map(group => group.dataValues.projectId)),
+      //     },
+      //   });
+      //   const versions = await Version.findAll({
+      //     where: {
+      //       deliverableId,
+      //       groupId: Op.in(groups.map(group => group.dataValues.id)),
+      //     },
+      //   });
+      const subs = [];
+      //   for (const group of groups) {
+      //     subs.push({
+      //       group: group.dataValues,
+      //       versions: versions.filter(
+      //         version => version.dataValues.groupId === group.dataValues.id
+      //       ),
+      //       project: projects.find(
+      //         project => project.dataValues.id === group.dataValues.projectId
+      //       ),
+      //     });
+      //   }
+
+      await Promise.all(
+        groups.map(async group => {
+          const versions = await Version.findAll({
+            where: {
+              deliverableId,
+              groupId: group.dataValues.id,
+            },
+          });
+          versions.sort((a, b) => {
+            return new Date(a.dataValues.id) - new Date(b.dataValues.id);
+          });
+          //   versions.reverse();
+          const project = await Project.findOne({
+            where: {
+              id: group.dataValues.projectId,
+            },
+          });
+          const data = {
+            ...group.dataValues,
+            submission: versions.pop(),
+            project: project.dataValues,
+          };
+          subs.push(data);
+        })
+      );
+      //   console.log(subs);
+      //   const submissions = await Version.findAll({
+      //     where: {
+      //       deliverableId,
+      //       groupId: {
+      //         [Op.in]: groups.map(group => group.id),
+      //       },
+      //     },
+      //   });
+      //   console.log(submissions.dataValues);
+      //   console.log(versions.dataValues);
+
+      res.json({
+        message: "Versions fetched successfully",
+        submissions: subs,
         get: true,
       });
     } catch (error) {

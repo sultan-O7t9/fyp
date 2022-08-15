@@ -86,7 +86,7 @@ const DeliverableSettingsModal = props => {
             <Box style={{ margin: "2rem 0.5rem" }}>
               <Typography variant="h6">Mail Settings</Typography>
               <Box style={{ margin: "1rem" }}>
-                <Select
+                {/* <Select
                   required
                   // style={{ width: "100%" }}
                   multiple={true}
@@ -94,7 +94,7 @@ const DeliverableSettingsModal = props => {
                   // value={groups}
                   // setValue={selectGroupsHandler}
                   // items={selectGroupItems}
-                />
+                /> */}
               </Box>
               <Box style={{ margin: "1rem" }}>
                 <TextField

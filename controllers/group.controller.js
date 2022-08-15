@@ -11,6 +11,7 @@ const {
   FacultyMember,
   Project,
   Admin,
+  Committee,
 } = require("../models");
 const sequelize = require("sequelize");
 var crypto = require("crypto");
@@ -47,6 +48,29 @@ class GroupController {
       });
     }
   };
+  static changeBookletStatus = async (req, res) => {
+    const { groupId, status } = req.body;
+    try {
+      const group = await Group.findOne({
+        where: {
+          id: groupId,
+        },
+      });
+      await group.update({
+        bookletsStatus: status,
+      });
+      res.json({
+        message: "Booklet status changed successfully",
+        group,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error getting group",
+        error: err,
+      });
+    }
+  };
   static getGroupById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -55,10 +79,44 @@ class GroupController {
           id: id,
         },
       });
-      res.json({
-        message: "Group fetched successfully",
-        group,
+      const supervisor = await FacultyMember.findOne({
+        where: {
+          id: group.dataValues.supervisorId,
+        },
       });
+      const members = await Student.findAll({
+        where: {
+          groupId: id,
+        },
+      });
+      const committee = await Committee.findOne({
+        where: {
+          id: group.dataValues.committeeId,
+        },
+      });
+      const project = await Project.findOne({
+        where: {
+          id: group.dataValues.projectId,
+        },
+      });
+      if (group)
+        res.json({
+          message: "Group fetched successfully",
+          group: {
+            id: group.dataValues.id,
+            name: group.dataValues.name,
+            members: members.map(member => member.dataValues.rollNo),
+            leader: members.find(member => member.dataValues.leader == 1)
+              .dataValues.rollNo,
+            supervisor: supervisor.dataValues,
+            committee: committee ? committee.dataValues : {},
+            project: project ? project.dataValues : {},
+          },
+        });
+      else
+        res.status(404).json({
+          message: "Group not found",
+        });
     } catch (err) {
       console.log(err);
       res.status(500).json({
@@ -370,7 +428,8 @@ class GroupController {
   };
 
   static getAllGroupsByFacultyDepartment = async (req, res) => {
-    const userId = req.user.id;
+    let userId = req.user ? req.user.id : req.params.id;
+
     try {
       const facultyMember = await FacultyMember.findOne({
         where: {

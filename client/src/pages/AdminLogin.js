@@ -45,7 +45,7 @@ const AdminLogin = () => {
     <Box style={Styles.container}>
       <Card style={Styles.card}>
         <Typography variant="h5" style={Styles.heading}>
-          Log In
+          Log In as Admin
         </Typography>
         <TextField
           style={Styles.input}

@@ -45,7 +45,7 @@ import ManageGroup from "./ManageGroup";
 // };
 
 const AllGroups = () => {
-  const isPMO = localStorage.getItem("USER_ROLE") === "PMO";
+  const isPMO = localStorage.getItem("USER_ROLE").includes("PMO");
   const [heads, setHeads] = useState([
     "Group ID",
     "Members",
@@ -67,7 +67,10 @@ const AllGroups = () => {
     setIsLoading(true);
 
     axios
-      .get("http://localhost:5000/api/group/get-all")
+      .get(
+        "http://localhost:5000/api/group/get-all/" +
+          localStorage.getItem("USER_ID")
+      )
       .then(res => {
         setBody(res.data.groups);
       })
@@ -118,6 +121,7 @@ const AllGroups = () => {
                   row.members.map(member => member.rollNo).join(","),
                   row.project ? row.project.title : "None",
                   row.supervisor ? row.supervisor : "None",
+                  row.bookletsStatus ? row.bookletsStatus : "None",
                 ]),
               ]}
             />

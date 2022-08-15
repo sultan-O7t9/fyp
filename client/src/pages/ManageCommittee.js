@@ -125,7 +125,10 @@ const ManageCommittee = props => {
     }
     // return;
     axios
-      .get("http://localhost:5000/api/group/get-all")
+      .get(
+        "http://localhost:5000/api/group/get-all/" +
+          localStorage.getItem("USER_ID")
+      )
       .then(res => {
         console.log(res.data);
         setGroupItems(

@@ -42,7 +42,7 @@ const Login = () => {
     <Box style={Styles.container}>
       <Card style={Styles.card}>
         <Typography variant="h5" style={Styles.heading}>
-          Log In
+          Log In as Faculty
         </Typography>
         <TextField
           style={Styles.input}

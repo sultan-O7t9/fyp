@@ -278,6 +278,7 @@ const ManageGroup = props => {
             </Button>
             <Button
               variant="contained"
+              severity="error"
               style={{ marginLeft: "1rem" }}
               onClick={() => setDisplay(false)}
             >
