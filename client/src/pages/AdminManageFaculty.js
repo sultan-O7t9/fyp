@@ -21,6 +21,7 @@ import ManageCommittee from "./ManageCommittee";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ManageFaculty from "./ManageFaculty";
+import AdminMainLayout from "../layouts/AdminMainLayout";
 const DATA = {
   heads: ["Name", "Department", "Role"],
   data: [
@@ -166,47 +167,49 @@ const AdminManageFaculty = () => {
     );
 
   return (
-    <ContainerFluid>
-      {showAddCommittee ? (
-        <ManageFaculty
-          faculty={showAddCommittee}
-          setDisplay={setShowAddCommittee}
-        />
-      ) : null}
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h3">Faculty Members</Typography>
+    <AdminMainLayout>
+      <ContainerFluid>
+        {showAddCommittee ? (
+          <ManageFaculty
+            faculty={showAddCommittee}
+            setDisplay={setShowAddCommittee}
+          />
+        ) : null}
+        <Main styles={{ padding: "1.5rem" }}>
+          <Box
+            sx={{ marginBottom: "3rem" }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h3">Faculty Members</Typography>
+            </Box>
+            <Box>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  addCommitteeHandler(null);
+                }}
+              >
+                Add Faculty
+              </Button>
+            </Box>
           </Box>
-          <Box>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                addCommitteeHandler(null);
-              }}
-            >
-              Add Faculty
-            </Button>
-          </Box>
-        </Box>
-        <DataTable
-          DataHead={() => <DataHead heads={heads} />}
-          DataBody={() => (
-            <DataBody
-              editCommittee={addCommitteeHandler}
-              data={body}
-              setData={setBody}
-            />
-          )}
-        />
-      </Main>
-    </ContainerFluid>
+          <DataTable
+            DataHead={() => <DataHead heads={heads} />}
+            DataBody={() => (
+              <DataBody
+                editCommittee={addCommitteeHandler}
+                data={body}
+                setData={setBody}
+              />
+            )}
+          />
+        </Main>
+      </ContainerFluid>
+    </AdminMainLayout>
   );
 };
 

@@ -17,11 +17,12 @@ Router.post("/create", verifyToken, Group.createGroup);
 Router.get("/get/dept", Group.getGroupsByDepartment);
 
 Router.get("/get-groups", Group.getAllGroups);
+Router.get("/get/:id", Group.getGroupById);
 Router.get("/get-all", Group.getAllGroupsByFacultyDepartment);
 Router.get("/get-student-group", verifyToken, Group.getGroupByStudent);
 Router.delete("/delete/:id", verifyToken, Group.deleteGroup);
 Router.put("/update", verifyToken, Group.editGroup);
 Router.post("/upload-file", upload.single("file"), Group.uploadFile);
 Router.post("/download-file", Group.downloadFile);
-
+Router.post("/submit-proposal", Group.submitProposal);
 module.exports = Router;

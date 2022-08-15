@@ -47,6 +47,26 @@ class GroupController {
       });
     }
   };
+  static getGroupById = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const group = await Group.findOne({
+        where: {
+          id: id,
+        },
+      });
+      res.json({
+        message: "Group fetched successfully",
+        group,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error getting group",
+        error: err,
+      });
+    }
+  };
 
   static deleteGroup = async (req, res) => {
     const groupId = req.params.id;
@@ -512,6 +532,9 @@ class GroupController {
       });
     }
   };
+
+  static submitProposal = async (req, res) => {};
+
   static downloadFile = async (req, res) => {
     const fileName = req.body.name;
     try {

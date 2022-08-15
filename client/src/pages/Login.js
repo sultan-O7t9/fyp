@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../store/actions/auth";
 import Styles from "./auth.styles";
 import axios from "axios";
+import Link from "../components/Link";
 
 const Login = () => {
   const history = useHistory();
@@ -49,7 +50,8 @@ const Login = () => {
           onChange={e => setEmail(e.target.value)}
         />
         <TextField
-          style={Styles.input} type="password"
+          style={Styles.input}
+          type="password"
           placeholder="Password"
           onChange={e => setPassword(e.target.value)}
         />
@@ -61,6 +63,9 @@ const Login = () => {
         >
           Log in
         </Button>
+        <Typography variant="h6" style={{ textAlign: "center" }}>
+          <Link to="/group">Log in as Student</Link>
+        </Typography>
         {error ? <Alert severity="error">{error}</Alert> : null}
       </Card>
     </Box>

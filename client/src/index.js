@@ -7,11 +7,13 @@ import { Provider as ReduxProvider } from "react-redux";
 import store from "./store/";
 import "./index.css";
 import { StyledEngineProvider } from "@mui/material";
+// import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 ReactDOM.render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
       <ReduxProvider store={store}>
         <BrowserRouter>
+          {/* <LocalizationProvider dateAdapter={AdapterMoment}></LocalizationProvider> */}
           <App />
         </BrowserRouter>
       </ReduxProvider>

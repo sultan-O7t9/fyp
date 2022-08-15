@@ -6,6 +6,7 @@ import ItemCard from "../components/ItemCard";
 import Main from "../components/Main";
 import jwt_decode from "jwt-decode";
 import { Redirect, useHistory } from "react-router-dom";
+import axios from "axios";
 
 const Deliverables = [
   {
@@ -28,6 +29,7 @@ const Deliverables = [
   },
 ];
 const Dashboard = () => {
+  const [deliverables, setDeliverables] = useState([]);
   const token = useSelector(state => state.auth.accessToken);
   const [role, setRole] = useState("");
   const history = useHistory();
@@ -37,9 +39,23 @@ const Dashboard = () => {
       console.log(userRole);
       history.replace("/register-group");
     }
+    if (userRole.includes("HOD")) {
+      history.replace("/admin/faculty");
+    }
     // console.log(userRole);
 
     // setRole(userRole);
+  }, [history, token]);
+
+  useEffect(() => {
+    const getDeliverables = async () => {
+      const res = await axios.get(
+        "http://localhost:5000/api/deliverable/get-all"
+      );
+      console.log(res.data);
+      setDeliverables(res.data.deliverables);
+    };
+    getDeliverables();
   }, []);
 
   return (
@@ -50,7 +66,7 @@ const Dashboard = () => {
       <ContainerFluid title="Dasboard">
         <Main>
           <Box sx={{ padding: "3rem" }}>
-            {Deliverables.map((deliverable, index) => {
+            {deliverables.map((deliverable, index) => {
               return (
                 <ItemCard
                   key={deliverable.id}

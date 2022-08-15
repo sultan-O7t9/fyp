@@ -1,7 +1,7 @@
 // const { getAllDepartments } = require("../controllers/department.controller");
 const verifyToken = require("../utils/verifyToken");
 // const Depratment = require("../controllers/department.controller");
-const Deliverable = require("../controllers/deliverable.controller");
+const Deliverable = require("../controllers/deliverable.controller.js");
 
 const multer = require("multer");
 const upload = multer();
@@ -13,11 +13,20 @@ const Router = require("express").Router();
 // Router.post("/create",Deliverable.createDeliverable)
 // Router.post("/template-file",Deliv)
 Router.get("/get-all", Deliverable.getAllDeliverables);
+Router.get("/get/:id", Deliverable.getDeliverableById);
 Router.post("/create-deliverable", Deliverable.createDeliverable);
+Router.patch("/update-deliverable", Deliverable.editDeliverable);
 Router.post(
   "/template-file",
   upload.single("file"),
   Deliverable.addTemplateFile
 );
-Router.get("/template-file", Deliverable.downloadTemplateFile);
+Router.post("/get-template-file", Deliverable.downloadTemplateFile);
+Router.post("/get-grp-submission", Deliverable.getGroupDeliverableSubmission);
+Router.post(
+  "/submit-grp-submission",
+  upload.single("file"),
+  Deliverable.submitGroupDeliverableSubmission
+);
+
 module.exports = Router;

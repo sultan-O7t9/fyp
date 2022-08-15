@@ -26,10 +26,12 @@ const ItemCard = props => {
           {item.title}
         </Link>
 
-        <Typography variant="subtitle1">{item.description}</Typography>
-      </Box>
-      <Box style={{ alignSelf: "center" }}>
-        <Typography variant="h4">{item.percentage}</Typography>
+        <Typography variant="subtitle1">
+          Deadline:{" "}
+          {item.deadline
+            ? new Date(item.deadline).toLocaleDateString()
+            : "None"}
+        </Typography>
       </Box>
     </Paper>
   );

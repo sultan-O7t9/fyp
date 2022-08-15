@@ -27,6 +27,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useHistory } from "react-router-dom";
 import Select from "../components/Select";
 import styles from "./auth.styles";
+import AdminMainLayout from "../layouts/AdminMainLayout";
 
 const DATA = {
   heads: ["Group ID", "Members", "Project Title", "Supervisor"],
@@ -71,7 +72,7 @@ const DataBody = ({ data, depts }) => {
 
   return (
     <>
-      <TableRow>
+      {/* <TableRow>
         <TableCell>
           <Typography variant="body1">Filter</Typography>
         </TableCell>
@@ -89,7 +90,7 @@ const DataBody = ({ data, depts }) => {
             }))}
           />
         </TableCell>
-      </TableRow>
+      </TableRow> */}
 
       {data &&
         data.map((row, index) => (
@@ -220,18 +221,19 @@ const AdminAllGroups = () => {
     );
 
   return (
-    <ContainerFluid>
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h3">Groups</Typography>
-          </Box>
-          {/* <Box style={{ display: "flex", flexDirection: "column" }}>
+    <AdminMainLayout>
+      <ContainerFluid>
+        <Main styles={{ padding: "1.5rem" }}>
+          <Box
+            sx={{ marginBottom: "3rem" }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h3">Groups</Typography>
+            </Box>
+            {/* <Box style={{ display: "flex", flexDirection: "column" }}>
             <ExportAsExcel
               label="Export Groups"
               data={[
@@ -253,21 +255,22 @@ const AdminAllGroups = () => {
               Add Group
             </Button> 
           </Box> */}
-        </Box>
-        <DataTable
-          DataHead={() => <GroupsDataHead heads={heads} />}
-          DataBody={() => (
-            <DataBody
-              data={body}
-              // data={DATA.data}
-              depts={depts.map(dept => dept.name)}
-              setData={setBody}
-              editGroup={editGroupHandler}
-            />
-          )}
-        />
-      </Main>
-    </ContainerFluid>
+          </Box>
+          <DataTable
+            DataHead={() => <GroupsDataHead heads={heads} />}
+            DataBody={() => (
+              <DataBody
+                data={body}
+                // data={DATA.data}
+                depts={depts.map(dept => dept.name)}
+                setData={setBody}
+                editGroup={editGroupHandler}
+              />
+            )}
+          />
+        </Main>
+      </ContainerFluid>
+    </AdminMainLayout>
   );
 };
 

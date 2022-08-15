@@ -36,6 +36,7 @@ export default function AppBarMenu() {
         { token: localStorage.getItem("refreshToken") }
       );
       if (response.data.logout) {
+        localStorage.clear();
         dispatch(logoutUser());
         histroy.replace("/login");
       }

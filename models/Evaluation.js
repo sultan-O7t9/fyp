@@ -1,25 +1,26 @@
 module.exports = (sequelize, DataTypes) => {
-  const Deliverable = sequelize.define(
-    "Deliverable",
+  const Evaluation = sequelize.define(
+    "Evaluation",
     {
-      title: {
+      name: {
         type: DataTypes.STRING,
       },
-      template: {
-        type: DataTypes.STRING,
+      //   groupId: {},
+      //   evaluationTypeId: {},
+      //   versionId: {},
+      //   projectId: {},
+      marks: {
+        type: DataTypes.INTEGER,
       },
-      deadline: {
-        type: DataTypes.DATE,
+      totalMarks: {
+        type: DataTypes.INTEGER,
       },
-      emailsubject: {
-        type: DataTypes.STRING,
-      },
-      emailbody: {
+      comments: {
         type: DataTypes.STRING,
       },
     },
     {
-      tableName: "tbl_deliverable",
+      tableName: "tbl_evaluation",
       createdAt: false,
       updatedAt: false,
     }
@@ -30,5 +31,5 @@ module.exports = (sequelize, DataTypes) => {
   //         as: 'posts'
   //     })
   // }
-  return Deliverable;
+  return Evaluation;
 };

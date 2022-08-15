@@ -19,6 +19,7 @@ import Dashboard from "./pages/Dashboard";
 import DeliverableDetail from "./pages/DeliverableDetail";
 import GroupDashboard from "./pages/GroupDashboard";
 import GroupDetail from "./pages/GroupDetail";
+import GroupLogin from "./pages/GroupLogin";
 import Login from "./pages/Login";
 import ProposalSubmissionPage from "./pages/ProposalSubmissionPage";
 import Register from "./pages/Register";
@@ -28,6 +29,18 @@ import SupervisorDocumentation from "./pages/SupervisorDocumentation";
 import SupervisorFinalDeliverable from "./pages/SupervisorFinalDeliverable";
 import SupervisorProposal from "./pages/SupervisorProposal";
 import { logoutUser, readUser, refreshAuthToken } from "./store/actions/auth";
+
+const AdminRoutes = () => {
+  return (
+    <>
+      {/* Admin */}
+      <Route exact path="/admin/groups" component={AdminAllGroups} />
+      <Route exact path="/admin/faculty" component={AdminManageFaculty} />
+      <Route exact path="/admin/dept" component={AdminManageDept} />
+      {/* ---- */}
+    </>
+  );
+};
 
 const App = () => {
   const [roles, setRoles] = useState([]);
@@ -96,46 +109,50 @@ const App = () => {
   return (
     <Switch>
       {/* <Route exact path="/committees" component={AllCommittees} /> */}
-      <Route exact path="/file" component={UploadFile} />
+      {/* <Route exact path="/file" component={UploadFile} /> */}
       <Route exact path="/login" component={Login} />
+      <Route exact path="/group" component={GroupLogin} />
       <Route exact path="/admin" component={AdminLogin} />
       <Route exact path="/register" component={Register} />
-      <MainLayout>
-        <Route exact path="/admin/faculty" component={AdminManageFaculty} />
-        <Route exact path="/admin/dept" component={AdminManageDept} />
-        <Route exact path="/admin/groups" component={AdminAllGroups} />
-        <Route exact path="/main/student" component={GroupDashboard} />
-        <Route exact path="/main/proposal" component={ProposalSubmissionPage} />
-        <Route exact path="/main/d2" component={D2SubmissionPage} />
-        <Route exact path="/main/d3" component={D3SubmissionPage} />
-        <Route exact path="/groups" component={AllGroups} />
-        <Route exact path="/groups/:id" component={GroupDetail} />
-        <Route
-          exact
-          path="/groups/proposal/:id"
-          component={SupervisorProposal}
-        />
-        <Route
-          exact
-          path="/groups/d2/:id"
-          component={SupervisorDocumentation}
-        />
-        <Route
-          exact
-          path="/groups/d3/:id"
-          component={SupervisorFinalDeliverable}
-        />
-        <Route exact path="/" component={Dashboard} />
-        <Route exact path="/deliverable/:id" component={DeliverableDetail} />
-      </MainLayout>
+      <Route exact path="/register-group" component={RegisterGroup} />
+      <Route exact path="/register-project" component={SubmitProjectTitle} />
+      {roles === "HOD" ? (
+        <AdminRoutes />
+      ) : (
+        <MainLayout>
+          <Route exact path="/main/student" component={GroupDashboard} />
+          <Route
+            exact
+            path="/main/proposal"
+            component={ProposalSubmissionPage}
+          />
+          <Route exact path="/main/d2" component={D2SubmissionPage} />
+          <Route exact path="/main/d3" component={D3SubmissionPage} />
+          <Route exact path="/groups" component={AllGroups} />
+          <Route exact path="/groups/:id" component={GroupDetail} />
+          <Route
+            exact
+            path="/groups/proposal/:id"
+            component={SupervisorProposal}
+          />
+          <Route
+            exact
+            path="/groups/d2/:id"
+            component={SupervisorDocumentation}
+          />
+          <Route
+            exact
+            path="/groups/d3/:id"
+            component={SupervisorFinalDeliverable}
+          />
+          <Route exact path="/" component={Dashboard} />
+          <Route exact path="/deliverable/:id" component={DeliverableDetail} />
+          <Route exact path="/students" component={AllStudents} />
+          <Route exact path="/committees" component={AllCommittees} />
+        </MainLayout>
+      )}
       {/* {roles && roles.includes("STUDENT") ? ( */}
       {/* <> */}
-      <ProtectedRoute exact path="/register-group" component={RegisterGroup} />
-      <ProtectedRoute
-        exact
-        path="/register-project"
-        component={SubmitProjectTitle}
-      />
       {/* </>
       ) : null} */}
       {/* <MainLayout> */}
@@ -147,9 +164,7 @@ const App = () => {
           true ? (
             <> */}
 
-      <Route exact path="/students" component={AllStudents} />
       {/* <ProtectedRoute exact path="/committees" component={AllCommittees} /> */}
-      <Route exact path="/committees" component={AllCommittees} />
       {/* <ProtectedRoute
         exact
         path="/deliverable/:id"

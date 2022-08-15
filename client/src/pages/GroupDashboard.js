@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   List,
@@ -16,12 +16,32 @@ import Link from "../components/Link";
 import Main from "../components/Main";
 import MenuButton from "../components/MenuButton";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 const DataHead = () => null;
 
 const DataBody = () => {
-  const role = localStorage.getItem("USER_ROLE");
+  const groupID = localStorage.getItem("USER_ID");
   const history = useHistory();
+  const [projectData, setProjectData] = useState({});
+  useEffect(() => {
+    console.log(groupID);
+    const getData = async () => {
+      try {
+        const projectRes = await axios.get(
+          `http://localhost:5000/api/project/get-grp/${groupID}`
+        );
+        console.log(projectRes.data.project);
+        localStorage.setItem("PROJECT_ID", projectRes.data.project.id);
+        setProjectData(projectRes.data.project);
+      } catch (err) {
+        console.log(err);
+        history.replace("/register-project");
+      }
+    };
+    getData();
+  }, [groupID, history]);
+
   return (
     <>
       <TableRow>
@@ -30,13 +50,13 @@ const DataBody = () => {
         </TableCell>
 
         <TableCell>
-          <Typography variant="body1">PMO Management System</Typography>
+          <Typography variant="body1">{projectData.title}</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell>
           <Button color="primary" variant="outlined">
-            <Link to="#">1st Deliverable: Project Proposal</Link>
+            <Link to="/main/proposal">1st Deliverable: Project Proposal</Link>
           </Button>
         </TableCell>
         <TableCell>
@@ -46,7 +66,7 @@ const DataBody = () => {
       <TableRow>
         <TableCell>
           <Button color="primary" variant="outlined">
-            <Link to="#">2nd Deliverable: Documentation</Link>
+            <Link to="/main/d2">2nd Deliverable: Documentation</Link>
           </Button>
         </TableCell>
         <TableCell>
@@ -56,7 +76,7 @@ const DataBody = () => {
       <TableRow>
         <TableCell>
           <Button color="primary" variant="outlined">
-            <Link to="#">3rd Deliverable: Working System</Link>
+            <Link to="/main/d3">3rd Deliverable: Working System</Link>
           </Button>
         </TableCell>
         <TableCell>
@@ -75,8 +95,26 @@ const DataBody = () => {
 };
 
 const GroupDashboard = () => {
+  const groupID = localStorage.getItem("USER_ID");
+  const [groupData, setGroupData] = useState({});
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/group/get/${groupID}`
+        );
+        console.log(res.data.group);
+        setGroupData(res.data.group);
+        localStorage.setItem("GROUP_NAME", res.data.group.name);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getData();
+  }, [groupID]);
+
   return (
-    <ContainerFluid title="SE_18_1">
+    <ContainerFluid title={groupData.name}>
       <Main styles={{ padding: "1.5rem" }}>
         <Box
           sx={{ marginBottom: "3rem" }}

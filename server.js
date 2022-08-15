@@ -20,6 +20,7 @@ app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 dotenv.config();
+app.use(express.static("uploads"));
 //Init DB
 require("./models");
 

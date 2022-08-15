@@ -5,7 +5,7 @@ import MainAppbar from "../components/MainAppbar";
 import Styles from "./auth.styles";
 import axios from "axios";
 import RadioButtonGroup from "../components/RadioButtonGroup";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../store/actions/auth";
 
@@ -27,23 +27,25 @@ const SubmitProjectTitle = () => {
   ];
   // const [students, setStudents] = useState([]);
   const [title, setTitle] = useState("");
-  const [groupId, setGroupId] = useState("");
+  // const [groupId, setGroupId] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState(typeItems[0].value);
   const [tech, setTech] = useState(techItems[0].value);
   const [platform, setPlatform] = useState(platformItems[0].value);
   const history = useHistory();
   const dispatch = useDispatch();
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/group/get-student-group")
-      .then(res => {
-        setGroupId(res.data.group.id);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }, []);
+  // const params=useParams();
+  const groupId = localStorage.getItem("USER_ID");
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/api/group/get-student-group")
+  //     .then(res => {
+  //       setGroupId(res.data.group.id);
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  // }, []);
 
   // const selectMembersHandler = members => {
   //   if (members.length > 3) {
@@ -78,7 +80,7 @@ const SubmitProjectTitle = () => {
           platform: platform,
         }
       );
-      console.log(result.data.project);
+      console.log(result.data);
       if (result.data.project) logoutHandler();
     } catch (error) {
       console.log(error);
@@ -93,7 +95,7 @@ const SubmitProjectTitle = () => {
       );
       if (response.data.logout) {
         dispatch(logoutUser());
-        history.replace("/login");
+        history.replace("/group");
       }
     } catch (error) {
       console.log(error);

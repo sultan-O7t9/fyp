@@ -90,6 +90,7 @@ module.exports.adminLogin = async (req, res) => {
       res.status(200).json({
         login: true,
         accessToken,
+        id: admin.id,
         refreshToken,
       });
     } else {
