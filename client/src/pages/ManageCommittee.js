@@ -206,9 +206,9 @@ const ManageCommittee = props => {
   };
 
   const selectGroupsHandler = groups => {
-    if (groups.length > 3) {
-      return;
-    }
+    // if (groups.length > 3) {
+    //   return;
+    // }
     setGroups(groups);
     console.log(groups);
   };
