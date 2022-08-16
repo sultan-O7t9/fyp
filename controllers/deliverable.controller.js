@@ -324,14 +324,12 @@ class DeliverableController {
               id: group.dataValues.projectId,
             },
           });
-          if (project && version.length > 0) {
-            const data = {
-              ...group.dataValues,
-              submission: versions.pop(),
-              project: project.dataValues,
-            };
-            subs.push(data);
-          }
+          const data = {
+            ...group.dataValues,
+            submission: versions.pop(),
+            project: project.dataValues,
+          };
+          subs.push(data);
         })
       );
       //   console.log(subs);
