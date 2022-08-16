@@ -21,6 +21,7 @@ const authReducer = (state = initialState, action) => {
     case DELETE_USER:
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      // window.location.reload();
       return {
         ...state,
         accessToken: null,

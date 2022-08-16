@@ -36,6 +36,7 @@ const SubmitProjectTitle = () => {
   const dispatch = useDispatch();
   // const params=useParams();
   const groupId = localStorage.getItem("USER_ID");
+  if (!groupId) history.replace("/group");
   // useEffect(() => {
   //   axios
   //     .get("http://localhost:5000/api/group/get-student-group")

@@ -16,6 +16,7 @@ const {
   Version,
   Group,
   Project,
+  Student,
 } = require("../models");
 const { Op } = require("sequelize");
 
@@ -271,8 +272,101 @@ class DeliverableController {
       });
       const deptId = faculty.dataValues.departmentId;
       const groups = await Group.findAll({
+        // where: {
+        //   departmentId: deptId,
+        //   // pmoOfDepartmentId: deptId,
+
+        // },
         where: {
-          departmentId: deptId,
+          [Op.or]: [{ departmentId: deptId }, { supervisorId: userId }],
+        },
+      });
+      console.log(groups.dataValues);
+      //   console.log(Op.in);
+      //   const projects = await Project.findAll({
+      //     where: {
+      //       id: Op.in(groups.map(group => group.dataValues.projectId)),
+      //     },
+      //   });
+      //   const versions = await Version.findAll({
+      //     where: {
+      //       deliverableId,
+      //       groupId: Op.in(groups.map(group => group.dataValues.id)),
+      //     },
+      //   });
+      const subs = [];
+      //   for (const group of groups) {
+      //     subs.push({
+      //       group: group.dataValues,
+      //       versions: versions.filter(
+      //         version => version.dataValues.groupId === group.dataValues.id
+      //       ),
+      //       project: projects.find(
+      //         project => project.dataValues.id === group.dataValues.projectId
+      //       ),
+      //     });
+      //   }
+
+      await Promise.all(
+        groups.map(async group => {
+          const versions = await Version.findAll({
+            where: {
+              deliverableId,
+              groupId: group.dataValues.id,
+            },
+          });
+          versions.sort((a, b) => {
+            return new Date(a.dataValues.id) - new Date(b.dataValues.id);
+          });
+          //   versions.reverse();
+          const project = await Project.findOne({
+            where: {
+              id: group.dataValues.projectId,
+            },
+          });
+          const data = {
+            ...group.dataValues,
+            submission: versions.pop(),
+            project: project.dataValues,
+          };
+          subs.push(data);
+        })
+      );
+      //   console.log(subs);
+      //   const submissions = await Version.findAll({
+      //     where: {
+      //       deliverableId,
+      //       groupId: {
+      //         [Op.in]: groups.map(group => group.id),
+      //       },
+      //     },
+      //   });
+      //   console.log(submissions.dataValues);
+      //   console.log(versions.dataValues);
+
+      res.json({
+        message: "Versions fetched successfully",
+        submissions: subs,
+        get: true,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting versions",
+        error,
+        get: false,
+      });
+    }
+  };
+  static getGroupsDeliverableSubmissionBySupervisor = async (req, res) => {
+    const { deliverableId, userId } = req.body;
+    try {
+      // console.log(deliverableId, groupId);
+      // try{}
+
+      const groups = await Group.findAll({
+        where: {
+          supervisorId: userId,
         },
       });
       //   console.log(Op.in);
@@ -411,6 +505,75 @@ class DeliverableController {
         message: "Error downloading file",
         error,
         download: false,
+      });
+    }
+  };
+  static sendMailToStudents = async (req, res) => {
+    const { deliverableId, userId } = req.body;
+
+    try {
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      const deliverable = await Deliverable.findOne({
+        where: {
+          id: deliverableId,
+        },
+      });
+      const subject = deliverable.dataValues.emailsubject;
+      const body = deliverable.dataValues.emailbody;
+      const deptId = faculty.dataValues.pmoOfDepartmentId;
+      const students = await Student.findAll({
+        departmentId: deptId,
+      });
+      const filteredStudents = students.filter(
+        student => student.dataValues.departmentId == deptId
+      );
+      sendMail(
+        filteredStudents.map(student => {
+          return {
+            email: student.dataValues.rollNo + "@uog.edu.pk",
+            subject: subject + " Ignore",
+            body: `
+          ${body}
+
+
+          Regards,
+          ${faculty.dataValues.name}
+          `,
+          };
+        })
+      );
+
+      res.json({
+        message: "Email sent successfully",
+        get: true,
+      });
+    } catch (err) {
+      // members.map(student => {
+      //   return {
+      //     email: student.dataValues.rollNo + "@uog.edu.pk",
+      //     subject: "Ignore - FYP Groups",
+      //     body: `Testing...
+      //      Your group has been created, successfully.
+      //      Group members:
+      //         ${members.map(member => member.dataValues.rollNo).join(", ")}
+
+      //      Your credentials are:
+      //         Username: ${group.dataValues.name}
+      //         Password:${group.dataValues.password}
+      //      Login to submit your FYP Idea.
+      //      `,
+      //   };
+      // })
+
+      console.log(err);
+      res.status(500).json({
+        message: "Error sending mail",
+        error,
+        send: false,
       });
     }
   };

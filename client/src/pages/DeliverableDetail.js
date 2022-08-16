@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
 const DATA = {
-  heads: ["Group ID", "Project Title", "Submission"],
+  heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
   data: [
     {
       id: "SE_18_1",
@@ -41,6 +41,7 @@ const DataHead = () => {
 };
 
 const DataBody = () => {
+  const roles = localStorage.getItem("USER_ROLE");
   const [submissionsData, setSubmissionsData] = useState([]);
   const params = useParams();
   const deliverableId = params.id;
@@ -59,21 +60,41 @@ const DataBody = () => {
     console.log(deliverableId);
     const getSubmissions = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/deliverable/get-grp-submission-dept",
-          {
-            deliverableId,
-            userId,
-          }
-        );
-        console.log(res.data);
-        setSubmissionsData(res.data.submissions);
+        let newData = [];
+        if (roles.includes("PMO")) {
+          const res = await axios.post(
+            "http://localhost:5000/api/deliverable/get-grp-submission-dept",
+            {
+              deliverableId,
+              userId,
+            }
+          );
+          console.log(res.data);
+          newData = res.data.submissions;
+          // if (!roles.includes("PMO")) {
+          //   newData = res.data.submissions.filter(submission => {
+          //     return submission.supervisorId == userId;
+          //   });
+          // }
+        }
+        if (roles.includes("SUPERVISOR")) {
+          const res = await axios.post(
+            "http://localhost:5000/api/deliverable/get-grp-submission-sup",
+            {
+              deliverableId,
+              userId,
+            }
+          );
+          console.log(res.data);
+          newData = res.data.submissions;
+        }
+        setSubmissionsData(newData);
       } catch (error) {
         console.log(error);
       }
     };
     getSubmissions();
-  }, [userId, deliverableId]);
+  }, [userId, deliverableId, roles]);
 
   const downloadSubmission = async (e, file) => {
     e.preventDefault();
@@ -87,15 +108,37 @@ const DataBody = () => {
     }
   };
 
+  const sendMailToStudents = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/deliverable/send-mail",
+        { deliverableId, userId }
+      );
+      console.log(res.data.get);
+      if (res.data.get) {
+        alert("Mail sent successfully");
+      } else {
+        alert("Mail not sent");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Error sending mail");
+    }
+  };
+
   return (
     <>
       <TableRow>
         <TableCell colSpan={3}>
-          {/* <Box>
-            <Button variant="contained" type="submit">
+          <Box>
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={sendMailToStudents}
+            >
               Send Mail
             </Button>
-          </Box> */}
+          </Box>
         </TableCell>
       </TableRow>
       {submissionsData.map((row, index) => (
@@ -105,7 +148,11 @@ const DataBody = () => {
           <TableCell>
             {row.project.hasOwnProperty("title") ? row.project.title : "None"}
           </TableCell>
-          {/* <TableCell>{"__STATUS HERE__"}</TableCell> */}
+          <TableCell>
+            {row.submission.createdAt
+              ? new Date(row.submission.createdAt).toLocaleString()
+              : "-"}
+          </TableCell>
           <TableCell>
             {row.hasOwnProperty("submission") && row.submission.name ? (
               <form
@@ -129,6 +176,7 @@ const DataBody = () => {
 };
 
 const DeliverableDetail = props => {
+  const roles = localStorage.getItem("USER_ROLE");
   const [file, setFile] = useState({});
   const [name, setName] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -156,7 +204,7 @@ const DeliverableDetail = props => {
     e.preventDefault();
     const data = new FormData();
     data.append("file", file);
-    data.append("deliverableId", 1);
+    data.append("deliverableId", deliverableId);
 
     try {
       const res = await axios.post(
@@ -176,7 +224,7 @@ const DeliverableDetail = props => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/deliverable/get-template-file",
-        { deliverableId: 1 }
+        { deliverableId: deliverableId }
       );
       console.log(res.data);
       let url = "http://localhost:5000/" + res.data.file;
@@ -250,13 +298,15 @@ const DeliverableDetail = props => {
               </Box>
             </Box>
             <Box>
-              <Button
-                variant="contained"
-                onClick={handleSettings}
-                color="primary"
-              >
-                Settings
-              </Button>
+              {roles.includes("PMO") ? (
+                <Button
+                  variant="contained"
+                  onClick={handleSettings}
+                  color="primary"
+                >
+                  Settings
+                </Button>
+              ) : null}
             </Box>
           </Box>
           <Card
@@ -285,13 +335,15 @@ const DeliverableDetail = props => {
               )}
             </Box>
             <Box>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={uploadTemplateFile}
-              >
-                Upload
-              </Button>
+              {roles.includes("PMO") ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={uploadTemplateFile}
+                >
+                  Upload
+                </Button>
+              ) : null}
             </Box>
           </Card>
           <DataTable DataHead={DataHead} DataBody={DataBody} />

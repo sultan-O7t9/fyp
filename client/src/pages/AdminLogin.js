@@ -30,10 +30,10 @@ const AdminLogin = () => {
           password,
         }
       );
-      dispatch(loginUser(response.data));
       // console.log(response.data);
       localStorage.setItem("ADMIN_ID", response.data.id);
-      history.replace("/admin/faculty");
+      history.replace("/admin/faculty", response.data);
+      dispatch(loginUser(response.data));
     } catch (error) {
       //  Generate an alert here.
       console.log(error.response?.data?.message);

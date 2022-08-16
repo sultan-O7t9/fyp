@@ -165,6 +165,17 @@ const ManageFaculty = props => {
           >
             {faculty.hasOwnProperty("name") ? "Update" : "Register"}
           </Button>
+          <Button
+            style={Styles.input}
+            size="large"
+            variant="contained"
+            onClick={() => {
+              setDisplay(false);
+            }}
+            color="error"
+          >
+            Cancel
+          </Button>
           {error ? <Alert severity="error">{error}</Alert> : null}
         </Card>
       </Container>

@@ -58,7 +58,6 @@ const UploadFile = props => {
                     <input
                       id="fileInput"
                       type="file"
-                      accept=".pdf"
                       onChange={handleFileInputChange}
                     />
                   ) : (
@@ -66,7 +65,12 @@ const UploadFile = props => {
                   )}
                 </div>
 
-                <Button variant="contained" type="submit">
+                <Button
+                  variant="contained"
+                  style={{ marginRight: "1rem" }}
+                  type="submit"
+                  disabled={!file.name}
+                >
                   Submit
                 </Button>
                 <Button

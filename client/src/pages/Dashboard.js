@@ -34,12 +34,13 @@ const Dashboard = () => {
   const [role, setRole] = useState("");
   const history = useHistory();
   useEffect(() => {
+    console.log(token);
     const userRole = jwt_decode(token).role;
     if (userRole.includes("STUDENT")) {
       console.log(userRole);
       history.replace("/register-group");
     }
-    if (userRole.includes("HOD")) {
+    if (userRole === "HOD") {
       history.replace("/admin/faculty");
     }
     // console.log(userRole);

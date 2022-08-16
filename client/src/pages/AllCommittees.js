@@ -69,9 +69,9 @@ const DataBody = ({ data, editCommittee, setData }) => {
             <List>
               {row.FacultyMembers.map(member => (
                 <ListItem style={{ padding: 0 }} key={member.id}>
-                  <Link to="#" style={{ textDecoration: "none" }}>
+                  <Typography to="#" style={{ textDecoration: "none" }}>
                     {member.name}
-                  </Link>
+                  </Typography>
                 </ListItem>
               ))}
             </List>
@@ -84,7 +84,10 @@ const DataBody = ({ data, editCommittee, setData }) => {
             <List>
               {row.Groups.map(group => (
                 <ListItem style={{ padding: 0 }} key={group.id}>
-                  <Link to="#" style={{ textDecoration: "none" }}>
+                  <Link
+                    to={"/groups/" + group.id}
+                    style={{ textDecoration: "none" }}
+                  >
                     {group.name}
                   </Link>
                 </ListItem>

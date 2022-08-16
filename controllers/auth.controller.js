@@ -7,6 +7,9 @@ const {
   Token,
   Group,
   Admin,
+  Batch,
+  Deliverable,
+  EvaluationType,
 } = require("../models");
 require("dotenv").config();
 const jwt_decode = require("jwt-decode");
@@ -22,6 +25,101 @@ const createRefreshToken = user =>
   jwt.sign(user, process.env.JWT_REFRESH_SECRET);
 
 const refreshTokens = [];
+
+module.exports.initializeApp = async (req, res) => {
+  try {
+    const admin = await Admin.findAll();
+    if (admin.length === 0) {
+      await Admin.create({
+        email: process.env.ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD,
+        name: "Admin",
+      });
+      await Role.create({
+        title: "PMO",
+      });
+      await Role.create({
+        title: "SUPERVISOR",
+      });
+      await Role.create({
+        title: "EVALUATOR",
+      });
+      await Deliverable.create({
+        title: "Deliverable 01",
+        id: 1,
+      });
+      await Deliverable.create({
+        title: "Deliverable 02",
+        id: 2,
+      });
+      await Deliverable.create({
+        title: "Deliverable 03",
+        id: 3,
+      });
+      //Eval Type
+      await EvaluationType.create({
+        name: "Proposal Document",
+        id: 1,
+        totalMarks: 20,
+      });
+      await EvaluationType.create({
+        name: "Software Requirements Specification",
+        id: 2,
+        totalMarks: 10,
+      });
+      await EvaluationType.create({
+        name: "Design Document",
+        id: 3,
+        totalMarks: 10,
+      });
+
+      await EvaluationType.create({
+        name: "Prototype",
+        id: 4,
+        totalMarks: 10,
+      });
+      await EvaluationType.create({
+        name: "Testing",
+        id: 6,
+        totalMarks: 20,
+      });
+      await EvaluationType.create({
+        name: "Code",
+        id: 5,
+        totalMarks: 30,
+      });
+      await EvaluationType.create({
+        name: "Overall System and Documentation",
+        id: 7,
+        totalMarks: 40,
+      });
+      await EvaluationType.create({
+        name: "Supervisor",
+        id: 8,
+        totalMarks: 40,
+      });
+      await EvaluationType.create({
+        name: "Project Management Office",
+        id: 9,
+        totalMarks: 20,
+      });
+      console.log("Initialized");
+      res.status(200).json({
+        message: "App initialized successfully",
+      });
+    } else {
+      console.log("App already initialized");
+      res.status(200).json({
+        message: "App already initialized",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports.createRoles = async (req, res) => {
   try {
@@ -160,6 +258,7 @@ module.exports.loginUser = async (req, res) => {
         },
         attributes: ["name", "rollNo", "departmentId"],
       });
+      console.log(student);
       if (student) {
         console.log(student.dataValues);
         user.id = student.dataValues.rollNo;

@@ -27,11 +27,16 @@ Router.post(
   "/get-grp-submission-dept",
   Deliverable.getGroupsDeliverableSubmissionByDept
 );
+Router.post(
+  "/get-grp-submission-sup",
+  Deliverable.getGroupsDeliverableSubmissionBySupervisor
+);
 
 Router.post(
   "/submit-grp-submission",
   upload.single("file"),
   Deliverable.submitGroupDeliverableSubmission
 );
+Router.post("/send-mail", Deliverable.sendMailToStudents);
 
 module.exports = Router;

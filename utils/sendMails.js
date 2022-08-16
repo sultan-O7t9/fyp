@@ -39,7 +39,7 @@ module.exports.sendMail = recipiants => {
   };
 
   const smtpTransport = nodemailer.createTransport(mg(mailgunAuth));
-
+  console.log(recipiants);
   Promise.all(
     recipiants.map(recipiant => {
       return new Promise((resolve, reject) => {

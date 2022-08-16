@@ -5,6 +5,7 @@ const {
   createRoles,
   refreshAccessToken,
   adminLogin,
+  initializeApp,
 } = require("../controllers/auth.controller");
 const verifyToken = require("../utils/verifyToken");
 
@@ -19,5 +20,6 @@ Router.get("/test", verifyToken, (req, res) => {
   console.log(req.user);
   res.send("test");
 });
+Router.get("/init", initializeApp);
 
 module.exports = Router;

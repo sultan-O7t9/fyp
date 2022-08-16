@@ -28,8 +28,9 @@ const DataBody = () => {
     console.log(groupID);
     const getData = async () => {
       try {
+        console.log("sending request");
         const projectRes = await axios.get(
-          `http://localhost:5000/api/project/get-grp/${groupID}`
+          "http://localhost:5000/api/project/get-grp/" + groupID
         );
         console.log(projectRes.data.project);
         localStorage.setItem("PROJECT_ID", projectRes.data.project.id);
@@ -46,11 +47,7 @@ const DataBody = () => {
     <>
       <TableRow>
         <TableCell>
-          <Typography variant="h6">Project</Typography>
-        </TableCell>
-
-        <TableCell>
-          <Typography variant="body1">{projectData.title}</Typography>
+          <Typography variant="h6">Project: {projectData.title}</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
@@ -59,18 +56,12 @@ const DataBody = () => {
             <Link to="/main/proposal">1st Deliverable: Project Proposal</Link>
           </Button>
         </TableCell>
-        <TableCell>
-          <Typography variant="body">Approved</Typography>
-        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell>
           <Button color="primary" variant="outlined">
             <Link to="/main/d2">2nd Deliverable: Documentation</Link>
           </Button>
-        </TableCell>
-        <TableCell>
-          <Typography variant="body">Approved</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
@@ -79,14 +70,13 @@ const DataBody = () => {
             <Link to="/main/d3">3rd Deliverable: Working System</Link>
           </Button>
         </TableCell>
-        <TableCell>
-          <Typography variant="body">Approved</Typography>
-        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell>
           <Button color="primary" variant="contained" size="large">
-            Show Report
+            <Link style={{ color: "white" }} to={"/main/group/" + groupID}>
+              Show Details
+            </Link>
           </Button>
         </TableCell>
       </TableRow>

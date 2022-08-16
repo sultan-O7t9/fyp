@@ -1,4 +1,4 @@
-const { Department, Admin, FacultyMember } = require("../models");
+const { Department, Admin, FacultyMember, Batch } = require("../models");
 
 class DepratmentController {
   static getAllDepartments = async (req, res) => {
@@ -48,6 +48,21 @@ class DepratmentController {
         const dept = await Department.create({
           name,
         });
+        const batch = await Batch.findOne({
+          where: {
+            batchCode: new Date().getYear() + 1896 - 2000,
+          },
+        });
+        if (batch) {
+          await batch.update({
+            departmentId: dept.dataValues.id,
+          });
+        } else {
+          await Batch.create({
+            batchCode: new Date().getYear() + 1896 - 2000,
+            departmentId: dept.dataValues.id,
+          });
+        }
         res.json({
           message: "Department created successfully",
           dept,

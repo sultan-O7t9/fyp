@@ -17,6 +17,7 @@ const Login = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // window.location.reload();
     if (accessToken) history.replace("/");
   }, [accessToken, history]);
 
@@ -42,7 +43,7 @@ const Login = () => {
     <Box style={Styles.container}>
       <Card style={Styles.card}>
         <Typography variant="h5" style={Styles.heading}>
-          Log In as Faculty
+          Log In
         </Typography>
         <TextField
           style={Styles.input}
@@ -64,7 +65,7 @@ const Login = () => {
           Log in
         </Button>
         <Typography variant="h6" style={{ textAlign: "center" }}>
-          <Link to="/group">Log in as Student</Link>
+          <Link to="/group">Log in as Group</Link>
         </Typography>
         {error ? <Alert severity="error">{error}</Alert> : null}
       </Card>

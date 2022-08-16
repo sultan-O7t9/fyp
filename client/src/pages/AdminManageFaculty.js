@@ -22,6 +22,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ManageFaculty from "./ManageFaculty";
 import AdminMainLayout from "../layouts/AdminMainLayout";
+import { useHistory } from "react-router-dom";
 const DATA = {
   heads: ["Name", "Department", "Role"],
   data: [

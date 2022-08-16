@@ -42,6 +42,7 @@ export default function AppBarMenu() {
       }
     } catch (error) {
       console.log(error);
+      window.location.reload();
     }
   };
 

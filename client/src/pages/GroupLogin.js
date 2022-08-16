@@ -34,6 +34,7 @@ const GroupLogin = () => {
       console.log(response.data);
       //   const { accessToken } = response.data;
       dispatch(loginUser(response.data));
+      history.replace("/main/student");
       const groupID = localStorage.getItem("USER_ID");
 
       axios
@@ -46,7 +47,6 @@ const GroupLogin = () => {
           console.log(err);
         });
       //   console.log(groupInfo.data);
-      history.replace("/main/student");
     } catch (error) {
       //  Generate an alert here.
       console.log(error.response?.data?.message);
@@ -58,7 +58,7 @@ const GroupLogin = () => {
     <Box style={Styles.container}>
       <Card style={Styles.card}>
         <Typography variant="h5" style={Styles.heading}>
-          Log In as Student
+          Log In as Group
         </Typography>
         <TextField
           style={Styles.input}

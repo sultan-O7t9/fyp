@@ -40,8 +40,8 @@ class ProjectController {
         project,
       });
     } catch (err) {
-      console.log(error);
-      res.status(500).json({ message: err });
+      console.log(err);
+      res.status(500).json({ message: err, get: false });
     }
   };
 }

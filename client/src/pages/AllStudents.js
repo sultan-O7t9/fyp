@@ -65,7 +65,7 @@ const DataBody = ({ data }) => {
 
   return (
     <>
-      <TableRow>
+      {/* <TableRow>
         <TableCell>
           <Typography variant="body1">Filter</Typography>
         </TableCell>
@@ -83,7 +83,7 @@ const DataBody = ({ data }) => {
             }))}
           />
         </TableCell>
-      </TableRow>
+      </TableRow> */}
       {data &&
         filteredData.map((row, index) => (
           <TableRow key={index}>

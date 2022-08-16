@@ -58,7 +58,6 @@ const UploadFile = props => {
                     <input
                       id="fileInput"
                       type="file"
-                      accept=".pdf"
                       onChange={handleFileInputChange}
                     />
                   ) : (

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UploadFile from "./components/UploadFile";
+import GroupMainLayout from "./layouts/GroupMainLayouot";
 import MainLayout from "./layouts/MainLayout";
 import AdminAllGroups from "./pages/AdminAllGroups";
 import AdminLogin from "./pages/AdminLogin";
@@ -43,6 +44,13 @@ const AdminRoutes = () => {
 };
 
 const App = () => {
+  useEffect(() => {
+    const init = async () => {
+      const res = await axios.get("http://localhost:5000/api/auth/init");
+      console.log(res.data);
+    };
+    init();
+  }, []);
   const [roles, setRoles] = useState([]);
   const token = useSelector(state => state.auth.accessToken);
   const history = useHistory();
@@ -118,8 +126,8 @@ const App = () => {
       <Route exact path="/register-project" component={SubmitProjectTitle} />
       {roles === "HOD" ? (
         <AdminRoutes />
-      ) : (
-        <MainLayout>
+      ) : roles === "group" ? (
+        <GroupMainLayout>
           <Route exact path="/main/student" component={GroupDashboard} />
           <Route
             exact
@@ -128,6 +136,10 @@ const App = () => {
           />
           <Route exact path="/main/d2" component={D2SubmissionPage} />
           <Route exact path="/main/d3" component={D3SubmissionPage} />
+          <Route exact path="/main/group/:id" component={GroupDetail} />
+        </GroupMainLayout>
+      ) : (
+        <MainLayout>
           <Route exact path="/groups" component={AllGroups} />
           <Route exact path="/groups/:id" component={GroupDetail} />
           <Route

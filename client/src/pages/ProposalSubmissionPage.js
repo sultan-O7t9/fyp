@@ -103,7 +103,7 @@ const DataBody = () => {
       );
       console.log("file:", res.data);
       if (res.data.upload) setShowUploadModal(false);
-      setFile();
+      setFile({ name: "" });
       // setName(res.data.file);
     } catch (err) {
       console.log(err);
@@ -138,14 +138,14 @@ const DataBody = () => {
           <Typography variant="h4">{deliverableData.title}</Typography>
         </TableCell>
       </TableRow>
-      <TableRow>
+      {/* <TableRow>
         <TableCell>
           <Typography variant="h6">Status</Typography>
         </TableCell>
         <TableCell>
           <Typography variant="body">Approved</Typography>
         </TableCell>
-      </TableRow>
+      </TableRow> */}
       {deliverableData.template ? (
         <TableRow>
           <TableCell>
