@@ -131,13 +131,13 @@ const DataBody = () => {
       <TableRow>
         <TableCell colSpan={3}>
           <Box>
-            <Button
+            {/* <Button
               variant="contained"
               type="submit"
               onClick={sendMailToStudents}
             >
               Send Mail
-            </Button>
+            </Button> */}
           </Box>
         </TableCell>
       </TableRow>

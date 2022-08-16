@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "tbl_version",
-      createdAt: false,
+      // createdAt: false,
       updatedAt: false,
     }
   );

@@ -326,8 +326,14 @@ class DeliverableController {
           });
           const data = {
             ...group.dataValues,
-            submission: versions.pop(),
-            project: project.dataValues,
+            submission: versions.length > 0 ? versions.pop() : {},
+            project: project
+              ? project.dataValues
+              : {
+                  id: null,
+                  title: null,
+                  description: null,
+                },
           };
           subs.push(data);
         })
@@ -413,8 +419,14 @@ class DeliverableController {
           });
           const data = {
             ...group.dataValues,
-            submission: versions.pop(),
-            project: project.dataValues,
+            submission: versions.length > 0 ? versions.pop() : {},
+            project: project
+              ? project.dataValues
+              : {
+                  id: null,
+                  title: null,
+                  description: null,
+                },
           };
           subs.push(data);
         })

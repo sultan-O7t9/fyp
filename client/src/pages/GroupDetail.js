@@ -76,6 +76,10 @@ const DataBody = () => {
   }, [groupId]);
 
   const updateSupMarks = async () => {
+    if (supMarks > supEvaluationData.totalMarks) {
+      alert("Marks cannot be greater than total marks");
+      return;
+    }
     const data = {
       groupId: groupId,
       projectId: groupInfo.project.id,
@@ -94,6 +98,10 @@ const DataBody = () => {
     }
   };
   const updatePmoMarks = async () => {
+    if (pmoMarks > pmoEvaluationData.totalMarks) {
+      alert("Marks cannot be greater than total marks");
+      return;
+    }
     const data = {
       groupId: groupId,
       projectId: groupInfo.project.id,
