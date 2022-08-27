@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  IconButton,
   List,
   ListItem,
   TableCell,
@@ -13,10 +15,12 @@ import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
 import ImportFromExcel from "../components/ImportFromExcel";
 import Link from "../components/Link";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Main from "../components/Main";
 import axios from "axios";
 import Select from "../components/Select";
 import styles from "./auth.styles";
+import { ConstructionOutlined } from "@mui/icons-material";
 
 const DATA = {
   heads: ["Group ID", "Members", "Project Title", "Supervisor"],
@@ -49,7 +53,7 @@ const DataHead = ({ heads }) => {
   );
 };
 
-const DataBody = ({ data }) => {
+const DataBody = ({ data, setRefresh }) => {
   const [filter, setFilter] = useState("All");
   const [filteredData, setFilteredData] = useState([...data]);
   const filters = ["In Groups", "All", "Not In Groups"];
@@ -62,6 +66,21 @@ const DataBody = ({ data }) => {
       setFilteredData(data.filter(item => item.group === null));
     }
   }, [filter, data]);
+
+  const handleDeleteStudent = async id => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/student/delete/${id}`
+      );
+      if (res.data.delete) {
+        setRefresh(refresh => !refresh);
+      } else {
+        alert("Something went wrong! Failed to delete the student");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -90,6 +109,18 @@ const DataBody = ({ data }) => {
             <TableCell>{row.rollNo}</TableCell>
             <TableCell>{row.name}</TableCell>
             <TableCell>{row.group || "None"}</TableCell>
+            <TableCell>
+              <IconButton
+                onClick={() => {
+                  console.log("del student " + row.rollNo);
+                  handleDeleteStudent(row.rollNo);
+                }}
+                color="error"
+                variant="outlined"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </TableCell>
           </TableRow>
         ))}
     </>
@@ -99,6 +130,7 @@ const DataBody = ({ data }) => {
 const AllStudents = () => {
   const [heads, setHeads] = useState(["Name", "Roll No", "Group"]);
   const [body, setBody] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -115,7 +147,7 @@ const AllStudents = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [refresh]);
 
   const importDataHandler = async importedData => {
     // console.log(importedData);
@@ -147,18 +179,24 @@ const AllStudents = () => {
         else return null;
       })
       .filter(item => item != null);
-
+    const alreadyCreatedStudents = body.map(item => item.rollNo);
+    const studentsToCreate = students.filter(
+      item => !alreadyCreatedStudents.includes(item.rollNo)
+    );
+    console.log(studentsToCreate);
+    // return;
     //Now send request to server and create studetns there, render the response array in table
     try {
       const response = await axios.post(
         "http://localhost:5000/api/student/create-all",
-        { students }
+        { students: studentsToCreate }
       );
 
       if (response.status === 200) {
         setIsLoading(false);
         setHeads(dataHeads);
-        setBody(response.data.students);
+        // setBody(response.data.students);
+        setRefresh(refresh => !refresh);
       }
     } catch (error) {
       console.log(error);
@@ -187,17 +225,20 @@ const AllStudents = () => {
           <Box>
             <Typography variant="h3">Students</Typography>
           </Box>
-          <Box>
+          <Box style={{ display: "flex", flexDirection: "column" }}>
             <ImportFromExcel
               label="Import Students"
               importData={importDataHandler}
-              disabled={body.length > 0}
+              // disabled={body.length > 0}
             />
+            {/* <Button style={{ marginTop: "1rem" }} variant="contained">
+              Add Student
+            </Button> */}
           </Box>
         </Box>
         <DataTable
           DataHead={() => <DataHead heads={heads} />}
-          DataBody={() => <DataBody data={body} />}
+          DataBody={() => <DataBody data={body} setRefresh={setRefresh} />}
         />
       </Main>
     </ContainerFluid>

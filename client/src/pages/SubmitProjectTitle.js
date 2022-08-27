@@ -82,7 +82,9 @@ const SubmitProjectTitle = () => {
         }
       );
       console.log(result.data);
-      if (result.data.project) logoutHandler();
+      if (result.data.project) {
+        history.replace("/main/student");
+      }
     } catch (error) {
       console.log(error);
     }

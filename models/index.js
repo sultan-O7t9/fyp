@@ -35,6 +35,21 @@ const Deliverable = require("./Deliverable")(sequelize, DataTypes);
 const Version = require("./Version")(sequelize, DataTypes);
 const EvaluationType = require("./EvaluationType")(sequelize, DataTypes);
 const Evaluation = require("./Evaluation")(sequelize, DataTypes);
+const EvaluationSchedule = require("./EvaluationSchedule")(
+  sequelize,
+  DataTypes
+);
+const ProposalEvaluation = require("./ProposalEvaluation")(
+  sequelize,
+  DataTypes
+);
+const D2Evaluation = require("./D2Evaluation")(sequelize, DataTypes);
+const D3Evaluation = require("./D3Evaluation")(sequelize, DataTypes);
+const SupervisorEvaluation = require("./SupervisorEvaluation")(
+  sequelize,
+  DataTypes
+);
+const PmoEvaluation = require("./PmoEvaluation")(sequelize, DataTypes);
 // const PMO= require("./PMO")(sequelize, DataTypes);
 
 // //Associate the model with other models
@@ -111,6 +126,36 @@ Deliverable.hasMany(Version, {
 Group.hasMany(Version, {
   foreignKey: "groupId",
 });
+Student.hasMany(ProposalEvaluation, {
+  foreignKey: "studentId",
+});
+Group.hasMany(ProposalEvaluation, {
+  foreignKey: "groupId",
+});
+Student.hasMany(D2Evaluation, {
+  foreignKey: "studentId",
+});
+Group.hasMany(D2Evaluation, {
+  foreignKey: "groupId",
+});
+Student.hasMany(D3Evaluation, {
+  foreignKey: "studentId",
+});
+Group.hasMany(D3Evaluation, {
+  foreignKey: "groupId",
+});
+Student.hasMany(SupervisorEvaluation, {
+  foreignKey: "studentId",
+});
+Group.hasMany(SupervisorEvaluation, {
+  foreignKey: "groupId",
+});
+Student.hasMany(PmoEvaluation, {
+  foreignKey: "studentId",
+});
+Group.hasMany(PmoEvaluation, {
+  foreignKey: "groupId",
+});
 // FacultyMember.hasMany(Deliverable, {
 //   foreignKey: "facultyId",
 // }
@@ -137,9 +182,16 @@ Project.hasMany(Evaluation, {
 Evaluation.belongsTo(EvaluationType, {
   foreignKey: "evaluationTypeId",
 });
-Group.hasMany(Evaluation, {
+Student.hasMany(Evaluation, {
+  foreignKey: "studentId",
+});
+Group.hasMany(EvaluationSchedule, {
   foreignKey: "groupId",
 });
+Deliverable.hasMany(EvaluationSchedule, {
+  foreignKey: "deliverableId",
+});
+// Committee.hs
 
 // Evaluation.hasMany(Version, {});
 // Evaluation.hasMany(Project, {});
@@ -166,6 +218,11 @@ module.exports = {
   Role,
   Faculty_Role,
   Group,
+  D2Evaluation,
+  D3Evaluation,
+  ProposalEvaluation,
+  SupervisorEvaluation,
+  PmoEvaluation,
   Student,
   Department,
   Deliverable,
@@ -174,6 +231,7 @@ module.exports = {
   Token,
   Evaluation,
   EvaluationType,
+  EvaluationSchedule,
   Project,
   Committee,
 };

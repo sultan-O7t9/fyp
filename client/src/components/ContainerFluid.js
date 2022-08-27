@@ -5,11 +5,11 @@ import InnerAppbar from "./InnerAppbar";
 import { CssBaseline } from "@mui/material";
 
 export default function ContainerFluid(props) {
-  const { children, title, appbarActions } = props;
+  const { children, title, appbarActions, maxWidth } = props;
   return (
     <>
       <CssBaseline />
-      <Container maxWidth="md">
+      <Container maxWidth={maxWidth ? maxWidth : "md"}>
         <InnerAppbar title={title} actions={appbarActions} />
         <Box>{children}</Box>
       </Container>

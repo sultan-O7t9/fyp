@@ -38,7 +38,9 @@ export default function AppBarMenu() {
       if (response.data.logout) {
         localStorage.clear();
         dispatch(logoutUser());
+
         histroy.replace("/login");
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);

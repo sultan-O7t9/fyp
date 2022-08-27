@@ -24,6 +24,9 @@ const DataBody = () => {
   const groupID = localStorage.getItem("USER_ID");
   const history = useHistory();
   const [projectData, setProjectData] = useState({});
+  const [proposalDeadline, setProposalDeadline] = useState("None");
+  const [d2Deadline, setD2Deadline] = useState("None");
+  const [d3Deadline, setD3Deadline] = useState("None");
   useEffect(() => {
     console.log(groupID);
     const getData = async () => {
@@ -37,16 +40,39 @@ const DataBody = () => {
         setProjectData(projectRes.data.project);
       } catch (err) {
         console.log(err);
-        history.replace("/register-project");
+        history.replace("/main/info");
       }
     };
+    const getDeliverablesData = async () => {
+      const delivRes = await axios.get(
+        "http://localhost:5000/api/deliverable/get-all"
+      );
+      console.log(delivRes.data);
+      const proposal = delivRes.data.deliverables.filter(
+        deliv => deliv.id == 1
+      )[0];
+      const d2 = delivRes.data.deliverables.filter(deliv => deliv.id == 2)[0];
+      const d3 = delivRes.data.deliverables.filter(deliv => deliv.id == 3)[0];
+      console.log(proposal, d2, d3);
+      setProposalDeadline(
+        proposal.deadline ? new Date(proposal.deadline).toDateString() : "None"
+      );
+      setD2Deadline(
+        d2.deadline ? new Date(d2.deadline).toDateString() : "None"
+      );
+      setD3Deadline(
+        d3.deadline ? new Date(d3.deadline).toDateString() : "None"
+      );
+      // setProposalDeadline(delivRes.data.deliverables);
+    };
     getData();
+    getDeliverablesData();
   }, [groupID, history]);
 
   return (
     <>
       <TableRow>
-        <TableCell>
+        <TableCell colSpan={2}>
           <Typography variant="h6">Project: {projectData.title}</Typography>
         </TableCell>
       </TableRow>
@@ -56,6 +82,13 @@ const DataBody = () => {
             <Link to="/main/proposal">1st Deliverable: Project Proposal</Link>
           </Button>
         </TableCell>
+
+        <TableCell>
+          <Typography variant="subtitle2">
+            {" "}
+            Deadline: {proposalDeadline}
+          </Typography>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell>
@@ -63,12 +96,19 @@ const DataBody = () => {
             <Link to="/main/d2">2nd Deliverable: Documentation</Link>
           </Button>
         </TableCell>
+
+        <TableCell>
+          <Typography variant="subtitle2"> Deadline: {d2Deadline}</Typography>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell>
           <Button color="primary" variant="outlined">
             <Link to="/main/d3">3rd Deliverable: Working System</Link>
           </Button>
+        </TableCell>
+        <TableCell>
+          <Typography variant="subtitle2"> Deadline: {d3Deadline}</Typography>
         </TableCell>
       </TableRow>
       <TableRow>

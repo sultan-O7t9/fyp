@@ -5,6 +5,7 @@ import {
   ListItem,
   TableCell,
   TableRow,
+  TextareaAutosize,
   TextField,
   Typography,
 } from "@mui/material";
@@ -17,113 +18,194 @@ import MenuButton from "../components/MenuButton";
 import { useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
+import Toast from "../components/Toast";
 
 const DataHead = () => null;
 
-const DataBody = () => {
+const DataBody = props => {
+  const { groupInfo, setToast, setTMsg } = props;
   const role = localStorage.getItem("USER_ROLE");
   const history = useHistory();
+  const [projectDetails, setProjectDetails] = useState({});
   // const [modal, setModal] = useState(false);
   const params = useParams();
   const groupId = params.id;
   // console.log(id);
-  const [groupInfo, setGroupInfo] = useState({});
+  // const [groupInfo, setGroupInfo] = useState({});
+
+  const isSupervisor =
+    localStorage.getItem("USER_ROLE").includes("SUPERVISOR") &&
+    groupInfo.hasOwnProperty("supervisor") &&
+    groupInfo.supervisor.id == localStorage.getItem("USER_ID");
+  const isPmo = localStorage.getItem("USER_ROLE").includes("PMO");
 
   const [pmoEvaluationData, setPmoEvaluationData] = useState({});
   const [pmoMarks, setPmoMarks] = useState("");
+  const [pmoRemarks, setPmoRemarks] = useState("");
 
   const [supEvaluationData, setSupEvaluationData] = useState({});
   const [supMarks, setSupMarks] = useState("");
+  const [supRemarks, setSupRemarks] = useState("");
+
   useEffect(() => {
-    const getData = async () => {
+    if (supEvaluationData.remarks) setSupRemarks(supEvaluationData.remarks);
+  }, [supEvaluationData]);
+  useEffect(() => {
+    if (pmoEvaluationData.remarks) setPmoRemarks(pmoEvaluationData.remarks);
+  }, [pmoEvaluationData]);
+
+  useEffect(() => {
+    if (!supEvaluationData.students) return;
+    const students = supEvaluationData.students;
+    const marks = {};
+    students.forEach(student => {
+      marks[student.rollNo] = student.marks;
+    });
+    setSupMarks(marks);
+  }, [supEvaluationData]);
+  useEffect(() => {
+    if (!pmoEvaluationData.students) return;
+    const students = pmoEvaluationData.students;
+    const marks = {};
+    students.forEach(student => {
+      marks[student.rollNo] = student.marks;
+    });
+    setPmoMarks(marks);
+  }, [pmoEvaluationData]);
+
+  useEffect(() => {
+    const getEvaluationData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/group/get/" + groupId
+        const response = await axios.post(
+          "http://localhost:5000/api/evaluation/sup-evaluation",
+          { groupId: groupId }
         );
-        console.log(res.data);
-        setGroupInfo(res.data.group);
-
-        const pmoRes = await axios.post(
-          "http://localhost:5000/api/evaluation/get-pmo-evaluation",
-          {
-            groupId: groupId,
-            projectId: res.data.group.project.id,
-          }
-        );
-        console.log(pmoRes.data);
-        setPmoEvaluationData(pmoRes.data.evaluation);
-        setPmoMarks(
-          pmoRes.data.evaluation.marks ? pmoRes.data.evaluation.marks : 0
-        );
-
-        const supRes = await axios.post(
-          "http://localhost:5000/api/evaluation/get-supervisor-evaluation",
-          {
-            groupId: groupId,
-            projectId: res.data.group.project.id,
-          }
-        );
-        console.log(supRes.data);
-        setSupEvaluationData(supRes.data.evaluation);
-        setSupMarks(
-          supRes.data.evaluation.marks ? supRes.data.evaluation.marks : 0
-        );
+        console.log(response.data);
+        setSupEvaluationData(response.data.group);
+        // console.log(DATA.group);
+        // setEvalData(DATA.group);
       } catch (err) {
         console.log(err);
       }
     };
-    getData();
+    getEvaluationData();
   }, [groupId]);
 
-  const updateSupMarks = async () => {
-    if (supMarks > supEvaluationData.totalMarks) {
-      alert("Marks cannot be greater than total marks");
-      return;
-    }
+  useEffect(() => {
+    //get project Data,
+    const getProjectDetails = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/project/get-grp/" + groupId
+        );
+        console.log(res.data);
+        setProjectDetails(res.data.project);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getProjectDetails();
+  }, [groupId]);
+
+  useEffect(() => {
+    const getEvaluationData = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/evaluation/pmo-evaluation",
+          { groupId: groupId }
+        );
+        console.log(response.data);
+        setPmoEvaluationData(response.data.group);
+        // console.log(DATA.group);
+        // setEvalData(DATA.group);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getEvaluationData();
+  }, [groupId]);
+
+  const changeSupMarks = (rollNo, marks) => {
+    if (marks < 0) return;
+    if (marks > 40) return;
+    const newMarks = { ...supMarks, [rollNo]: marks };
+    setSupMarks(newMarks);
+  };
+  const changePmoMarks = (rollNo, marks) => {
+    if (marks < 0) return;
+    if (marks > 20) return;
+    const newMarks = { ...pmoMarks, [rollNo]: marks };
+    setPmoMarks(newMarks);
+  };
+
+  const handleSupMarks = async () => {
+    // const data = {
+    //   groupId: groupId,
+    //   remarks: supRemarks,
+    //   students: supMarks.keys().map(rollNo => {
+    //     return { rollNo: rollNo, marks: supMarks[rollNo] };
+    //   }),
+    // };
+    const students = [...supEvaluationData.students];
+
+    students.forEach(student => {
+      student.marks = supMarks[student.rollNo];
+    });
     const data = {
       groupId: groupId,
-      projectId: groupInfo.project.id,
-      marksObtained: supMarks,
-      totalMarks: supEvaluationData.totalMarks,
+      remarks: supRemarks,
+      students: students,
     };
+    console.log(data);
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/evaluation/update-supervisor-evaluation",
+      const res = await axios.post(
+        "http://localhost:5000/api/evaluation/add-sup-evaluation",
         data
       );
       console.log(res.data);
-      setPmoEvaluationData(res.data.evaluation);
+      setTMsg("Marks updated successfully");
+      setToast(true);
     } catch (err) {
+      setTMsg("Error updating marks");
+      setToast(true);
       console.log(err);
     }
   };
-  const updatePmoMarks = async () => {
-    if (pmoMarks > pmoEvaluationData.totalMarks) {
-      alert("Marks cannot be greater than total marks");
-      return;
-    }
+  const handlePmoMarks = async () => {
+    const students = [...pmoEvaluationData.students];
+
+    students.forEach(student => {
+      student.marks = pmoMarks[student.rollNo];
+    });
     const data = {
       groupId: groupId,
-      projectId: groupInfo.project.id,
-      marksObtained: pmoMarks,
-      totalMarks: pmoEvaluationData.totalMarks,
+      remarks: pmoRemarks,
+      students: students,
     };
+    console.log(data);
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/evaluation/update-pmo-evaluation",
+      const res = await axios.post(
+        "http://localhost:5000/api/evaluation/add-pmo-evaluation",
         data
       );
       console.log(res.data);
-      setPmoEvaluationData(res.data.evaluation);
+      setTMsg("Marks updated successfully");
+      setToast(true);
     } catch (err) {
+      setTMsg("Error updating marks");
+      setToast(true);
       console.log(err);
     }
+  };
+
+  const handleDetailedReport = () => {
+    history.push("/report", groupInfo);
   };
 
   return (
     <>
       <TableRow>
-        <TableCell>
+        <TableCell colSpan={2}>
           <Typography variant="h6">Group Leader</Typography>
         </TableCell>
         <TableCell>
@@ -139,7 +221,7 @@ const DataBody = () => {
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>
+        <TableCell colSpan={2}>
           <Typography variant="h6">Group Members</Typography>
         </TableCell>
         <TableCell>
@@ -158,7 +240,7 @@ const DataBody = () => {
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>
+        <TableCell colSpan={2}>
           <Typography variant="h6">Supervisor</Typography>
         </TableCell>
         <TableCell>
@@ -176,7 +258,7 @@ const DataBody = () => {
       </TableRow>
 
       <TableRow>
-        <TableCell>
+        <TableCell colSpan={2}>
           <Typography variant="h6">Evaluation Committee</Typography>
         </TableCell>
         <TableCell>
@@ -192,8 +274,16 @@ const DataBody = () => {
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>
-          <Typography variant="h6">Project</Typography>
+        <TableCell colSpan={3}>{""}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell colSpan={3}>
+          <Typography variant="h4">Project Details</Typography>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell colSpan={2}>
+          <Typography variant="h6">Project Title</Typography>
         </TableCell>
         <TableCell>
           {groupInfo.hasOwnProperty("project") && groupInfo.project.title ? (
@@ -205,6 +295,54 @@ const DataBody = () => {
           )}
         </TableCell>
       </TableRow>
+      {groupInfo.hasOwnProperty("project") &&
+      groupInfo.project.title &&
+      projectDetails.hasOwnProperty("title") ? (
+        <>
+          <TableRow>
+            <TableCell colSpan={2}>
+              <Typography variant="h6">Project Description</Typography>
+            </TableCell>
+            <TableCell>
+              <Typography variant="body1">
+                {projectDetails.description}
+              </Typography>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell colSpan={2}>
+              <Typography variant="h6">Project Type</Typography>
+            </TableCell>
+            <TableCell>
+              <Typography variant="body1">{projectDetails.type}</Typography>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell colSpan={2}>
+              <Typography variant="h6">Project Platform</Typography>
+            </TableCell>
+            <TableCell>
+              <Typography variant="body1">
+                {projectDetails.platform[0].toUpperCase() +
+                  projectDetails.platform.slice(1)}
+              </Typography>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell colSpan={2}>
+              <Typography variant="h6">Development Technology</Typography>
+            </TableCell>
+            <TableCell>
+              <Typography variant="body1">
+                {projectDetails.dev_tech
+                  .split(" ")
+                  .map(word => word[0].toUpperCase() + word.slice(1))
+                  .join(" ")}
+              </Typography>
+            </TableCell>
+          </TableRow>
+        </>
+      ) : null}
       {/* <TableRow>
         <TableCell>
           <Typography variant="h6">Project Proposal</Typography>
@@ -263,39 +401,100 @@ const DataBody = () => {
         ) : null}
       </TableRow> */}
       <TableRow>
-        <TableCell colSpan={2}></TableCell>
+        <TableCell colSpan={3}></TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={2}>
+        <TableCell colSpan={3}>
           <Typography variant="h4">PMO Evaluation</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={2}>
+        <TableCell colSpan={3}>
           <Typography variant="body1" style={{ fontWeight: "bold" }}>
-            Project Management Office (Sub-section total:{" "}
-            {pmoEvaluationData.totalMarks})
+            Project Management Office (Sub-section total:20)
           </Typography>
           <Typography>Meetings Deadlines, Attending Workshops</Typography>
         </TableCell>
       </TableRow>
-      {localStorage.getItem("USER_ROLE").includes("PMO") ? (
-        <>
-          <TableRow>
-            <TableCell colSpan={2}>
-              <TextField
-                type="number"
-                placeholder="Marks"
-                value={pmoMarks}
-                onChange={e => setPmoMarks(e.target.value)}
-              />
-            </TableCell>
-          </TableRow>
+      {/* {localStorage.getItem("USER_ROLE").includes("PMO") ? (*/}
+      <>
+        <TableRow>
+          <TableCell style={{ fontWeight: "bold" }}>Total Marks</TableCell>
+          <TableCell style={{ fontWeight: "bold" }}>Marks Obtained</TableCell>
+          <TableCell style={{ fontWeight: "bold" }}>Remarks</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell colSpan={1}></TableCell>
+          <TableCell style={{ display: "flex" }}>
+            {pmoEvaluationData.students && pmoEvaluationData.students.length
+              ? pmoEvaluationData.students.map(student => (
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      width: "6rem",
+                      marginRight: "1rem",
+                    }}
+                  >
+                    {student.rollNo}
+                  </div>
+                ))
+              : null}
+          </TableCell>
+          <TableCell colSpan={1}>{""}</TableCell>
+        </TableRow>
 
+        <TableRow>
+          <TableCell>20</TableCell>
+          <TableCell>
+            {pmoEvaluationData.students && pmoEvaluationData.students.length
+              ? pmoEvaluationData.students.map(student => {
+                  const value = pmoMarks[student.rollNo]
+                    ? pmoMarks[student.rollNo]
+                    : 0;
+                  return (
+                    <>
+                      {isPmo ? (
+                        <TextField
+                          style={{ width: "6rem", marginRight: "1rem" }}
+                          value={value}
+                          onChange={e => {
+                            changePmoMarks(student.rollNo, e.target.value);
+                          }}
+                        />
+                      ) : (
+                        <Typography
+                          style={{
+                            width: "6rem",
+                            marginRight: "1rem",
+                            display: "inline-block",
+                          }}
+                        >
+                          {value}
+                        </Typography>
+                      )}
+                    </>
+                  );
+                })
+              : null}
+          </TableCell>
+          <TableCell>
+            {isPmo ? (
+              <TextareaAutosize
+                minRows={4}
+                value={pmoRemarks}
+                onChange={e => setPmoRemarks(e.target.value)}
+              />
+            ) : (
+              <Typography variant="body1">{pmoRemarks}</Typography>
+            )}
+          </TableCell>
+        </TableRow>
+
+        {isPmo ? (
           <TableRow>
-            <TableCell colSpan={2}>
+            <TableCell colSpan={3}>
               <Button
-                onClick={updatePmoMarks}
+                onClick={handlePmoMarks}
                 variant="contained"
                 color="primary"
                 size="large"
@@ -305,52 +504,104 @@ const DataBody = () => {
               </Button>
             </TableCell>
           </TableRow>
-        </>
-      ) : (
-        <TableRow>
-          <TableCell colSpan={2}>
-            <Typography variant="body1">
-              {pmoMarks}/{pmoEvaluationData.totalMarks}
-            </Typography>
-          </TableCell>
-        </TableRow>
-      )}
+        ) : null}
+      </>
       {/* Supervisor Marks */}
       <TableRow>
-        <TableCell colSpan={2}></TableCell>
+        <TableCell colSpan={3}></TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={2}>
+        <TableCell colSpan={3}>
           <Typography variant="h4">Supervisor Evaluation</Typography>
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={2}>
+        <TableCell colSpan={3}>
           <Typography variant="body1" style={{ fontWeight: "bold" }}>
-            Supervisor (Sub-section total: {supEvaluationData.totalMarks})
+            Supervisor (Sub-section total: 40)
           </Typography>
           <Typography>Meetings, Project Progress</Typography>
         </TableCell>
       </TableRow>
-      {localStorage.getItem("USER_ROLE").includes("SUPERVISOR") &&
-      groupInfo.hasOwnProperty("supervisor") &&
-      groupInfo.supervisor.id == localStorage.getItem("USER_ID") ? (
-        <>
-          <TableRow>
-            <TableCell colSpan={2}>
-              <TextField
-                type="number"
-                placeholder="Marks"
-                value={supMarks}
-                onChange={e => setSupMarks(e.target.value)}
-              />
-            </TableCell>
-          </TableRow>
 
+      <>
+        <TableRow>
+          <TableCell style={{ fontWeight: "bold" }}>Total Marks</TableCell>
+          <TableCell style={{ fontWeight: "bold" }}>Marks Obtained</TableCell>
+          <TableCell style={{ fontWeight: "bold" }}>Remarks</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell colSpan={1}></TableCell>
+          <TableCell style={{ display: "flex" }}>
+            {supEvaluationData.students && supEvaluationData.students.length
+              ? supEvaluationData.students.map(student => (
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      width: "6rem",
+                      marginRight: "1rem",
+                    }}
+                  >
+                    {student.rollNo}
+                  </div>
+                ))
+              : null}
+          </TableCell>
+          <TableCell colSpan={1}>{""}</TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell>40</TableCell>
+          <TableCell>
+            {supEvaluationData.students && supEvaluationData.students.length
+              ? supEvaluationData.students.map(student => {
+                  const value = supMarks[student.rollNo]
+                    ? supMarks[student.rollNo]
+                    : 0;
+                  return (
+                    <>
+                      {isSupervisor ? (
+                        <TextField
+                          style={{ width: "6rem", marginRight: "1rem" }}
+                          value={value}
+                          onChange={e => {
+                            changeSupMarks(student.rollNo, e.target.value);
+                          }}
+                        />
+                      ) : (
+                        <Typography
+                          style={{
+                            width: "6rem",
+                            marginRight: "1rem",
+                            display: "inline-block",
+                          }}
+                        >
+                          {value}
+                        </Typography>
+                      )}
+                    </>
+                  );
+                })
+              : null}
+          </TableCell>
+          <TableCell>
+            {isSupervisor ? (
+              <TextareaAutosize
+                minRows={4}
+                value={supRemarks}
+                onChange={e => setSupRemarks(e.target.value)}
+              />
+            ) : (
+              <Typography variant="body1">{supRemarks}</Typography>
+            )}
+          </TableCell>
+        </TableRow>
+
+        {isSupervisor ? (
           <TableRow>
-            <TableCell colSpan={2}>
+            <TableCell colSpan={3}>
               <Button
-                onClick={updateSupMarks}
+                onClick={handleSupMarks}
                 variant="contained"
                 color="primary"
                 size="large"
@@ -360,22 +611,26 @@ const DataBody = () => {
               </Button>
             </TableCell>
           </TableRow>
-        </>
-      ) : (
-        <TableRow>
-          <TableCell colSpan={2}>
-            <Typography variant="body1">
-              {supMarks}/{supEvaluationData.totalMarks}
-            </Typography>
-          </TableCell>
-        </TableRow>
-      )}
+        ) : null}
+      </>
+      <TableRow>
+        <TableCell colSpan={3}>
+          {/* <Typography variant="h6">
+            Detailed Report
+          </Typography> */}
+          <Button variant="contained" onClick={handleDetailedReport}>
+            Show Detailed Report
+          </Button>
+        </TableCell>
+      </TableRow>
     </>
   );
 };
 
 const GroupDetail = () => {
   const [groupInfo, setGroupInfo] = useState({});
+  const [open, setOpen] = useState(false);
+  const [tMsg, setTMsg] = useState("");
   const params = useParams();
   const groupId = params.id;
   useEffect(() => {
@@ -391,31 +646,43 @@ const GroupDetail = () => {
       }
     };
     getData();
-  }, []);
+  }, [groupId]);
   return (
-    <ContainerFluid title="">
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h3">
-              {groupInfo.hasOwnProperty("name") ? groupInfo.name : ""}
-            </Typography>
-          </Box>
-          {/* <Box>
+    <>
+      {open ? <Toast open={open} setOpen={setOpen} message={tMsg} /> : null}
+      <ContainerFluid title="">
+        <Main styles={{ padding: "1.5rem" }}>
+          <Box
+            sx={{ marginBottom: "3rem" }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h3">
+                {groupInfo.hasOwnProperty("name") ? groupInfo.name : ""}
+              </Typography>
+            </Box>
+            {/* <Box>
             <Button variant="contained" color="primary">
               Settings
             </Button>
           </Box> */}
-        </Box>
+          </Box>
 
-        <DataTable DataHead={DataHead} DataBody={DataBody} />
-      </Main>
-    </ContainerFluid>
+          <DataTable
+            DataHead={DataHead}
+            DataBody={() => (
+              <DataBody
+                groupInfo={groupInfo}
+                setToast={setOpen}
+                setTMsg={setTMsg}
+              />
+            )}
+          />
+        </Main>
+      </ContainerFluid>
+    </>
   );
 };
 

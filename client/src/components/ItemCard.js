@@ -4,6 +4,7 @@ import Link from "./Link";
 
 const ItemCard = props => {
   const { styles, item, index } = props;
+  const roles = localStorage.getItem("USER_ROLE");
   return (
     <Paper
       style={{
@@ -19,7 +20,11 @@ const ItemCard = props => {
         <Typography variant="caption">{index}</Typography>
         <br />
         <Link
-          to={"/deliverable/" + item.id}
+          to={
+            roles.includes("PMO") || roles.includes("EVALUATOR")
+              ? "/deliverable/" + item.id
+              : "/sup/deliverable/" + item.id
+          }
           style={{ textDecoration: "none" }}
           variant="h5"
         >

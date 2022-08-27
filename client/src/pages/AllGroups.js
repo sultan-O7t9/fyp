@@ -13,11 +13,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
-import ExportAsExcel from "../components/ExportAsExcel";
+import GroupExportTable from "../components/GroupExportTable";
 import GroupsDataBody from "../components/GroupsDataBody";
 import GroupsDataHead from "../components/GroupsDataHead";
 import Link from "../components/Link";
 import Main from "../components/Main";
+import Toast from "../components/Toast";
 import ManageGroup from "./ManageGroup";
 
 // const DATA = {
@@ -46,21 +47,35 @@ import ManageGroup from "./ManageGroup";
 
 const AllGroups = () => {
   const isPMO = localStorage.getItem("USER_ROLE").includes("PMO");
-  const [heads, setHeads] = useState([
-    "Group ID",
-    "Members",
-    "Project Title",
-    "Supervisor",
-    "Booklets Status",
-    "",
-  ]);
+
+  const [heads, setHeads] = useState([]);
 
   const [body, setBody] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showManageGroup, setShowManageGroup] = useState(false);
   useEffect(() => {
-    if (!isPMO)
-      setHeads(["Group ID", "Members", "Project Title", "Booklets Status", ""]);
+    const headers = isPMO
+      ? [
+          "Group ID",
+          "Members",
+          "",
+          "Project Title",
+          "Supervisor",
+          "Booklets Status",
+          "Booklets Comment",
+          "",
+          "",
+        ]
+      : [
+          "Group ID",
+          "Members",
+          "",
+          "Project Title",
+          "Booklets Status",
+          "Booklets Comment",
+          "",
+        ];
+    if (!isPMO) setHeads(headers);
   }, [isPMO]);
 
   useEffect(() => {
@@ -72,6 +87,7 @@ const AllGroups = () => {
           localStorage.getItem("USER_ID")
       )
       .then(res => {
+        console.log(res.data.groups);
         setBody(res.data.groups);
       })
       .catch(err => {
@@ -97,7 +113,7 @@ const AllGroups = () => {
     );
 
   return (
-    <ContainerFluid>
+    <ContainerFluid maxWidth="lg">
       {showManageGroup ? (
         <ManageGroup group={showManageGroup} setDisplay={setShowManageGroup} />
       ) : null}
@@ -112,27 +128,38 @@ const AllGroups = () => {
             <Typography variant="h3">Groups</Typography>
           </Box>
           <Box style={{ display: "flex", flexDirection: "column" }}>
-            <ExportAsExcel
-              label="Export Groups"
-              data={[
-                [...heads],
-                ...body.map(row => [
-                  row.id,
-                  row.members.map(member => member.rollNo).join(","),
-                  row.project ? row.project.title : "None",
-                  row.supervisor ? row.supervisor : "None",
-                  row.bookletsStatus ? row.bookletsStatus : "None",
-                ]),
-              ]}
-            />
-            <Button
-              style={{ marginTop: ".5rem" }}
-              variant="contained"
-              color="primary"
-              onClick={() => editGroupHandler()}
-            >
-              Add Group
-            </Button>
+            {body.length > 0 ? (
+              <>
+                <GroupExportTable
+                  label="Export Groups"
+                  filename={("groups_" + new Date().toLocaleString()).replace(
+                    " ",
+                    "_"
+                  )}
+                  head={heads.filter(head => head !== "Booklets Comment")}
+                  body={body.map(row => ({
+                    id: row.id,
+                    members: row.members.map(member => member.rollNo),
+                    project: row.project ? row.project.title : "None",
+                    supervisor: row.supervisor ? row.supervisor : "None",
+                    booklets: row.bookletsStatus ? row.bookletsStatus : "None",
+                    bookletsComment: row.bookletsComment
+                      ? row.bookletsComment
+                      : "",
+                  }))}
+                />
+              </>
+            ) : null}
+            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+              <Button
+                style={{ marginTop: ".5rem" }}
+                variant="contained"
+                color="primary"
+                onClick={() => editGroupHandler()}
+              >
+                Add Group
+              </Button>
+            ) : null}
           </Box>
         </Box>
         <DataTable

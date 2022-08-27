@@ -62,12 +62,12 @@ const DataBody = ({ data, editCommittee, setData }) => {
     data &&
     data.map((row, index) => (
       <TableRow key={row.id}>
-        <TableCell>{row.id}</TableCell>
+        <TableCell>{row.name}</TableCell>
         {/* <TableCell>{row.members}</TableCell> */}
         <TableCell>
-          {row.FacultyMembers && row.FacultyMembers.length > 0 ? (
+          {row.members && row.members.length > 0 ? (
             <List>
-              {row.FacultyMembers.map(member => (
+              {row.members.map(member => (
                 <ListItem style={{ padding: 0 }} key={member.id}>
                   <Typography to="#" style={{ textDecoration: "none" }}>
                     {member.name}
@@ -98,7 +98,7 @@ const DataBody = ({ data, editCommittee, setData }) => {
           )}
         </TableCell>
         <TableCell align="right">
-          <IconButton
+          {/* <IconButton
             onClick={() => {
               editCommittee(row);
             }}
@@ -106,7 +106,7 @@ const DataBody = ({ data, editCommittee, setData }) => {
             variant="outlined"
           >
             <EditIcon />
-          </IconButton>
+          </IconButton> */}
 
           <IconButton
             onClick={() => {

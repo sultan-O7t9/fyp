@@ -81,17 +81,17 @@ const EditDeptPMO = props => {
   //   const [evaluators, setEvaluators] = useState([]);
   const [faculty, setFaculty] = useState([]);
   const [deptPMO, setDeptPMO] = useState("");
+  const [deptTitle, setDeptTitle] = useState("");
 
   useEffect(() => {
     // setDeptPMO(pmo);
     axios
-      .get(`http://localhost:5000/api/faculty/get-supervisors-only`, {
-        name: dept.name,
-      })
+      .get("http://localhost:5000/api/faculty/get-supervisors")
       .then(res => {
         const facultyData = res.data.supervisors.filter(
           supervisor => supervisor.id !== pmo.id
         );
+        console.log(facultyData);
         setFaculty(facultyData);
 
         //    setEvaluatorItems(res.data.supervisors)
@@ -218,6 +218,11 @@ const EditDeptPMO = props => {
       text: faculty.name,
     };
   });
+
+  // useEffect(() => {
+  //   const prevPMO = faculty.find(faculty => faculty.id == pmo.id);
+  //   setDeptPMO(prevPMO);
+  // }, [data, pmo]);
 
   //   const selectEvaluatorItems = evaluatorItems.map(evaluator => {
   //     return {

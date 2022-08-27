@@ -1,6 +1,17 @@
 import { useState } from "react";
-import { Button, Card, TableCell, TableRow, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  IconButton,
+  List,
+  ListItem,
+  TableCell,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
 import Main from "../components/Main";
@@ -12,26 +23,58 @@ import { useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
+import Toast from "../components/Toast";
+import AddSchedule from "../components/AddSchedule";
+import EditSchedule from "../components/EditSchedule";
+
 const DATA = {
-  heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
+  // heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
+  heads: [
+    "Group ID",
+    "Project Title",
+    "Supervisor",
+    // "Student Name",
+    // "Student Roll no.",
+    "Committee",
+    "Evaluation Date",
+    "",
+  ],
   data: [
     {
       id: "SE_18_1",
-      title: "Project 1",
-      submitted_on: new Date().toISOString(),
-      status: "Verified",
+      project: "Project1",
+      supervisor: "Sup1",
+      members: [
+        { rollNo: "18094198-079", name: "Sultan" },
+        { rollNo: "18094198-079", name: "Sultan" },
+        { rollNo: "18094198-079", name: "Sultan" },
+      ],
+      committee: "C_18_2",
+      date: new Date().toDateString(),
     },
     {
       id: "SE_18_1",
-      title: "Project 1",
-      submitted_on: new Date().toISOString(),
-      status: "Verified",
+      project: "Project1",
+      supervisor: "Sup1",
+      members: [
+        { rollNo: "18094198-079", name: "Sultan" },
+        { rollNo: "18094198-079", name: "Sultan" },
+        { rollNo: "18094198-079", name: "Sultan" },
+      ],
+      committee: "C_18_2",
+      date: new Date().toDateString(),
     },
     {
       id: "SE_18_1",
-      title: "Project 1",
-      submitted_on: new Date().toISOString(),
-      status: "Verified",
+      project: "Project1",
+      supervisor: "Sup1",
+      members: [
+        { rollNo: "18094198-079", name: "Sultan" },
+        { rollNo: "18094198-079", name: "Sultan" },
+        { rollNo: "18094198-079", name: "Sultan" },
+      ],
+      committee: "C_18_2",
+      date: new Date().toDateString(),
     },
   ],
 };
@@ -146,7 +189,9 @@ const DataBody = () => {
           <TableCell>{row.name}</TableCell>
           {/* <TableCell>{row.members}</TableCell> */}
           <TableCell>
-            {row.project.hasOwnProperty("title") ? row.project.title : "None"}
+            {row.project.hasOwnProperty("title") && row.project.title
+              ? row.project.title
+              : "None"}
           </TableCell>
           <TableCell>
             {row.submission.createdAt
@@ -175,6 +220,163 @@ const DataBody = () => {
   );
 };
 
+const DataBody2 = props => {
+  const { showScheduleModal } = props;
+  const userId = localStorage.getItem("USER_ID");
+  const history = useHistory();
+  const params = useParams();
+  const deliverableId = params.id;
+  const [schedulesData, setSchedulesData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [showEditScheduleModal, setShowEditScheduleModal] = useState(false);
+
+  useEffect(() => {
+    console.log(userId);
+    console.log(deliverableId);
+    const getSchedules = async () => {
+      const data = {
+        deliverableId,
+        userId,
+      };
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/evaluation/get-schedule-deliverable",
+          data
+        );
+        console.log(res.data);
+        const schedules = res.data.schedules;
+        schedules.sort((a, b) => {
+          return new Date(a.date) - new Date(b.date);
+        });
+        setSchedulesData(schedules);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getSchedules();
+  }, [
+    userId,
+    deliverableId,
+    refresh,
+    showScheduleModal,
+    showEditScheduleModal,
+  ]);
+
+  const handleDeleteSchedule = async id => {
+    console.log("DEL", id);
+    try {
+      const res = await axios.delete(
+        "http://localhost:5000/api/evaluation/del-schedule/" + id
+      );
+      console.log(res.data);
+      setRefresh(refresh => !refresh);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleNavToEvaluationPage = data => {
+    console.log(data.group);
+    if (deliverableId == 1) history.push("/proposal/eval/", data.group);
+    else if (deliverableId == 2) history.push("/d2/eval/", data.group);
+    else if (deliverableId == 3) history.push("/d3/eval/", data.group);
+  };
+
+  return (
+    <>
+      {schedulesData.length
+        ? schedulesData.map(row => {
+            const evaluators =
+              row.committee && row.committee.evaluators
+                ? row.committee.evaluators.map(evaluator => {
+                    return evaluator.id;
+                  })
+                : [];
+            const isEvaluator =
+              evaluators.filter(user => user == userId).length == 1;
+            const evalRole = localStorage
+              .getItem("USER_ROLE")
+              .includes("EVALUATOR");
+            console.log("HELLO", userId, isEvaluator, evalRole);
+            return (
+              <>
+                <TableRow key={row.id}>
+                  <TableCell>
+                    {row.group.id ? row.group.name : "None"}
+                  </TableCell>
+                  <TableCell>
+                    {row.project.id ? row.project.name : "None"}
+                  </TableCell>
+                  <TableCell>
+                    {row.group.supervisor.id
+                      ? row.group.supervisor.name
+                      : "None"}
+                  </TableCell>
+                  {/* <TableCell>
+              <List>
+                {row.members.map(member => (
+                  <ListItem>{member.name}</ListItem>
+                ))}
+              </List>
+            </TableCell>
+            <TableCell>
+              <List>
+                {row.members.map(member => (
+                  <ListItem style={{ fontSize: "12px" }}>
+                    {member.rollNo}
+                  </ListItem>
+                ))}
+              </List>
+            </TableCell> */}
+                  <TableCell>
+                    {row.committee.id ? row.committee.name : "None"}
+                  </TableCell>
+                  <TableCell>
+                    {row.date ? new Date(row.date).toDateString() : "None"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {/* <IconButton
+                      onClick={() => {
+                        handleEditSchedule(row.id);
+                      }}
+                      color="primary"
+                      variant="outlined"
+                    >
+                      <EditIcon />
+                    </IconButton> */}
+
+                    <IconButton
+                      style={{ marginRight: "1rem" }}
+                      onClick={() => {
+                        handleDeleteSchedule(row.id);
+                      }}
+                      color="error"
+                      variant="outlined"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                    {localStorage.getItem("USER_ROLE").includes("EVALUATOR") &&
+                    isEvaluator ? (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => {
+                          handleNavToEvaluationPage(row);
+                        }}
+                      >
+                        Evaluate
+                      </Button>
+                    ) : null}
+                  </TableCell>
+                </TableRow>
+              </>
+            );
+          })
+        : null}
+    </>
+  );
+};
+
 const DeliverableDetail = props => {
   const roles = localStorage.getItem("USER_ROLE");
   const [file, setFile] = useState({});
@@ -184,6 +386,9 @@ const DeliverableDetail = props => {
     title: "",
     template: "",
   });
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   // const history=useHistory();
   const params = useParams();
@@ -212,7 +417,11 @@ const DeliverableDetail = props => {
         data
       );
       console.log(res.data);
-      if (res.data.upload) setShowUploadModal(false);
+      if (res.data.upload) {
+        setShowUploadModal(false);
+        setToastMessage("Template uploaded successfully");
+        setShowToast(true);
+      }
       setName(res.data.file);
     } catch (err) {
       console.log(err);
@@ -245,8 +454,16 @@ const DeliverableDetail = props => {
     setShowSettingsModal(true);
   };
 
+  const handleSchedule = () => {
+    setShowScheduleModal(true);
+  };
+
   return (
     <>
+      {showToast ? (
+        <Toast open={showToast} setOpen={setShowToast} message={toastMessage} />
+      ) : null}
+
       {showUploadModal ? (
         <UploadFile
           setFile={setFile}
@@ -261,8 +478,15 @@ const DeliverableDetail = props => {
           setDisplay={setShowSettingsModal}
         />
       ) : null}
-
-      <ContainerFluid>
+      {showScheduleModal ? (
+        <AddSchedule
+          deliverable={deliverableData}
+          setDisplay={setShowScheduleModal}
+          setToastMessage={setToastMessage}
+          setShowToast={setShowToast}
+        />
+      ) : null}
+      <ContainerFluid maxWidth="lg">
         <Main styles={{ padding: "1.5rem" }}>
           <Box
             sx={{ marginBottom: "3rem" }}
@@ -346,7 +570,38 @@ const DeliverableDetail = props => {
               ) : null}
             </Box>
           </Card>
-          <DataTable DataHead={DataHead} DataBody={DataBody} />
+          <Card
+            variant="outlined"
+            style={{
+              marginBottom: "2rem",
+              padding: "1rem 2rem",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <Typography variant="h6">Evaluation Schedule</Typography>
+            </Box>
+            <Box>
+              {roles.includes("PMO") &&
+              deliverableData &&
+              deliverableData.deadline ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSchedule}
+                >
+                  Add Schedule
+                </Button>
+              ) : null}
+            </Box>
+          </Card>
+          {/* <DataTable DataHead={DataHead} DataBody={DataBody} /> */}
+          <DataTable
+            DataHead={DataHead}
+            DataBody={() => <DataBody2 showScheduleModal={showScheduleModal} />}
+          />
         </Main>
       </ContainerFluid>
     </>

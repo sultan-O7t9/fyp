@@ -15,6 +15,7 @@ const upload = multer();
 Router.post("/create", verifyToken, Group.createGroup);
 // Router.get("/get/dept", verifyToken, Group.getGroupsByDepartment);
 Router.get("/get/dept", Group.getGroupsByDepartment);
+Router.post("/change/password", Group.changePassword);
 
 Router.get("/get-groups", Group.getAllGroups);
 Router.get("/get/:id", Group.getGroupById);
@@ -26,4 +27,5 @@ Router.post("/upload-file", upload.single("file"), Group.uploadFile);
 Router.post("/download-file", Group.downloadFile);
 Router.post("/submit-proposal", Group.submitProposal);
 Router.post("/change-booklet-status", Group.changeBookletStatus);
+Router.post("/change-booklet-comment", Group.changeBookletComment);
 module.exports = Router;

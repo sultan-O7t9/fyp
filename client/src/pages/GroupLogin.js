@@ -22,6 +22,10 @@ const GroupLogin = () => {
 
   const loginHandler = async () => {
     setError(null);
+    if (email.split("_").length - 1 !== 2) {
+      console.log(email.split("_").length - 1);
+      return setError("Please enter a valid Group ID");
+    }
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -63,6 +67,7 @@ const GroupLogin = () => {
         <TextField
           style={Styles.input}
           placeholder="Email"
+          type="email"
           onChange={e => setEmail(e.target.value)}
         />
         <TextField

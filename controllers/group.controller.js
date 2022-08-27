@@ -18,6 +18,51 @@ var crypto = require("crypto");
 const { sendMail } = require("../utils/sendMails");
 
 class GroupController {
+  static changePassword = async (req, res) => {
+    const { groupId, password } = req.body;
+    try {
+      const group = await Group.findOne({
+        where: {
+          id: groupId,
+        },
+      });
+      const members = await Student.findAll({
+        where: {
+          groupId: group.id,
+        },
+      });
+
+      await group.update({
+        password: password,
+      });
+
+      sendMail(
+        members.map(student => {
+          return {
+            email: student.dataValues.rollNo + "@uog.edu.pk",
+            subject: "Ignore - FYP Groups",
+            body: `Testing...
+             Your group has been updated.
+             Group members:
+                ${members.map(member => member.dataValues.rollNo).join(", ")} 
+                
+             Your credentials are: 
+                Username: ${group.dataValues.name}
+                Password:${group.dataValues.password}
+             `,
+          };
+        })
+      );
+
+      return res.status(200).send({
+        message: "Password changed successfully",
+      });
+    } catch (error) {
+      return res.status(500).send({
+        message: error.message,
+      });
+    }
+  };
   static getGroupByStudent = async (req, res) => {
     const studentId = req.user.id;
     try {
@@ -50,6 +95,7 @@ class GroupController {
   };
   static changeBookletStatus = async (req, res) => {
     const { groupId, status } = req.body;
+    console.log(status);
     try {
       const group = await Group.findOne({
         where: {
@@ -71,14 +117,42 @@ class GroupController {
       });
     }
   };
+  static changeBookletComment = async (req, res) => {
+    const { groupId, comment } = req.body;
+    try {
+      const group = await Group.findOne({
+        where: {
+          id: groupId,
+        },
+      });
+      await group.update({
+        bookletsComment: comment,
+      });
+      console.log(group);
+      res.json({
+        message: "Booklet comment changed successfully",
+        comment: true,
+        group,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error getting group",
+        error: err,
+        comment: false,
+      });
+    }
+  };
   static getGroupById = async (req, res) => {
     const { id } = req.params;
+    console.log(id);
     try {
       const group = await Group.findOne({
         where: {
           id: id,
         },
       });
+      console.log(group);
       const supervisor = await FacultyMember.findOne({
         where: {
           id: group.dataValues.supervisorId,
@@ -323,9 +397,13 @@ class GroupController {
         await group.update({
           name: `${department.dataValues.name}_${leader.dataValues.batchId}_${group.id}`,
         });
+        const leaderStudent = members.find(
+          student => student.dataValues.leader == 1
+        );
+        console.log(leaderStudent);
 
         sendMail(
-          members.map(student => {
+          [leaderStudent].map(student => {
             return {
               email: student.dataValues.rollNo + "@uog.edu.pk",
               subject: "Ignore - FYP Groups",
@@ -442,6 +520,7 @@ class GroupController {
           departmentId: facultyMember.dataValues.departmentId,
         },
       });
+
       const detailedGroups = await Promise.all(
         groups.map(async group => {
           const supervisor = await FacultyMember.findOne({
@@ -449,6 +528,23 @@ class GroupController {
               id: group.dataValues.supervisorId,
             },
           });
+          let committee = null;
+          if (group.dataValues.committeeId) {
+            committee = await Committee.findOne({
+              where: {
+                id: group.dataValues.committeeId,
+              },
+            });
+            const committeeMembers = await FacultyMember.findAll({
+              where: {
+                committeeId: group.dataValues.committeeId,
+              },
+            });
+            committee = {
+              ...committee.dataValues,
+              members: committeeMembers,
+            };
+          }
           const department = await Department.findOne({
             where: {
               id: group.dataValues.departmentId,
@@ -478,10 +574,13 @@ class GroupController {
           return {
             id: group.dataValues.name,
             committeeId: group.dataValues.committeeId,
+            committee: committee ? committee : null,
             project: group.dataValues.project,
             members: group.dataValues.members,
             supervisor: supervisor.dataValues.name,
+            supervisorId: group.dataValues.supervisorId,
             bookletsStatus: group.dataValues.bookletsStatus,
+            bookletsComment: group.dataValues.bookletsComment,
             department: department.dataValues.name,
           };
         })
@@ -544,6 +643,7 @@ class GroupController {
             supervisor: supervisor.dataValues.name,
             bookletsStatus: group.dataValues.bookletsStatus,
             department: department.dataValues.name,
+            bookletsComment: group.dataValues.bookletsComment,
           };
         })
       );

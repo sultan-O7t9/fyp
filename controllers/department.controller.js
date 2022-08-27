@@ -33,6 +33,17 @@ class DepratmentController {
   };
   static createDepartment = async (req, res) => {
     const { name } = req.body;
+    const title = name;
+    function onlyCapitalLetters(str) {
+      let newStr = "";
+
+      for (let i = 0; i < str.length; i++) {
+        if (str[i].match(/[A-Z]/)) {
+          newStr += str[i];
+        }
+      }
+      return newStr;
+    }
     try {
       // const admin = await Admin.findOne({
       //   where: {
@@ -46,7 +57,8 @@ class DepratmentController {
         //   throw new Error("Invalid Admin Id");
         // }
         const dept = await Department.create({
-          name,
+          title,
+          name: onlyCapitalLetters(name),
         });
         const batch = await Batch.findOne({
           where: {

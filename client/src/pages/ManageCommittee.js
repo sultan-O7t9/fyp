@@ -131,18 +131,29 @@ const ManageCommittee = props => {
       )
       .then(res => {
         console.log(res.data);
+        console.log(evaluators.includes(1));
+        console.log(res.data.groups);
+        setGroups([]);
         setGroupItems(
           committee.hasOwnProperty("Groups")
             ? res.data.groups
-                .filter(group => group.committeeId == null)
+                .filter(
+                  group =>
+                    group.committeeId == null &&
+                    !evaluators.includes(group.supervisorId)
+                )
                 .concat(committee.Groups.map(group => ({ id: group.name })))
-            : res.data.groups.filter(group => group.committeeId == null)
+            : res.data.groups.filter(
+                group =>
+                  group.committeeId == null &&
+                  !evaluators.includes(group.supervisorId)
+              )
         );
       })
       .catch(err => {
         console.log(err);
       });
-  }, [committee]);
+  }, [committee, evaluators]);
   useEffect(() => {
     if (committee.hasOwnProperty("FacultyMembers")) {
       setEvaluators(committee.FacultyMembers.map(member => member.id));

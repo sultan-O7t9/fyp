@@ -14,21 +14,28 @@ import AdminManageFaculty from "./pages/AdminManageFaculty";
 import AllCommittees from "./pages/AllCommittees";
 import AllGroups from "./pages/AllGroups";
 import AllStudents from "./pages/AllStudents";
+import D2EvaluationPage from "./pages/D2EvaluationPage";
 import D2SubmissionPage from "./pages/D2SubmissionPage";
+import D3EvaluationPage from "./pages/D3EvaluationPage";
 import D3SubmissionPage from "./pages/D3SubmissionPage";
 import Dashboard from "./pages/Dashboard";
 import DeliverableDetail from "./pages/DeliverableDetail";
+import DetailedReport from "./pages/DetailedReport";
+import DetailedReportPage from "./pages/DetailedReportPage";
 import GroupDashboard from "./pages/GroupDashboard";
 import GroupDetail from "./pages/GroupDetail";
 import GroupLogin from "./pages/GroupLogin";
 import Login from "./pages/Login";
+import ProposalEvaluationPage from "./pages/ProposalEvaluationPage";
 import ProposalSubmissionPage from "./pages/ProposalSubmissionPage";
 import Register from "./pages/Register";
 import RegisterGroup from "./pages/RegisterGroup";
 import SubmitProjectTitle from "./pages/SubmitProjectTitle";
+import SupervisorDeliverableDetail from "./pages/SupervisorDeliverableDetail";
 import SupervisorDocumentation from "./pages/SupervisorDocumentation";
 import SupervisorFinalDeliverable from "./pages/SupervisorFinalDeliverable";
 import SupervisorProposal from "./pages/SupervisorProposal";
+import ViewGroup from "./pages/ViewGroup";
 import { logoutUser, readUser, refreshAuthToken } from "./store/actions/auth";
 
 const AdminRoutes = () => {
@@ -118,11 +125,14 @@ const App = () => {
     <Switch>
       {/* <Route exact path="/committees" component={AllCommittees} /> */}
       {/* <Route exact path="/file" component={UploadFile} /> */}
+
+      <Route exact path="/report" component={DetailedReport} />
       <Route exact path="/login" component={Login} />
       <Route exact path="/group" component={GroupLogin} />
       <Route exact path="/admin" component={AdminLogin} />
       <Route exact path="/register" component={Register} />
       <Route exact path="/register-group" component={RegisterGroup} />
+      <Route exact path="/main/info" component={ViewGroup} />
       <Route exact path="/register-project" component={SubmitProjectTitle} />
       {roles === "HOD" ? (
         <AdminRoutes />
@@ -135,6 +145,7 @@ const App = () => {
             component={ProposalSubmissionPage}
           />
           <Route exact path="/main/d2" component={D2SubmissionPage} />
+
           <Route exact path="/main/d3" component={D3SubmissionPage} />
           <Route exact path="/main/group/:id" component={GroupDetail} />
         </GroupMainLayout>
@@ -159,6 +170,18 @@ const App = () => {
           />
           <Route exact path="/" component={Dashboard} />
           <Route exact path="/deliverable/:id" component={DeliverableDetail} />
+          <Route
+            exact
+            path="/sup/deliverable/:id"
+            component={SupervisorDeliverableDetail}
+          />
+          <Route
+            exact
+            path="/proposal/eval/"
+            component={ProposalEvaluationPage}
+          />
+          <Route exact path="/d2/eval/" component={D2EvaluationPage} />
+          <Route exact path="/d3/eval/" component={D3EvaluationPage} />
           <Route exact path="/students" component={AllStudents} />
           <Route exact path="/committees" component={AllCommittees} />
         </MainLayout>

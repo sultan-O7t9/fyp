@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
+  IconButton,
   List,
   ListItem,
   Switch,
@@ -11,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
 import Link from "../components/Link";
@@ -19,6 +21,7 @@ import MenuButton from "../components/MenuButton";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import UploadFile from "../components/UploadFile";
+import Toast from "../components/Toast";
 
 const DataHead = () => null;
 
@@ -30,6 +33,8 @@ const DataBody = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [file, setFile] = useState({ name: "" });
   const [submissionData, setSubmissionData] = useState({});
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
     const getData = async () => {
@@ -49,7 +54,7 @@ const DataBody = () => {
       }
     };
     getData();
-  }, [showUploadModal]);
+  }, [showUploadModal, showToast]);
 
   useEffect(() => {
     const getData = async () => {
@@ -122,8 +127,25 @@ const DataBody = () => {
     }
   };
 
+  const deleteVersion = async file => {
+    try {
+      const res = await axios.delete(
+        "http://localhost:5000/api/deliverable/del-grp-submission/" + file
+      );
+      if (res.data.delete) {
+        setShowToast(true);
+        setToastMessage(file + " deleted successfully");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
+      {showToast ? (
+        <Toast open={showToast} setOpen={setShowToast} message={toastMessage} />
+      ) : null}
       {showUploadModal ? (
         <UploadFile
           setFile={setFile}
@@ -134,18 +156,22 @@ const DataBody = () => {
       ) : null}
 
       <TableRow>
-        <TableCell>
+        <TableCell colSpan={2}>
           <Typography variant="h4">{deliverableData.title}</Typography>
         </TableCell>
       </TableRow>
-      {/* <TableRow>
+      <TableRow>
         <TableCell>
-          <Typography variant="h6">Status</Typography>
+          <Typography variant="h6">Deadline</Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="body">Approved</Typography>
+          <Typography variant="body">
+            {deliverableData.deadline
+              ? new Date(deliverableData.deadline).toUTCString()
+              : "None"}
+          </Typography>
         </TableCell>
-      </TableRow> */}
+      </TableRow>
       {deliverableData.template ? (
         <TableRow>
           <TableCell>
@@ -160,29 +186,35 @@ const DataBody = () => {
           </TableCell>
         </TableRow>
       ) : null}
-      <TableRow>
-        <TableCell>
-          {submissionData.length > 0 ? (
-            <form
-              onSubmit={e => {
-                downloadVersionFile(e, submissionData[0].name);
-              }}
-              className="form"
+      {deliverableData.template && deliverableData.deadline ? (
+        <TableRow>
+          <TableCell>
+            {submissionData.length > 0 ? (
+              <form
+                onSubmit={e => {
+                  downloadVersionFile(e, submissionData[0].name);
+                }}
+                className="form"
+              >
+                <Button variant="text" type="submit">
+                  {submissionData[0].name}
+                </Button>
+              </form>
+            ) : (
+              <Typography variant="body">No submission</Typography>
+            )}
+          </TableCell>
+          <TableCell>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={submitProposal}
             >
-              <Button variant="text" type="submit">
-                {submissionData[0].name}
-              </Button>
-            </form>
-          ) : (
-            <Typography variant="body">No submission</Typography>
-          )}
-        </TableCell>
-        <TableCell>
-          <Button color="primary" variant="contained" onClick={submitProposal}>
-            Upload Deliverable
-          </Button>
-        </TableCell>
-      </TableRow>
+              Upload Deliverable
+            </Button>
+          </TableCell>
+        </TableRow>
+      ) : null}
       <TableRow>
         <TableCell colSpan={2}>
           <Typography variant="h6">Version History</Typography>
@@ -200,9 +232,27 @@ const DataBody = () => {
                     }}
                     className="form"
                   >
-                    <Button variant="text" type="submit">
-                      {submission.name}
-                    </Button>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Button variant="text" type="submit">
+                        {submission.name}
+                      </Button>
+                      <IconButton
+                        onClick={() => {
+                          console.log("deleting " + submission.name);
+                          deleteVersion(submission.name);
+                        }}
+                        color="error"
+                        variant="outlined"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </div>
                   </form>
                 </li>
               ))}

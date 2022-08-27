@@ -232,10 +232,7 @@ const ManageGroup = props => {
       sx={{ color: "#000", zIndex: theme => theme.zIndex.drawer + 1 }}
       open={true}
     >
-      <Container
-        maxWidth="md"
-        style={{ maxHeight: "80vh", overflowY: "scroll" }}
-      >
+      <Container maxWidth="md" style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <Card style={styles.card}>
           <Typography variant="h5" style={styles.heading}>
             Register Group
@@ -273,7 +270,11 @@ const ManageGroup = props => {
             }))}
           />
           <Box>
-            <Button variant="contained" onClick={editGroupHandler}>
+            <Button
+              variant="contained"
+              onClick={editGroupHandler}
+              disabled={!supervisor || !leader || members.length <= 0}
+            >
               Submit
             </Button>
             <Button

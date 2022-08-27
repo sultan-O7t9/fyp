@@ -6,6 +6,7 @@ const {
   Student,
   Role,
   Faculty_Role,
+  EvaluationSchedule,
 } = require("../models");
 const sequelize = require("sequelize");
 
@@ -27,20 +28,70 @@ class CommitteeClass {
         where: {
           departmentId: pmo.dataValues.departmentId,
         },
-        include: [
-          {
-            model: FacultyMember,
-            // as: "facultyId",
-            attributes: ["id", "name"],
-          },
-          {
-            model: Group,
-            // as: "group",
-            attributes: ["id", "name"],
-          },
-        ],
       });
-      res.json({ committees });
+
+      const detailedCommittees = await Promise.all(
+        committees.map(async committee => {
+          const members = await FacultyMember.findAll({
+            where: {
+              committeeId: committee.dataValues.id,
+            },
+          });
+          const groups = await Group.findAll({
+            where: {
+              committeeId: committee.dataValues.id,
+            },
+          });
+          const Groups = await Promise.all(
+            groups.map(async group => {
+              const schedules = await EvaluationSchedule.findAll({
+                where: {
+                  groupId: group.dataValues.id,
+                },
+              });
+              const members = await Student.findAll({
+                where: {
+                  groupId: group.dataValues.id,
+                },
+              });
+              return {
+                id: group.dataValues.id,
+                name: group.dataValues.name,
+                members: members.map(member => ({
+                  rollNo: member.dataValues.rollNo,
+                  name: member.dataValues.name,
+                })),
+                schedules: {
+                  d1: schedules.find(
+                    schedule => schedule.dataValues.deliverableId == 1
+                  )
+                    ? true
+                    : false,
+                  d2: schedules.find(
+                    schedule => schedule.dataValues.deliverableId == 2
+                  )
+                    ? true
+                    : false,
+                  d3: schedules.find(
+                    schedule => schedule.dataValues.deliverableId == 3
+                  )
+                    ? true
+                    : false,
+                },
+              };
+            })
+          );
+
+          return {
+            id: committee.dataValues.id,
+            name: committee.dataValues.name,
+            members: members,
+            Groups: Groups,
+          };
+        })
+      );
+
+      res.json({ committees: detailedCommittees });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -377,6 +428,22 @@ class CommitteeClass {
           await group.update({
             committeeId: null,
           });
+          const schedules = await EvaluationSchedule.findAll({
+            where: {
+              groupId: group.dataValues.id,
+            },
+          });
+          console.log(
+            schedules.map(schedule => ({
+              id: schedule.dataValues.id,
+              groupId: schedule.dataValues.groupId,
+            }))
+          );
+          await Promise.all(
+            schedules.map(async schedule => {
+              await schedule.destroy();
+            })
+          );
         })
       );
       // groups.forEach(async group => {

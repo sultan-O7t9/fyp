@@ -23,6 +23,8 @@ const Login = () => {
 
   const loginHandler = async () => {
     setError(null);
+    if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
+      return setError("Please enter a valid UOG email address");
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -47,6 +49,7 @@ const Login = () => {
         </Typography>
         <TextField
           style={Styles.input}
+          type="email"
           placeholder="Email"
           onChange={e => setEmail(e.target.value)}
         />

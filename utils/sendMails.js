@@ -27,19 +27,73 @@ require("dotenv").config();
 //   });
 // };
 
+// const nodemailer = require("nodemailer");
+// const mg = require("nodemailer-mailgun-transport");
+
+// module.exports.sendMail = recipiants => {
+//   const mailgunAuth = {
+//     auth: {
+//       api_key: process.env.MAILGUN_API,
+//       domain: process.env.MAILGUN_DOMAIN,
+//     },
+//   };
+
+//   const transporter = nodemailer.createTransport(mg(mailgunAuth));
+//   console.log(recipiants);
+// Promise.all(
+//   recipiants.map(recipiant => {
+//     return new Promise((resolve, reject) => {
+//       const mailOptions = {
+//         from: process.env.SENDER_EMAIL,
+//         to: recipiant.email,
+//         subject: recipiant.subject,
+//         text: recipiant.body,
+//       };
+//       transporter.sendMail(mailOptions, (err, info) => {
+//         if (err) {
+//           reject(err);
+//         } else {
+//           console.log("Email sent: " + info.response);
+//           resolve(info);
+//         }
+//       });
+//     });
+//   })
+// ).then(info => {
+//   console.log(info);
+// }).catch(err => {
+//   console.log(err);
+// });
+
+//   // recipiants.forEach(recipiant => {
+//   //       const mailOptions = {
+//   //         from: process.env.SENDER_EMAIL,
+//   //         to: recipiant.email,
+//   //         subject: recipiant.subject,
+//   //         text: recipiant.body,
+//   //       };
+
+//   // transporter.sendMail(mailOptions, function(error, response) {
+//   //   if (error) {
+//   //     console.log(error)
+//   //   } else {
+//   //     console.log("Successfully sent email.")
+//   //   }
+//   // })
+//   //     });
+// };
+
 const nodemailer = require("nodemailer");
-const mg = require("nodemailer-mailgun-transport");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SENDER_EMAIL,
+    pass: process.env.SENDER_PASSWORD,
+  },
+});
 
 module.exports.sendMail = recipiants => {
-  const mailgunAuth = {
-    auth: {
-      api_key: process.env.MAILGUN_API,
-      domain: process.env.MAILGUN_DOMAIN,
-    },
-  };
-
-  const smtpTransport = nodemailer.createTransport(mg(mailgunAuth));
-  console.log(recipiants);
   Promise.all(
     recipiants.map(recipiant => {
       return new Promise((resolve, reject) => {
@@ -49,33 +103,29 @@ module.exports.sendMail = recipiants => {
           subject: recipiant.subject,
           text: recipiant.body,
         };
-        smtpTransport.sendMail(mailOptions, (err, info) => {
+        transporter.sendMail(mailOptions, (err, info) => {
           if (err) {
             reject(err);
           } else {
+            console.log("Email sent: " + info.response);
             resolve(info);
           }
         });
       });
     })
-  ).then(info => {
-    console.log(info);
-  });
+  )
+    .then(info => {
+      console.log(info);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 
-  // recipiants.forEach(recipiant => {
-  //       const mailOptions = {
-  //         from: process.env.SENDER_EMAIL,
-  //         to: recipiant.email,
-  //         subject: recipiant.subject,
-  //         text: recipiant.body,
-  //       };
-
-  // smtpTransport.sendMail(mailOptions, function(error, response) {
+  // transporter.sendMail(mailOptions, function (error, info) {
   //   if (error) {
-  //     console.log(error)
+  //     console.log(error);
   //   } else {
-  //     console.log("Successfully sent email.")
+  //     console.log("Email sent: " + info.response);
   //   }
-  // })
-  //     });
+  // });
 };

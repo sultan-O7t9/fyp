@@ -23,6 +23,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import ManageDept from "./ManageDept";
 import EditDeptPMO from "../components/EditDeptPMO";
 import AdminMainLayout from "../layouts/AdminMainLayout";
+
+import ReactDataGrid from "@inovua/reactdatagrid-community";
+import "@inovua/reactdatagrid-community/index.css";
+import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+
 const DATA = {
   heads: ["Name", "Department", "Role"],
   data: [
@@ -49,6 +54,84 @@ const DataHead = ({ heads }) => {
 };
 
 const DataBody = ({ data, editFaculty, setData }) => {
+  const [gridData, setGridData] = useState(data);
+  const [gridCols, setGridCols] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+
+  const deleteDept = async deptId => {
+    console.log(deptId);
+    setShowDeleteModal(false);
+  };
+
+  useEffect(() => {
+    const dataSource = data.map(item => {
+      return {
+        ...item,
+        pmo: item.pmoId ? item.pmo : "Not Assigned",
+        actions: (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => {
+                editFaculty(true, {
+                  dept: { id: item.id, name: item.name, title: item.title },
+                  pmo: { id: item.pmoId, name: item.pmo },
+                });
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              size="small"
+              onClick={() => {
+                setShowDeleteModal(true);
+                setToDelete(item);
+              }}
+              variant="contained"
+              color="error"
+            >
+              Delete
+            </Button>
+          </div>
+        ),
+      };
+    });
+    const columns = [
+      {
+        name: "title",
+        header: "Department",
+        defaultFlex: 2,
+      },
+
+      {
+        name: "name",
+        header: "Abbreviation",
+        defaultFlex: 1,
+      },
+      {
+        name: "pmo",
+        header: "PMO",
+        defaultFlex: 2,
+      },
+      {
+        name: "actions",
+        defaultFlex: 2,
+        header: "Actions",
+      },
+    ];
+    setGridCols(columns);
+    setGridData(dataSource);
+  }, [data, editFaculty]);
+
   // const deleteCommittee = async id => {
   //   console.log("ID", id);
   //   const response = await axios.delete(
@@ -58,78 +141,102 @@ const DataBody = ({ data, editFaculty, setData }) => {
   //     setData(data => data.filter(committee => committee.id !== id));
   //   }
   // };
-
   return (
-    data &&
-    data.map((row, index) => (
-      <TableRow key={row.id}>
-        <TableCell>{row.name}</TableCell>
-        <TableCell>{row.pmo}</TableCell>
-        {/* <TableCell>{row.email}</TableCell> */}
-        {/* <TableCell>{row.members}</TableCell> */}
-        {/* <TableCell>
-            {row.role && row.FacultyMembers.length > 0 ? (
-              <List>
-                {row.FacultyMembers.map(member => (
-                  <ListItem style={{ padding: 0 }} key={member.id}>
-                    <Link to="#" style={{ textDecoration: "none" }}>
-                      {member.name}
-                    </Link>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Typography variant="body2">None</Typography>
-            )}
-          </TableCell> */}
-        {/* <TableCell>
-            {row.Groups && row.Groups.length > 0 ? (
-              <List>
-                {row.Groups.map(group => (
-                  <ListItem style={{ padding: 0 }} key={group.id}>
-                    <Link to="#" style={{ textDecoration: "none" }}>
-                      {group.name}
-                    </Link>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Typography variant="body2">None</Typography>
-            )}
-          </TableCell> */}
-        <TableCell align="right">
-          <IconButton
-            onClick={() => {
-              // editCommittee(row);
-              editFaculty(true, {
-                dept: { id: row.id, name: row.name },
-                pmo: { id: row.pmoId, name: row.pmo },
-              });
-            }}
-            color="primary"
-            variant="outlined"
-          >
-            <EditIcon />
-          </IconButton>
-
-          {/* <IconButton
-            onClick={() => {
-              deleteCommittee(row.id);
-            }}
-            color="error"
-            variant="outlined"
-          >
-            <DeleteIcon />
-          </IconButton> */}
-        </TableCell>
-        {/* <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell> */}
-      </TableRow>
-    ))
+    <>
+      <ReactDataGrid
+        idProperty="id"
+        columns={gridCols}
+        dataSource={gridData}
+        rowHeight={100}
+        style={{
+          height: "calc(100vh - 230px)",
+        }}
+      />
+      {showDeleteModal ? (
+        <DeleteConfirmationDialog
+          itemType="Department"
+          item={toDelete.name}
+          handleDelete={() => {
+            deleteDept(toDelete.id);
+            // deleteFaculty(toDelete.id);
+          }}
+          setOpen={setShowDeleteModal}
+        />
+      ) : null}
+    </>
   );
+  // return (
+  //   data &&
+  //   data.map((row, index) => (
+  //     <TableRow key={row.id}>
+  //       <TableCell>{row.title} </TableCell>
+  //       <TableCell>{row.name}</TableCell>
+  //       <TableCell>{row.pmo}</TableCell>
+  //       {/* <TableCell>{row.email}</TableCell> */}
+  //       {/* <TableCell>{row.members}</TableCell> */}
+  //       {/* <TableCell>
+  //           {row.role && row.FacultyMembers.length > 0 ? (
+  //             <List>
+  //               {row.FacultyMembers.map(member => (
+  //                 <ListItem style={{ padding: 0 }} key={member.id}>
+  //                   <Link to="#" style={{ textDecoration: "none" }}>
+  //                     {member.name}
+  //                   </Link>
+  //                 </ListItem>
+  //               ))}
+  //             </List>
+  //           ) : (
+  //             <Typography variant="body2">None</Typography>
+  //           )}
+  //         </TableCell> */}
+  //       {/* <TableCell>
+  //           {row.Groups && row.Groups.length > 0 ? (
+  //             <List>
+  //               {row.Groups.map(group => (
+  //                 <ListItem style={{ padding: 0 }} key={group.id}>
+  //                   <Link to="#" style={{ textDecoration: "none" }}>
+  //                     {group.name}
+  //                   </Link>
+  //                 </ListItem>
+  //               ))}
+  //             </List>
+  //           ) : (
+  //             <Typography variant="body2">None</Typography>
+  //           )}
+  //         </TableCell> */}
+  //       <TableCell align="right">
+  //         <IconButton
+  //           onClick={() => {
+  //             // editCommittee(row);
+  //             editFaculty(true, {
+  //               dept: { id: row.id, name: row.name },
+  //               pmo: { id: row.pmoId, name: row.pmo },
+  //             });
+  //           }}
+  //           color="primary"
+  //           variant="outlined"
+  //         >
+  //           <EditIcon />
+  //         </IconButton>
+
+  //         {/* <IconButton
+  //           onClick={() => {
+  //             deleteCommittee(row.id);
+  //           }}
+  //           color="error"
+  //           variant="outlined"
+  //         >
+  //           <DeleteIcon />
+  //         </IconButton> */}
+  //       </TableCell>
+  //       {/* <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell> */}
+  //     </TableRow>
+  //   ))
+  // );
 };
 
 const AdminManageDept = () => {
-  const [heads, setHeads] = useState(["Department", "PMO"]);
+  const [heads, setHeads] = useState(["Department", "", "PMO", ""]);
   const [showAddCommittee, setShowAddCommittee] = useState(false);
   const [body, setBody] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -228,17 +335,18 @@ const AdminManageDept = () => {
               </Button>
             </Box>
           </Box>
-          <DataTable
+          {/* <DataTable
             DataHead={() => <DataHead heads={heads} />}
             DataBody={() => (
-              <DataBody
-                editCommittee={addCommitteeHandler}
-                data={body}
-                editFaculty={editFacultyHandler}
-                // data={DATA.data}
-                setData={setBody}
-              />
+            
             )}
+          /> */}
+          <DataBody
+            editCommittee={addCommitteeHandler}
+            data={body}
+            editFaculty={editFacultyHandler}
+            // data={DATA.data}
+            setData={setBody}
           />
         </Main>
       </ContainerFluid>

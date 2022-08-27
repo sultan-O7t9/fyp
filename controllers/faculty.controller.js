@@ -370,7 +370,14 @@ class FacultyController {
             ),
           },
         },
-        attributes: ["id", "name", "email", "committeeId", "departmentId"],
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "committeeId",
+          "departmentId",
+          "password",
+        ],
       });
       await Promise.all(
         supervisors.map(async supervisor => {

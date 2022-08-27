@@ -18,6 +18,60 @@ require("dotenv").config();
 var crypto = require("crypto");
 
 class StudentController {
+  static deleteStudent = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const student = await Student.findOne({
+        where: {
+          rollNo: id,
+        },
+      });
+      if (!student) {
+        return res.status(404).send({
+          message: "Student not found",
+        });
+      }
+      const group = await Group.findOne({
+        where: {
+          id: student.groupId,
+        },
+      });
+      if (group) {
+        const members = await Student.findAll({
+          where: {
+            groupId: group.id,
+          },
+        });
+        if (members.length == 1) {
+          await Group.destroy({
+            where: {
+              id: group.id,
+            },
+          });
+        } else {
+          if (student.leader == 1) {
+            members.filter(member => {
+              return student.rollNo != member.rollNo;
+            });
+            await members[0].update({
+              leader: 1,
+            });
+          }
+        }
+      }
+      await student.destroy();
+      return res.status(200).send({
+        message: "Student deleted successfully",
+        delete: true,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        message: error.message,
+        delete: true,
+      });
+    }
+  };
   static getStudents = async (req, res) => {
     const userId = req.user.id;
 
@@ -37,6 +91,36 @@ class StudentController {
           },
         });
       }
+      const students = await Student.findAll({
+        where: {
+          departmentId: user.dataValues.departmentId,
+          groupId: null,
+        },
+        attributes: ["name", "rollNo", "leader"],
+      });
+      res.json({
+        message: "Students retrieved successfully",
+        students,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error getting students",
+        error: err,
+      });
+    }
+  };
+  static getStudentsByStudent = async (req, res) => {
+    const userId = req.body.rollNo;
+
+    console.log("ROLL", userId);
+    try {
+      const user = await Student.findOne({
+        where: {
+          rollNo: userId,
+        },
+      });
+
       const students = await Student.findAll({
         where: {
           departmentId: user.dataValues.departmentId,

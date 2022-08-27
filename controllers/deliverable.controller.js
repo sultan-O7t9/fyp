@@ -180,7 +180,7 @@ class DeliverableController {
     }
   };
   static editDeliverable = async (req, res) => {
-    const { deliverableId, deadline, email } = req.body;
+    const { deliverableId, deadline, email, userId } = req.body;
     try {
       const deliverable = await Deliverable.findOne({
         where: {
@@ -192,6 +192,42 @@ class DeliverableController {
         emailbody: email.body,
         emailsubject: email.subject,
       });
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      const subject = deliverable.dataValues.emailsubject
+        ? deliverable.dataValues.emailsubject
+        : "Deliverable " + deliverableId + " has been updated";
+      const body = deliverable.dataValues.emailbody
+        ? deliverable.dataValues.emailbody
+        : "Deliverable " +
+          deliverableId +
+          " has been updated. Log in to the system to view the updated details";
+      const deptId = faculty.dataValues.pmoOfDepartmentId;
+      const students = await Student.findAll({
+        departmentId: deptId,
+      });
+      const filteredStudents = students.filter(
+        student => student.dataValues.departmentId == deptId
+      );
+      sendMail(
+        filteredStudents.map(student => {
+          return {
+            email: student.dataValues.rollNo + "@uog.edu.pk",
+            subject: subject + " Ignore",
+            body: `
+          ${body}
+
+
+          Regards,
+          ${faculty.dataValues.name}
+          `,
+          };
+        })
+      );
+
       res.json({
         message: "Deliverable updated successfully",
         deliverable,
@@ -361,6 +397,36 @@ class DeliverableController {
         message: "Error getting versions",
         error,
         get: false,
+      });
+    }
+  };
+  static deleteGroupDeliverableSubmission = async (req, res) => {
+    const { file } = req.params;
+    try {
+      console.log(file);
+      // const path = `${__dirname}/../uploads/${file}`;
+      // console.log(path);
+      const version = await Version.findOne({
+        where: {
+          name: file,
+        },
+      });
+      await version.destroy();
+      // fs.unlink(path, err => {
+      //   if (err) throw err;
+      //   console.log("file deleted");
+      // });
+      res.json({
+        message: "Version deleted successfully",
+        version,
+        delete: true,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error deleting version",
+        error,
+        delete: false,
       });
     }
   };
@@ -564,23 +630,6 @@ class DeliverableController {
         get: true,
       });
     } catch (err) {
-      // members.map(student => {
-      //   return {
-      //     email: student.dataValues.rollNo + "@uog.edu.pk",
-      //     subject: "Ignore - FYP Groups",
-      //     body: `Testing...
-      //      Your group has been created, successfully.
-      //      Group members:
-      //         ${members.map(member => member.dataValues.rollNo).join(", ")}
-
-      //      Your credentials are:
-      //         Username: ${group.dataValues.name}
-      //         Password:${group.dataValues.password}
-      //      Login to submit your FYP Idea.
-      //      `,
-      //   };
-      // })
-
       console.log(err);
       res.status(500).json({
         message: "Error sending mail",

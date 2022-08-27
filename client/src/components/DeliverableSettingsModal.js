@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import { useEffect } from "react";
 // import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { useState } from "react";
 import Select from "./Select";
@@ -18,12 +19,24 @@ import Select from "./Select";
 const DeliverableSettingsModal = props => {
   const { deliverable, setDisplay } = props;
   const [deadlineInput, setDeadlineInput] = useState("");
+  const [evaluationDate, setEvaluationDate] = useState("");
+  const [evaluationInput, setEvaluationInput] = useState("");
   const [deliverableDeadline, setDeliverableDeadline] = useState(
     deliverable.deadline
   );
   const [emailBody, setEmailBody] = useState(deliverable.email.body);
   const [emailRecipients, setEmailRecipients] = useState();
   const [emailSubject, setEmailSubject] = useState(deliverable.email.subject);
+
+  useEffect(() => {
+    const dd = new Date(deadlineInput);
+    const ed = new Date(evaluationInput);
+    if (dd <= ed) return;
+
+    setEvaluationDate("");
+    setEvaluationInput("");
+  }, [deadlineInput]);
+
   const handleDateChange = e => {
     const dd = new Date(e.target.value);
     if (dd < new Date()) return;
@@ -33,9 +46,19 @@ const DeliverableSettingsModal = props => {
     }
     console.log(e.target.value);
   };
+  const handleEvalDateChange = e => {
+    const dd = new Date(deadlineInput);
+    const ed = new Date(e.target.value);
+    if (ed <= dd || ed.getDay() === 6 || ed.getDay() === 0) return;
+
+    setEvaluationInput(e.target.value);
+    setEvaluationDate(ed);
+    console.log(e.target.value);
+  };
 
   const submitDeliverable = async e => {
     const data = {
+      userId: localStorage.getItem("USER_ID"),
       deliverableId: deliverable.id,
       deadline: deliverableDeadline
         ? deliverableDeadline
@@ -83,19 +106,10 @@ const DeliverableSettingsModal = props => {
                 />
               </Box>
             </Box>
-            <Box style={{ margin: "2rem 0.5rem" }}>
+
+            {/* <Box style={{ margin: "2rem 0.5rem" }}>
               <Typography variant="h6">Mail Settings</Typography>
-              <Box style={{ margin: "1rem" }}>
-                {/* <Select
-                  required
-                  // style={{ width: "100%" }}
-                  multiple={true}
-                  label="Recipients"
-                  // value={groups}
-                  // setValue={selectGroupsHandler}
-                  // items={selectGroupItems}
-                /> */}
-              </Box>
+              
               <Box style={{ margin: "1rem" }}>
                 <TextField
                   label="Subject"
@@ -118,7 +132,7 @@ const DeliverableSettingsModal = props => {
                   style={{ width: "100%", minHeight: "10vh" }}
                 />
               </Box>
-            </Box>
+            </Box> */}
           </Box>
           <Box
             style={{

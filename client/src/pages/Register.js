@@ -38,6 +38,8 @@ const Register = () => {
     setError(null);
     if (!email.includes("@uog.edu.pk"))
       return setError("Please enter a valid UOG email address");
+    if (email.indexOf("@uog.edu.pk") === 0)
+      return setError("Please enter a valid UOG email address");
     // dispatch(registerUser(name, email, password, department));
     console.log(name, email, password, department);
     axios

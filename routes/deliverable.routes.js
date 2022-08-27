@@ -37,6 +37,10 @@ Router.post(
   upload.single("file"),
   Deliverable.submitGroupDeliverableSubmission
 );
+Router.delete(
+  "/del-grp-submission/:file",
+  Deliverable.deleteGroupDeliverableSubmission
+);
 Router.post("/send-mail", Deliverable.sendMailToStudents);
 
 module.exports = Router;

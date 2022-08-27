@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Select from "../components/Select";
 import Styles from "./auth.styles";
 import axios from "axios";
+import PasswordField from "../components/PasswordField";
 // import { loginUser } from "../store/actions/auth";
 
 const ManageFaculty = props => {
@@ -24,7 +25,7 @@ const ManageFaculty = props => {
   const accessToken = useSelector(state => state.auth.accessToken);
   const [name, setName] = useState(faculty ? faculty.name : "");
   const [email, setEmail] = useState(faculty ? faculty.email : "");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(faculty ? faculty.password : "");
   const [allDepartments, setAllDepartments] = useState([]);
   const [department, setDepartment] = useState(
     faculty ? faculty.departmentId : ""
@@ -59,7 +60,7 @@ const ManageFaculty = props => {
   const registerHandler = async () => {
     console.log(name, email, password, department);
     setError(null);
-    if (!email.includes("@uog.edu.pk"))
+    if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
       return setError("Please enter a valid UOG email address");
     // dispatch(registerUser(name, email, password, department));
     console.log(name, email, password, department);
@@ -77,6 +78,7 @@ const ManageFaculty = props => {
             email: faculty.email,
             name: name,
             departmentId: department,
+            password: password,
           }
         );
         console.log(res);
@@ -97,6 +99,7 @@ const ManageFaculty = props => {
     } catch (err) {
       console.log(err);
       setError(err.response.data.message);
+      alert(err.response.data.message);
     } finally {
       setDisplay(false);
     }
@@ -128,19 +131,17 @@ const ManageFaculty = props => {
             value={email}
             placeholder="@uog.edu.pk"
             type="email"
-            disabled={faculty.hasOwnProperty("email")}
+            // disabled={faculty.hasOwnProperty("email")}
             onChange={e => setEmail(e.target.value)}
           />
-          {faculty.hasOwnProperty("name") &&
-          faculty.hasOwnProperty("email") &&
-          faculty.hasOwnProperty("department") ? null : (
-            <TextField
-              style={Styles.input}
-              placeholder="Password"
-              type="password"
-              onChange={e => setPassword(e.target.value)}
-            />
-          )}
+
+          <PasswordField
+            style={Styles.input}
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+
           <Select
             label="Department"
             style={Styles.input}

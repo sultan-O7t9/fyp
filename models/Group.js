@@ -16,10 +16,13 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "Not Submitted",
         validate: {
           isIn: {
-            args: [["Not Submitted", "Approved"]],
+            args: [["Not Submitted", "Approved", "Pending"]],
             msg: "Booklets status must be one of the following: No Submission, Submitted, Approved",
           },
         },
+      },
+      bookletsComment: {
+        type: DataTypes.STRING,
       },
 
       // supervisorStatus: {

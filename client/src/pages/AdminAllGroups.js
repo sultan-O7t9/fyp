@@ -8,6 +8,8 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import ReactDataGrid from "@inovua/reactdatagrid-community";
+import "@inovua/reactdatagrid-community/index.css";
 import { Box } from "@mui/system";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -54,108 +56,193 @@ const DATA = {
 };
 
 const DataBody = ({ data, depts }) => {
-  const [filter, setFilter] = useState("All");
-  const [filteredData, setFilteredData] = useState([...data]);
-  const filters = ["All", ...depts];
+  // const [filter, setFilter] = useState("All");
+  const [gridData, setGridData] = useState(data);
+  const [gridCols, setGridCols] = useState([]);
+  // const [filteredData, setFilteredData] = useState([...data]);
+  // const filters = ["All", ...depts];
 
+  // useEffect(() => {
+  //   if (filter === "All") setFilteredData(data);
+  //   // else if (filter === "In Groups") {
+  //   //   setFilteredData(data.filter(item => item.group !== null));
+  //   // } else if (filter === "Not In Groups") {
+  //   //   setFilteredData(data.filter(item => item.group === null));
+  //   // }
+  //   else {
+  //     setFilteredData(data.filter(item => item.department === filter));
+  //   }
+  // }, [filter, data]);
   useEffect(() => {
-    if (filter === "All") setFilteredData(data);
-    // else if (filter === "In Groups") {
-    //   setFilteredData(data.filter(item => item.group !== null));
-    // } else if (filter === "Not In Groups") {
-    //   setFilteredData(data.filter(item => item.group === null));
-    // }
-    else {
-      setFilteredData(data.filter(item => item.department === filter));
-    }
-  }, [filter, data]);
+    const columns = [
+      {
+        name: "id",
+        header: "Name",
+        defaultFlex: 1,
+      },
+
+      // {
+      //   name: "members",
+      //   header: "Members",
+      //   defaultFlex: 2,
+      //   render: ({ value }) => {
+      //     const comp = [];
+      //     for (let i = 0; i < value.length; i++) {
+      //       comp.push(<div>{value[i].rollNo}</div>);
+      //     }
+      //     return <div>{comp}</div>;
+      //   },
+      // },
+      {
+        name: "semester",
+        header: "Semester",
+        defaultFlex: 1,
+      },
+      {
+        name: "project",
+        header: "Project",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          return value ? value : "None";
+        },
+      },
+      {
+        name: "supervisor",
+        defaultFlex: 1,
+        header: "Supervisor",
+      },
+      {
+        name: "bookletsStatus",
+        header: "Booklets Status",
+        render: ({ value }) => {
+          return value === "Approved" ? (
+            <div style={{ color: "green" }}>{value}</div>
+          ) : value === "Pending" ? (
+            <div style={{ color: "orange" }}>{value}</div>
+          ) : (
+            <div style={{ color: "red" }}>{value}</div>
+          );
+        },
+      },
+      {
+        name: "bookletsComment",
+        header: "Booklets Comments",
+        defaultFlex: 2,
+      },
+    ];
+    setGridCols(columns);
+
+    setGridData(data);
+  }, [data]);
 
   return (
-    <>
-      {/* <TableRow>
-        <TableCell>
-          <Typography variant="body1">Filter</Typography>
-        </TableCell>
-        <TableCell colSpan={2}>
-          <Select
-            required
-            style={{ ...styles.input, margin: 0 }}
-            label="Filter"
-            value={filter}
-            setValue={setFilter}
-            items={filters.map(filter => ({
-              id: filter,
-              value: filter,
-              text: filter,
-            }))}
-          />
-        </TableCell>
-      </TableRow> */}
-
-      {data &&
-        data.map((row, index) => (
-          <TableRow key={row.id}>
-            <TableCell>{row.id}</TableCell>
-            {/* <TableCell>{row.members}</TableCell> */}
-            {/* <TableCell>
-          <List>
-            {row.members.map(member => (
-              <ListItem
-                style={{ padding: 0 }}
-                key={member.rollNo + member.name}
-                >
-                <Link to="#" style={{ textDecoration: "none" }}>
-                {member.rollNo}
-                </Link>
-                </ListItem>
-                ))}
-          </List>
-        </TableCell> */}
-            <TableCell>{row.project ? row.project : "None"}</TableCell>
-            <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell>
-            <TableCell>
-              <p
-                style={{
-                  color: row.bookletsStatus === "Approved" ? "green" : "red",
-                }}
-              >
-                {row.bookletsStatus}
-              </p>
-            </TableCell>
-            {/* <TableCell align="right">
-          <IconButton
-            onClick={() => {
-              editGroup(row);
-            }}
-            color="primary"
-            variant="outlined"
-          >
-            <EditIcon />
-          </IconButton>
-
-          <IconButton
-            onClick={() => {
-              deleteGroup(row.id);
-            }}
-            color="error"
-            variant="outlined"
-          >
-            <DeleteIcon />
-          </IconButton>
-        </TableCell>
-        <TableCell align="right">
-          <Button
-            onClick={() => {
-              history.push("/groups/" + row.id.split("_")[2]);
-            }}
-          >
-            Show Details
-          </Button>
-        </TableCell> */}
-          </TableRow>
-        ))}
-    </>
+    <ReactDataGrid
+      idProperty="id"
+      columns={gridCols}
+      dataSource={gridData}
+      rowHeight={100}
+      style={{
+        height: "calc(100vh - 230px)",
+      }}
+    />
   );
+
+  // return (
+  //   <>
+  //     {/* <TableRow>
+  //       <TableCell>
+  //         <Typography variant="body1">Filter</Typography>
+  //       </TableCell>
+  //       <TableCell colSpan={2}>
+  //         <Select
+  //           required
+  //           style={{ ...styles.input, margin: 0 }}
+  //           label="Filter"
+  //           value={filter}
+  //           setValue={setFilter}
+  //           items={filters.map(filter => ({
+  //             id: filter,
+  //             value: filter,
+  //             text: filter,
+  //           }))}
+  //         />
+  //       </TableCell>
+  //     </TableRow> */}
+
+  //     {data &&
+  //       data.map((row, index) => (
+  //         <TableRow key={row.id}>
+  //           <TableCell>{row.id}</TableCell>
+  //           {/* <TableCell>{row.members}</TableCell> */}
+  //           {/* <TableCell>
+  //         <List>
+  //           {row.members.map(member => (
+  //             <ListItem
+  //               style={{ padding: 0 }}
+  //               key={member.rollNo + member.name}
+  //               >
+  //               <Link to="#" style={{ textDecoration: "none" }}>
+  //               {member.rollNo}
+  //               </Link>
+  //               </ListItem>
+  //               ))}
+  //         </List>
+  //       </TableCell> */}
+  //           <TableCell>{row.project ? row.project : "None"}</TableCell>
+  //           <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell>
+  //           <TableCell>
+  //             <p
+  //               style={{
+  //                 color:
+  //                   row.bookletsStatus === "Approved"
+  //                     ? "green"
+  //                     : row.bookletsStatus === "Pending"
+  //                     ? "orange"
+  //                     : "red",
+  //               }}
+  //             >
+  //               {row.bookletsStatus}
+  //             </p>
+  //           </TableCell>
+  //           <TableCell>
+  //             <Typography variant="body1">
+  //               {row.bookletsComment ? row.bookletsComment : "None"}
+  //             </Typography>
+  //           </TableCell>
+  //           {/* <TableCell align="right">
+  //         <IconButton
+  //           onClick={() => {
+  //             editGroup(row);
+  //           }}
+  //           color="primary"
+  //           variant="outlined"
+  //         >
+  //           <EditIcon />
+  //         </IconButton>
+
+  //         <IconButton
+  //           onClick={() => {
+  //             deleteGroup(row.id);
+  //           }}
+  //           color="error"
+  //           variant="outlined"
+  //         >
+  //           <DeleteIcon />
+  //         </IconButton>
+  //       </TableCell>
+  //       <TableCell align="right">
+  //         <Button
+  //           onClick={() => {
+  //             history.push("/groups/" + row.id.split("_")[2]);
+  //           }}
+  //         >
+  //           Show Details
+  //         </Button>
+  //       </TableCell> */}
+  //         </TableRow>
+  //       ))}
+  //   </>
+  // );
 };
 
 const AdminAllGroups = () => {
@@ -164,7 +251,7 @@ const AdminAllGroups = () => {
     "Project Title",
     "Supervisor",
     "Booklet Status",
-    "",
+    "Booklet Comments",
   ]);
   const [body, setBody] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -256,8 +343,15 @@ const AdminAllGroups = () => {
             </Button> 
           </Box> */}
           </Box>
-          <DataTable
-            DataHead={() => <GroupsDataHead heads={heads} />}
+          <DataBody
+            data={body}
+            // data={DATA.data}
+            depts={depts.map(dept => dept.name)}
+            setData={setBody}
+            editGroup={editGroupHandler}
+          />
+          {/* <DataTable
+            DataHead={null}
             DataBody={() => (
               <DataBody
                 data={body}
@@ -267,7 +361,7 @@ const AdminAllGroups = () => {
                 editGroup={editGroupHandler}
               />
             )}
-          />
+          /> */}
         </Main>
       </ContainerFluid>
     </AdminMainLayout>
