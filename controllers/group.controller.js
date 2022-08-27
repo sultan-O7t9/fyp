@@ -179,6 +179,8 @@ class GroupController {
           group: {
             id: group.dataValues.id,
             name: group.dataValues.name,
+            bookletsStatus: group.dataValues.bookletsStatus,
+            bookletsComment: group.dataValues.bookletsComment,
             members: members.map(member => member.dataValues.rollNo),
             leader: members.find(member => member.dataValues.leader == 1)
               .dataValues.rollNo,
@@ -642,7 +644,7 @@ class GroupController {
             members: group.dataValues.members,
             supervisor: supervisor.dataValues.name,
             bookletsStatus: group.dataValues.bookletsStatus,
-            department: department.dataValues.name,
+            department: department ? department.dataValues.name : null,
             bookletsComment: group.dataValues.bookletsComment,
           };
         })

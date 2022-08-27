@@ -27,6 +27,7 @@ import AdminMainLayout from "../layouts/AdminMainLayout";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+import Toast from "../components/Toast";
 
 const DATA = {
   heads: ["Name", "Department", "Role"],
@@ -53,15 +54,34 @@ const DataHead = ({ heads }) => {
   );
 };
 
-const DataBody = ({ data, editFaculty, setData }) => {
+const DataBody = ({ data, editFaculty, setData, setRefresh }) => {
   const [gridData, setGridData] = useState(data);
   const [gridCols, setGridCols] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [toDelete, setToDelete] = useState(null);
+  const [toast, setToast] = useState(false);
+  const [tMsg, setTMsg] = useState("");
 
   const deleteDept = async deptId => {
     console.log(deptId);
-    setShowDeleteModal(false);
+    try {
+      const res = await axios.delete(
+        "http://localhost:5000/api/dept/delete/" + deptId
+      );
+      console.log(res);
+      if (res.data.remove) {
+        setTMsg("Department Deleted Successfully");
+        setToast(true);
+        setShowDeleteModal(false);
+        setRefresh(refresh => !refresh);
+      }
+    } catch (err) {
+      setTMsg("Error Deleting Department");
+      setToast(true);
+      setShowDeleteModal(false);
+      setRefresh(refresh => !refresh);
+      console.log(err);
+    }
   };
 
   useEffect(() => {
@@ -163,6 +183,7 @@ const DataBody = ({ data, editFaculty, setData }) => {
           setOpen={setShowDeleteModal}
         />
       ) : null}
+      {toast ? <Toast open={toast} setOpen={setToast} message={tMsg} /> : null}
     </>
   );
   // return (
@@ -242,6 +263,7 @@ const AdminManageDept = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showEditFaculty, setShowEditFaculty] = useState(false);
   const [editData, setEditData] = useState({});
+  const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     setIsLoading(true);
 
@@ -274,7 +296,7 @@ const AdminManageDept = () => {
     //   .finally(() => {
     //     setIsLoading(false);
     //   });
-  }, [showAddCommittee, showEditFaculty]);
+  }, [showAddCommittee, showEditFaculty, refresh]);
 
   // return <ManageCommittee />;
 
@@ -347,6 +369,7 @@ const AdminManageDept = () => {
             editFaculty={editFacultyHandler}
             // data={DATA.data}
             setData={setBody}
+            setRefresh={setRefresh}
           />
         </Main>
       </ContainerFluid>

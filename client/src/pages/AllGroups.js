@@ -16,6 +16,7 @@ import DataTable from "../components/DataTable";
 import GroupExportTable from "../components/GroupExportTable";
 import GroupsDataBody from "../components/GroupsDataBody";
 import GroupsDataHead from "../components/GroupsDataHead";
+import ImportFromExcel from "../components/ImportFromExcel";
 import Link from "../components/Link";
 import Main from "../components/Main";
 import Toast from "../components/Toast";
@@ -111,6 +112,60 @@ const AllGroups = () => {
         <CircularProgress color="inherit" />
       </Backdrop>
     );
+  const importDataHandler = async importedData => {
+    console.log(importedData);
+    return;
+    setIsLoading(true);
+
+    //ok
+    //now find roll no and name is on which index
+    const indexOfRoll = importedData.heads.findIndex(item =>
+      item.includes("oll")
+    );
+    const indexOfName = importedData.heads.findIndex(item =>
+      item.includes("ame")
+    );
+    // console.log(indexOfRoll, indexOfName);
+    // //this will show us which column contains roll no and name
+    // console.log(indexOfRoll, indexOfName);
+    const dataHeads = [
+      importedData.heads[indexOfRoll],
+      importedData.heads[indexOfName],
+      "Group",
+    ];
+    const students = importedData.data
+      .map(item => {
+        if (item[indexOfRoll] && item[indexOfName])
+          return {
+            rollNo: item[indexOfRoll],
+            name: item[indexOfName],
+          };
+        else return null;
+      })
+      .filter(item => item != null);
+    const alreadyCreatedStudents = body.map(item => item.rollNo);
+    const studentsToCreate = students.filter(
+      item => !alreadyCreatedStudents.includes(item.rollNo)
+    );
+    console.log(studentsToCreate);
+    // return;
+    //Now send request to server and create studetns there, render the response array in table
+    // try {
+    //   const response = await axios.post(
+    //     "http://localhost:5000/api/student/create-all",
+    //     { students: studentsToCreate }
+    //   );
+
+    //   if (response.status === 200) {
+    //     setIsLoading(false);
+    //     setHeads(dataHeads);
+    //     // setBody(response.data.students);
+    //     setRefresh(refresh => !refresh);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
+  };
 
   return (
     <ContainerFluid maxWidth="lg">
@@ -128,6 +183,13 @@ const AllGroups = () => {
             <Typography variant="h3">Groups</Typography>
           </Box>
           <Box style={{ display: "flex", flexDirection: "column" }}>
+            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+              <ImportFromExcel
+                label="Import Groups"
+                importData={importDataHandler}
+                // disabled={body.length > 0}
+              />
+            ) : null}
             {body.length > 0 ? (
               <>
                 <GroupExportTable

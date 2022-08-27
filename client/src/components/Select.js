@@ -6,6 +6,7 @@ import { Select as MuiSelect } from "@mui/material";
 
 const Select = props => {
   const { value, setValue, label, items, ...restProps } = props;
+  console.log(value);
   const handleChange = event => {
     console.log(event.target.value, value);
 
@@ -23,7 +24,6 @@ const Select = props => {
           id="demo-simple-select"
           value={value}
           label={label}
-          defaultValue={"None"}
           onChange={handleChange}
           {...restProps}
         >

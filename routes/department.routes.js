@@ -6,6 +6,8 @@ const Router = require("express").Router();
 
 Router.get("/get-all", Depratment.getAllDepartments);
 Router.post("/create", Depratment.createDepartment);
-Router.delete("/delete", Depratment.removeDepartment);
+
+Router.delete("/delete/:deptId", Depratment.removeDepartment);
+Router.post("/update", Depratment.updateDepartment);
 
 module.exports = Router;

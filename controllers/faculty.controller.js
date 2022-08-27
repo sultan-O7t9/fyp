@@ -386,7 +386,9 @@ class FacultyController {
               id: supervisor.dataValues.departmentId,
             },
           });
-          supervisor.dataValues.department = department.dataValues.name;
+          if (department)
+            supervisor.dataValues.department = department.dataValues.name;
+          else supervisor.dataValues.department = null;
           return supervisor;
         })
       );

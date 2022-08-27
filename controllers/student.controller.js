@@ -10,6 +10,7 @@ const {
 } = require("../models");
 const { sendMail } = require("../utils/sendMails");
 const Sequelize = require("sequelize");
+var crypto = require("crypto");
 
 // const Student = require("../models/Student");
 // const FacultyMember = require("../models/FacultyMember");
@@ -18,6 +19,56 @@ require("dotenv").config();
 var crypto = require("crypto");
 
 class StudentController {
+  static updateAStudent = async (req, res) => {
+    const { name, rollNo, dept } = req.body;
+    try {
+      const student = await Student.findOne({
+        where: {
+          rollNo: rollNo,
+        },
+      });
+      if (student) {
+        await Student.update(
+          {
+            name: name,
+            rollNo: rollNo,
+            dept: dept,
+          },
+          {
+            where: {
+              rollNo: rollNo,
+            },
+          }
+        );
+      }
+
+      res.status(200).json({
+        message: "Student update successfully",
+        student,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
+    }
+  };
+  static createAStudent = async (req, res) => {
+    const { name, rollNo, dept } = req.body;
+    try {
+      const student = await Student.create({
+        name,
+        rollNo,
+        departmentId: dept,
+        password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+      });
+      res.status(200).json({
+        message: "Student created successfully",
+        student,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
+    }
+  };
   static deleteStudent = async (req, res) => {
     const { id } = req.params;
     try {
@@ -96,8 +147,9 @@ class StudentController {
           departmentId: user.dataValues.departmentId,
           groupId: null,
         },
-        attributes: ["name", "rollNo", "leader"],
+        attributes: ["name", "rollNo", "leader", "departmentId"],
       });
+
       res.json({
         message: "Students retrieved successfully",
         students,
@@ -154,7 +206,7 @@ class StudentController {
         where: {
           departmentId: user.dataValues.departmentId,
         },
-        attributes: ["name", "rollNo", "groupId"],
+        attributes: ["name", "rollNo", "groupId", "departmentId"],
       });
       console.log(students);
       const studentsWithGroups = students.filter(
@@ -170,11 +222,19 @@ class StudentController {
         },
         attributes: ["id", "name"],
       });
+
+      const depts = await Department.findAll({
+        attributes: ["id", "name"],
+      });
+
       res.json({
         message: "Students retrieved successfully",
         students: students.map(student => {
           return {
             ...student.dataValues,
+            dept: depts.find(dept => dept.id == student.dataValues.departmentId)
+              .name,
+            deptId: student.dataValues.departmentId,
             group: student.dataValues.groupId
               ? groups.find(
                   group => group.dataValues.id === student.dataValues.groupId

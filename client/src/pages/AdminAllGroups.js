@@ -309,7 +309,7 @@ const AdminAllGroups = () => {
 
   return (
     <AdminMainLayout>
-      <ContainerFluid>
+      <ContainerFluid maxWidth="lg">
         <Main styles={{ padding: "1.5rem" }}>
           <Box
             sx={{ marginBottom: "3rem" }}

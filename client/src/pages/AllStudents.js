@@ -21,6 +21,14 @@ import axios from "axios";
 import Select from "../components/Select";
 import styles from "./auth.styles";
 import { ConstructionOutlined } from "@mui/icons-material";
+import Toast from "../components/Toast";
+import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+
+import ReactDataGrid from "@inovua/reactdatagrid-community";
+import "@inovua/reactdatagrid-community/index.css";
+import { useHistory } from "react-router-dom";
+import AddStudent from "../components/AddStudent";
+import EditStudent from "../components/EditStudent";
 
 const DATA = {
   heads: ["Group ID", "Members", "Project Title", "Supervisor"],
@@ -53,19 +61,95 @@ const DataHead = ({ heads }) => {
   );
 };
 
-const DataBody = ({ data, setRefresh }) => {
-  const [filter, setFilter] = useState("All");
-  const [filteredData, setFilteredData] = useState([...data]);
-  const filters = ["In Groups", "All", "Not In Groups"];
+const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
+  const [open, setOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [gridData, setGridData] = useState(data);
+  const [gridCols, setGridCols] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
-    if (filter === "All") setFilteredData(data);
-    else if (filter === "In Groups") {
-      setFilteredData(data.filter(item => item.group !== null));
-    } else if (filter === "Not In Groups") {
-      setFilteredData(data.filter(item => item.group === null));
-    }
-  }, [filter, data]);
+    const dataSource = data.map(item => {
+      return {
+        ...item,
+        actions: (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                // editGroup(item);
+                // editStudent
+                setToEdit(item);
+                setShowEditStudent(true);
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              size="small"
+              onClick={() => {
+                setShowDeleteModal(true);
+                setToDelete(item);
+              }}
+              variant="outlined"
+              color="error"
+            >
+              Delete
+            </Button>
+          </div>
+        ),
+      };
+    });
+    const columns = [
+      {
+        name: "name",
+        header: "Name",
+        defaultFlex: 2,
+      },
+
+      {
+        name: "rollNo",
+        header: "Roll #",
+        defaultFlex: 2,
+      },
+      {
+        name: "batch",
+        header: "Batch",
+        defaultFlex: 1,
+      },
+      {
+        name: "dept",
+        header: "Department",
+        defaultFlex: 2,
+      },
+      {
+        name: "group",
+        header: "Group",
+        defaultFlex: 1,
+        render: ({ value }) => {
+          return value ? value : "None";
+        },
+      },
+
+      {
+        name: "actions",
+        defaultFlex: 2,
+        header: "Actions",
+      },
+    ];
+    setGridCols(columns);
+    setGridData(dataSource);
+  }, [data, history]);
 
   const handleDeleteStudent = async id => {
     try {
@@ -84,47 +168,75 @@ const DataBody = ({ data, setRefresh }) => {
 
   return (
     <>
-      {/* <TableRow>
-        <TableCell>
-          <Typography variant="body1">Filter</Typography>
-        </TableCell>
-        <TableCell colSpan={2}>
-          <Select
-            required
-            style={{ ...styles.input, margin: 0 }}
-            label="Filter"
-            value={filter}
-            setValue={setFilter}
-            items={filters.map(filter => ({
-              id: filter,
-              value: filter,
-              text: filter,
-            }))}
-          />
-        </TableCell>
-      </TableRow> */}
-      {data &&
-        filteredData.map((row, index) => (
-          <TableRow key={index}>
-            <TableCell>{row.rollNo}</TableCell>
-            <TableCell>{row.name}</TableCell>
-            <TableCell>{row.group || "None"}</TableCell>
-            <TableCell>
-              <IconButton
-                onClick={() => {
-                  console.log("del student " + row.rollNo);
-                  handleDeleteStudent(row.rollNo);
-                }}
-                color="error"
-                variant="outlined"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </TableCell>
-          </TableRow>
-        ))}
+      <ReactDataGrid
+        idProperty="id"
+        columns={gridCols}
+        dataSource={gridData}
+        rowHeight={100}
+        style={{
+          height: "calc(100vh - 230px)",
+        }}
+      />
+      {showDeleteModal ? (
+        <DeleteConfirmationDialog
+          itemType="Student"
+          item={toDelete.rollNo}
+          handleDelete={() => {
+            // deleteGroup(toDelete.id);
+            handleDeleteStudent(toDelete.rollNo);
+          }}
+          setOpen={setShowDeleteModal}
+        />
+      ) : null}
+      {open ? (
+        <Toast open={open} setOpen={setOpen} message={toastMessage} />
+      ) : null}
     </>
   );
+
+  // return (
+  //   <>
+  //     {/* <TableRow>
+  //       <TableCell>
+  //         <Typography variant="body1">Filter</Typography>
+  //       </TableCell>
+  //       <TableCell colSpan={2}>
+  //         <Select
+  //           required
+  //           style={{ ...styles.input, margin: 0 }}
+  //           label="Filter"
+  //           value={filter}
+  //           setValue={setFilter}
+  //           items={filters.map(filter => ({
+  //             id: filter,
+  //             value: filter,
+  //             text: filter,
+  //           }))}
+  //         />
+  //       </TableCell>
+  //     </TableRow> */}
+  //     {data &&
+  //       filteredData.map((row, index) => (
+  //         <TableRow key={index}>
+  //           <TableCell>{row.rollNo}</TableCell>
+  //           <TableCell>{row.name}</TableCell>
+  //           <TableCell>{row.group || "None"}</TableCell>
+  //           <TableCell>
+  //             <IconButton
+  //               onClick={() => {
+  //                 console.log("del student " + row.rollNo);
+  //                 handleDeleteStudent(row.rollNo);
+  //               }}
+  //               color="error"
+  //               variant="outlined"
+  //             >
+  //               <DeleteIcon />
+  //             </IconButton>
+  //           </TableCell>
+  //         </TableRow>
+  //       ))}
+  //   </>
+  // );
 };
 
 const AllStudents = () => {
@@ -132,6 +244,9 @@ const AllStudents = () => {
   const [body, setBody] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [showEditStudent, setShowEditStudent] = useState(false);
+  const [toEdit, setToEdit] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -147,7 +262,7 @@ const AllStudents = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [refresh]);
+  }, [refresh, showAddStudent, showEditStudent]);
 
   const importDataHandler = async importedData => {
     // console.log(importedData);
@@ -203,6 +318,11 @@ const AllStudents = () => {
     }
   };
 
+  const handleAddStudent = () => {
+    console.log("add student");
+    setShowAddStudent(true);
+  };
+
   if (isLoading)
     return (
       <Backdrop
@@ -214,34 +334,50 @@ const AllStudents = () => {
     );
 
   return (
-    <ContainerFluid>
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h3">Students</Typography>
+    <>
+      {showAddStudent ? <AddStudent setDisplay={setShowAddStudent} /> : null}
+      {showEditStudent ? (
+        <EditStudent student={toEdit} setDisplay={setShowEditStudent} />
+      ) : null}
+      <ContainerFluid>
+        <Main styles={{ padding: "1.5rem" }}>
+          <Box
+            sx={{ marginBottom: "3rem" }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h3">Students</Typography>
+            </Box>
+            <Box style={{ display: "flex", flexDirection: "column" }}>
+              <ImportFromExcel
+                label="Import Students"
+                importData={importDataHandler}
+                // disabled={body.length > 0}
+              />
+              <Button
+                style={{ marginTop: "1rem" }}
+                variant="contained"
+                onClick={handleAddStudent}
+              >
+                Add Student
+              </Button>
+            </Box>
           </Box>
-          <Box style={{ display: "flex", flexDirection: "column" }}>
-            <ImportFromExcel
-              label="Import Students"
-              importData={importDataHandler}
-              // disabled={body.length > 0}
-            />
-            {/* <Button style={{ marginTop: "1rem" }} variant="contained">
-              Add Student
-            </Button> */}
-          </Box>
-        </Box>
-        <DataTable
+          {/* <DataTable
           DataHead={() => <DataHead heads={heads} />}
           DataBody={() => <DataBody data={body} setRefresh={setRefresh} />}
-        />
-      </Main>
-    </ContainerFluid>
+        /> */}
+          <DataBody
+            data={body}
+            setToEdit={setToEdit}
+            setShowEditStudent={setShowEditStudent}
+            setRefresh={setRefresh}
+          />
+        </Main>
+      </ContainerFluid>
+    </>
   );
 };
 

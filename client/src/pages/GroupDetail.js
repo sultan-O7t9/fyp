@@ -19,14 +19,18 @@ import { useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
 import Toast from "../components/Toast";
+import RadioButtonGroup from "../components/RadioButtonGroup";
 
 const DataHead = () => null;
 
 const DataBody = props => {
-  const { groupInfo, setToast, setTMsg } = props;
+  const { groupInfo } = props;
   const role = localStorage.getItem("USER_ROLE");
   const history = useHistory();
   const [projectDetails, setProjectDetails] = useState({});
+  const [toast, setToast] = useState(false);
+  const [tMsg, setTMsg] = useState("");
+  const [bookletComment, setBookletComment] = useState("");
   // const [modal, setModal] = useState(false);
   const params = useParams();
   const groupId = params.id;
@@ -202,8 +206,70 @@ const DataBody = props => {
     history.push("/report", groupInfo);
   };
 
+  useEffect(() => {
+    console.log(groupInfo);
+    // setBookletStatus(groupInfo.bookletsStatus);
+    setBookletComment(groupInfo.bookletsComment);
+  }, [groupInfo]);
+
+  const changeBookletStatus = async (id, status) => {
+    const data = {
+      groupId: id,
+      status: status,
+    };
+    // console.log(data);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/group/change-booklet-status",
+        data
+      );
+      // console.log("STATUS", response.data.group.bookletsStatus);
+      // setBookletStatus(response.data.group.bookletsStatus);
+      setTMsg(
+        "Booklet Status changed to " + response.data.group.bookletsStatus
+      );
+      setToast(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const changeBookletComment = async id => {
+    const data = {
+      groupId: id,
+      comment: bookletComment,
+    };
+
+    console.log(data);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/group/change-booklet-comment",
+        data
+      );
+      if (res.data.comment === true) {
+        setTMsg("Comment Added Successfully");
+        setToast(true);
+      }
+    } catch (error) {
+      console.log(error);
+      setTMsg(error.message);
+      setToast(true);
+    }
+
+    // try {
+    //   const response = await axios.post(
+    //     "http://localhost:5000/api/group/change-booklet-status",
+    //     data
+    //   );
+    //   setBookletStatus(response.data.group.bookletsStatus === "Approved");
+    // } catch (error) {
+    //   console.log(error);
+    // }
+  };
+
   return (
     <>
+      {toast ? <Toast open={toast} setOpen={setToast} message={tMsg} /> : null}
+
       <TableRow>
         <TableCell colSpan={2}>
           <Typography variant="h6">Group Leader</Typography>
@@ -273,6 +339,74 @@ const DataBody = props => {
           )}
         </TableCell>
       </TableRow>
+      {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+        <TableRow>
+          <TableCell colSpan={1}>
+            <Typography variant="h6">Booklets</Typography>
+          </TableCell>
+          <TableCell>
+            <RadioButtonGroup
+              label=""
+              defaultValue={groupInfo.bookletsStatus}
+              // value={bookletStatus}
+              onChange={e => {
+                changeBookletStatus(groupInfo.id, e.target.value);
+
+                console.log(e.target.value);
+              }}
+              items={[
+                { label: "Approved", value: "Approved" },
+                { label: "Pending", value: "Pending" },
+                { label: "Not Submitted", value: "Not Submitted" },
+              ]}
+            />
+          </TableCell>
+          <TableCell>
+            <TextareaAutosize
+              minRows={3}
+              value={bookletComment}
+              onChange={e => {
+                setBookletComment(e.target.value);
+              }}
+            />
+            <Button
+              variant="contained"
+              size="small"
+              // disabled={!bookletComment}
+              onClick={() => {
+                changeBookletComment(groupInfo.id);
+              }}
+            >
+              Add Comment
+            </Button>
+          </TableCell>
+        </TableRow>
+      ) : (
+        <TableRow>
+          <TableCell>
+            {groupInfo.hasOwnProperty("bookletsStatus") ? (
+              <Typography
+                to="#"
+                variant="body1"
+                style={{
+                  color:
+                    groupInfo.bookletsStatus === "Approved"
+                      ? "green"
+                      : groupInfo.bookletsStatus === "Pending"
+                      ? "orange"
+                      : "red",
+                }}
+              >
+                {groupInfo.bookletsStatus}
+              </Typography>
+            ) : (
+              <Typography variant="body1" style={{ color: "red" }}>
+                Not Submitted
+              </Typography>
+            )}
+          </TableCell>
+        </TableRow>
+      )}
       <TableRow>
         <TableCell colSpan={3}>{""}</TableCell>
       </TableRow>
@@ -629,8 +763,7 @@ const DataBody = props => {
 
 const GroupDetail = () => {
   const [groupInfo, setGroupInfo] = useState({});
-  const [open, setOpen] = useState(false);
-  const [tMsg, setTMsg] = useState("");
+
   const params = useParams();
   const groupId = params.id;
   useEffect(() => {
@@ -649,7 +782,6 @@ const GroupDetail = () => {
   }, [groupId]);
   return (
     <>
-      {open ? <Toast open={open} setOpen={setOpen} message={tMsg} /> : null}
       <ContainerFluid title="">
         <Main styles={{ padding: "1.5rem" }}>
           <Box
@@ -672,13 +804,7 @@ const GroupDetail = () => {
 
           <DataTable
             DataHead={DataHead}
-            DataBody={() => (
-              <DataBody
-                groupInfo={groupInfo}
-                setToast={setOpen}
-                setTMsg={setTMsg}
-              />
-            )}
+            DataBody={() => <DataBody groupInfo={groupInfo} />}
           />
         </Main>
       </ContainerFluid>

@@ -7,6 +7,7 @@ import {
   List,
   ListItem,
   Paper,
+  TextField,
   Typography,
 } from "@mui/material";
 import axios from "axios";
@@ -88,9 +89,14 @@ const EditDeptPMO = props => {
     axios
       .get("http://localhost:5000/api/faculty/get-supervisors")
       .then(res => {
-        const facultyData = res.data.supervisors.filter(
-          supervisor => supervisor.id !== pmo.id
-        );
+        let facultyData;
+        if (pmo) {
+          facultyData = res.data.supervisors.filter(
+            supervisor => supervisor.id !== pmo.id
+          );
+        } else {
+          facultyData = res.data.supervisors;
+        }
         console.log(facultyData);
         setFaculty(facultyData);
 
@@ -99,6 +105,11 @@ const EditDeptPMO = props => {
       .catch(err => {
         console.log(err);
       });
+  }, [dept, pmo]);
+
+  useEffect(() => {
+    setDeptTitle(dept.title);
+    setDeptPMO(pmo ? pmo.id : null);
   }, [dept, pmo]);
 
   //   useEffect(() => {
@@ -233,12 +244,26 @@ const EditDeptPMO = props => {
   //   });
 
   const submitPMOHandler = async () => {
-    const res = await axios.patch(
-      "http://localhost:5000/api/faculty/pmo/assign",
-      { deptId: dept.id, facultyId: deptPMO }
-    );
-    console.log(res.data.assign);
-    setDisplay(false);
+    try {
+      const deptRes = await axios.post(
+        "http://localhost:5000/api/dept/update",
+        {
+          id: dept.id,
+          title: deptTitle,
+        }
+      );
+      const pmoRes = await axios.patch(
+        "http://localhost:5000/api/faculty/pmo/assign",
+        { deptId: dept.id, facultyId: deptPMO }
+      );
+      if (deptRes.data.update && pmoRes.data.assign) {
+        console.log("Updated");
+      }
+      setDisplay(false);
+    } catch (err) {
+      console.log(err);
+      setDisplay(false);
+    }
   };
 
   return (
@@ -252,13 +277,23 @@ const EditDeptPMO = props => {
       >
         <Paper style={{ padding: "3.5rem 2rem" }}>
           <Box style={{ margin: "2rem 0.5rem", marginTop: "0rem" }}>
-            <Typography variant="h6">Change PMO</Typography>
+            <Typography variant="h6">Edit Department</Typography>
+            <Box style={{ margin: "1rem" }}>
+              <TextField
+                style={{ width: "100%" }}
+                placeholder="Department Name"
+                value={deptTitle}
+                onChange={e => {
+                  setDeptTitle(e.target.value);
+                }}
+              />
+            </Box>
             <Box style={{ margin: "1rem" }}>
               <Select
                 required
                 // style={{ width: "100%" }}
                 multiple={false}
-                label="Faculty Members"
+                label="PMO"
                 value={deptPMO}
                 setValue={selectPMOHandler}
                 items={selectFacultyItems}
@@ -296,7 +331,7 @@ const EditDeptPMO = props => {
             <Button
               variant="contained"
               color="primary"
-              disabled={deptPMO.length == 0}
+              disabled={!deptPMO}
               onClick={submitPMOHandler}
             >
               Save

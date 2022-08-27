@@ -1,4 +1,10 @@
-const { Department, Admin, FacultyMember, Batch } = require("../models");
+const {
+  Department,
+  Admin,
+  FacultyMember,
+  Batch,
+  Faculty_Role,
+} = require("../models");
 
 class DepratmentController {
   static getAllDepartments = async (req, res) => {
@@ -94,37 +100,80 @@ class DepratmentController {
     }
   };
   static removeDepartment = async (req, res) => {
-    const { id, deptId } = req.body;
+    const { deptId } = req.params;
     try {
-      const admin = await Admin.findOne({
+      const dept = await Department.findOne({
         where: {
-          id: id,
+          id: deptId,
         },
       });
-      console.log(admin);
-      if (admin) {
-        if (id != admin.id) {
-          throw new Error("Invalid Admin Id");
-        }
-        const dept = await Department.destroy({
+      if (dept) {
+        const pmo = await FacultyMember.findOne({
           where: {
-            id: deptId,
+            pmoOfDepartmentId: deptId,
           },
         });
-        res.json({
-          message: "Department delted successfully",
-          delete: true,
-        });
-      } else
-        res.status(400).json({
-          message: "Invalid Admin Id",
-          delete: false,
-        });
+        if (pmo) {
+          const faculty_role = await Faculty_Role.findOne({
+            where: {
+              facultyId: pmo.id,
+              roleId: 1,
+            },
+          });
+          if (faculty_role) {
+            await faculty_role.destroy();
+          }
+        }
+
+        await dept.destroy();
+      }
+      res.json({
+        message: "Department removed successfully",
+        remove: true,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({
         message: "Error getting departments",
         delete: false,
+        error,
+      });
+    }
+  };
+  static updateDepartment = async (req, res) => {
+    const { title, id } = req.body;
+    try {
+      const dept = await Department.findOne({
+        where: {
+          id: id,
+        },
+      });
+
+      if (dept) {
+        function onlyCapitalLetters(str) {
+          let newStr = "";
+
+          for (let i = 0; i < str.length; i++) {
+            if (str[i].match(/[A-Z]/)) {
+              newStr += str[i];
+            }
+          }
+          return newStr;
+        }
+        await dept.update({
+          title: title,
+          name: onlyCapitalLetters(title),
+        });
+      }
+      res.json({
+        message: "Department updated successfully",
+        update: true,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error updating departments",
+        update: false,
         error,
       });
     }
