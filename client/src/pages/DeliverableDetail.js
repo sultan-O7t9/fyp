@@ -474,6 +474,8 @@ const DeliverableDetail = props => {
       ) : null}
       {showSettingsModal ? (
         <DeliverableSettingsModal
+          setToastMessage={setToastMessage}
+          setShowToast={setShowToast}
           deliverable={deliverableData}
           setDisplay={setShowSettingsModal}
         />
@@ -559,7 +561,7 @@ const DeliverableDetail = props => {
               )}
             </Box>
             <Box>
-              {roles.includes("PMO") ? (
+              {/* {roles.includes("PMO") ? (
                 <Button
                   variant="contained"
                   color="primary"
@@ -567,7 +569,7 @@ const DeliverableDetail = props => {
                 >
                   Upload
                 </Button>
-              ) : null}
+              ) : null} */}
             </Box>
           </Card>
           <Card

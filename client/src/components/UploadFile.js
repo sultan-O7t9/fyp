@@ -36,7 +36,7 @@ const UploadFile = props => {
 
   return (
     <Backdrop
-      sx={{ color: "#000", zIndex: theme => theme.zIndex.drawer + 1 }}
+      sx={{ color: "#000", zIndex: theme => theme.zIndex.drawer + 10 }}
       open={true}
     >
       <Container
@@ -54,15 +54,11 @@ const UploadFile = props => {
                 className="form"
               >
                 <div style={{ margin: "1rem 0" }}>
-                  {!file.name ? (
-                    <input
-                      id="fileInput"
-                      type="file"
-                      onChange={handleFileInputChange}
-                    />
-                  ) : (
-                    <Typography variant="body1">{file.name}</Typography>
-                  )}
+                  <input
+                    id="fileInput"
+                    type="file"
+                    onChange={handleFileInputChange}
+                  />
                 </div>
 
                 <Button
