@@ -23,10 +23,12 @@ sequelize
 const FacultyMember = require("./FacultyMember")(sequelize, DataTypes);
 const Role = require("./Role")(sequelize, DataTypes);
 const Faculty_Role = require("./Faculty_Role")(sequelize, DataTypes);
+const PMO = require("./PMO")(sequelize, DataTypes);
 const Group = require("./Group")(sequelize, DataTypes);
 const Student = require("./Student")(sequelize, DataTypes);
 const Department = require("./Department")(sequelize, DataTypes);
 const Batch = require("./Batch")(sequelize, DataTypes);
+const Semester = require("./Semester")(sequelize, DataTypes);
 const Token = require("./Token")(sequelize, DataTypes);
 const Project = require("./Project")(sequelize, DataTypes);
 const Committee = require("./Committee")(sequelize, DataTypes);
@@ -78,10 +80,24 @@ Department.hasMany(FacultyMember, {
   foreignKey: "departmentId",
 });
 
-Department.hasOne(FacultyMember, {
-  //Each Department has one FacultyMember
-  foreignKey: "pmoOfDepartmentId",
+// Department.hasOne(FacultyMember, {
+//   //Each Department has one FacultyMember
+//   foreignKey: "pmoOfDepartmentId",
+// });
+FacultyMember.belongsToMany(Department, {
+  //Each FacultyMember belongs to many Roles
+  foreignKey: "pmoId",
+  through: PMO,
 });
+Department.belongsToMany(FacultyMember, {
+  //Each Role can have many Users
+  foreignKey: "deptId",
+  through: PMO,
+});
+
+// FacultyMember.hasMany(Department, {
+//   foreignKey: "pmoId",
+// });
 
 Department.hasMany(Batch, {
   //Each Department can have many Batches
@@ -191,6 +207,9 @@ Group.hasMany(EvaluationSchedule, {
 Deliverable.hasMany(EvaluationSchedule, {
   foreignKey: "deliverableId",
 });
+Semester.hasMany(Group, {
+  foreignKey: "semesterId",
+});
 // Committee.hs
 
 // Evaluation.hasMany(Version, {});
@@ -228,8 +247,10 @@ module.exports = {
   Deliverable,
   Version,
   Batch,
+  Semester,
   Token,
   Evaluation,
+  PMO,
   EvaluationType,
   EvaluationSchedule,
   Project,

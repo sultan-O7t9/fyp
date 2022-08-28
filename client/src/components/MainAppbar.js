@@ -10,6 +10,9 @@ import AppBarMenu from "./AppBarMenu";
 
 export default function MainAppbar(props) {
   const { toggleSidebar, menu } = props;
+  const [currentRole, setCurrentRole] = React.useState(
+    localStorage.getItem("USER_ROLE")
+  );
 
   return (
     <AppBar position="static">
@@ -26,13 +29,18 @@ export default function MainAppbar(props) {
             <MenuIcon />
           </IconButton>
         ) : null}
-        <Typography
-          variant="h6"
+        <Box
           component="div"
-          sx={{ flexGrow: 1 }}
-        ></Typography>
+          sx={{ flexGrow: 1, justifyContent: "flex-end", display: "flex" }}
+        >
+          {currentRole.includes("PMO") ||
+          currentRole.includes("SUPERVISOR") ||
+          currentRole.includes("EVALUATOR") ? (
+            <p style={{ fontSize: "12px" }}>Logged in as {currentRole}</p>
+          ) : null}
+        </Box>
 
-        <AppBarMenu />
+        <AppBarMenu currentRole={currentRole} setCurrentRole={setCurrentRole} />
       </Toolbar>
     </AppBar>
   );

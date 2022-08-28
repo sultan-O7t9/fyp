@@ -6,5 +6,6 @@ const Router = require("express").Router();
 
 Router.get("/get", Role.getAllRoles);
 Router.post("/create", Role.createRole);
+Router.get("/faculty-all", verifyToken, Role.getAllRolesByFaculty);
 
 module.exports = Router;

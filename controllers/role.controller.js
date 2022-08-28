@@ -1,6 +1,40 @@
-const { Role, Admin } = require("../models");
+const sequelize = require("sequelize");
+const { Role, Admin, Faculty_Role } = require("../models");
 
 class RoleController {
+  static getAllRolesByFaculty = async (req, res) => {
+    try {
+      const froles = await Faculty_Role.findAll({
+        where: {
+          facultyId: req.user.id,
+        },
+      });
+      if (froles.length > 0) {
+        const roles = await Role.findAll({
+          where: {
+            id: {
+              [sequelize.Op.in]: froles.map(frole => frole.roleId),
+            },
+          },
+        });
+
+        res.json({
+          message: "Roles fetched successfully",
+          get: true,
+          roles: roles.length ? roles.map(role => role.title) : [],
+        });
+      } else {
+        res.json({
+          message: "Roles fetched successfully",
+          get: true,
+          roles: [],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error getting roles" });
+    }
+  };
   static getAllRoles = async (req, res) => {
     try {
       const Roles = await Role.findAll();

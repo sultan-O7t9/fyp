@@ -15,12 +15,16 @@ const MainLayout = props => {
   console.log(roles);
   const navLinks = [
     { name: "Dashboard", path: "/", icon: "dashboard" },
+    // {
+    //   name: roles && roles.includes("PMO") ? "Semesters" : null,
+    //   path: "/semesters",
+    //   icon: "menubook",
+    // },
     {
-      name: roles && roles.includes("PMO") ? "Semesters" : null,
-      path: "/semesters",
-      icon: "menubook",
+      name: roles && roles.includes("SUPERVISOR") ? "My Groups" : "Groups",
+      path: "/groups",
+      icon: "group",
     },
-    { name: "Groups", path: "/groups", icon: "group" },
     {
       name: roles && roles.includes("PMO") ? "Students" : null,
       path: "/students",

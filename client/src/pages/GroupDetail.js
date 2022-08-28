@@ -383,6 +383,9 @@ const DataBody = props => {
         </TableRow>
       ) : (
         <TableRow>
+          <TableCell colSpan={2}>
+            <Typography variant="h6">Booklets</Typography>
+          </TableCell>
           <TableCell>
             {groupInfo.hasOwnProperty("bookletsStatus") ? (
               <Typography
@@ -534,112 +537,118 @@ const DataBody = props => {
           </TableCell>
         ) : null}
       </TableRow> */}
-      <TableRow>
-        <TableCell colSpan={3}></TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell colSpan={3}>
-          <Typography variant="h4">PMO Evaluation</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell colSpan={3}>
-          <Typography variant="body1" style={{ fontWeight: "bold" }}>
-            Project Management Office (Sub-section total:20)
-          </Typography>
-          <Typography>Meetings Deadlines, Attending Workshops</Typography>
-        </TableCell>
-      </TableRow>
-      {/* {localStorage.getItem("USER_ROLE").includes("PMO") ? (*/}
-      <>
-        <TableRow>
-          <TableCell style={{ fontWeight: "bold" }}>Total Marks</TableCell>
-          <TableCell style={{ fontWeight: "bold" }}>Marks Obtained</TableCell>
-          <TableCell style={{ fontWeight: "bold" }}>Remarks</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell colSpan={1}></TableCell>
-          <TableCell style={{ display: "flex" }}>
-            {pmoEvaluationData.students && pmoEvaluationData.students.length
-              ? pmoEvaluationData.students.map(student => (
-                  <div
-                    style={{
-                      fontWeight: "bold",
-                      width: "6rem",
-                      marginRight: "1rem",
-                    }}
-                  >
-                    {student.rollNo}
-                  </div>
-                ))
-              : null}
-          </TableCell>
-          <TableCell colSpan={1}>{""}</TableCell>
-        </TableRow>
-
-        <TableRow>
-          <TableCell>20</TableCell>
-          <TableCell>
-            {pmoEvaluationData.students && pmoEvaluationData.students.length
-              ? pmoEvaluationData.students.map(student => {
-                  const value = pmoMarks[student.rollNo]
-                    ? pmoMarks[student.rollNo]
-                    : 0;
-                  return (
-                    <>
-                      {isPmo ? (
-                        <TextField
-                          style={{ width: "6rem", marginRight: "1rem" }}
-                          value={value}
-                          onChange={e => {
-                            changePmoMarks(student.rollNo, e.target.value);
-                          }}
-                        />
-                      ) : (
-                        <Typography
-                          style={{
-                            width: "6rem",
-                            marginRight: "1rem",
-                            display: "inline-block",
-                          }}
-                        >
-                          {value}
-                        </Typography>
-                      )}
-                    </>
-                  );
-                })
-              : null}
-          </TableCell>
-          <TableCell>
-            {isPmo ? (
-              <TextareaAutosize
-                minRows={4}
-                value={pmoRemarks}
-                onChange={e => setPmoRemarks(e.target.value)}
-              />
-            ) : (
-              <Typography variant="body1">{pmoRemarks}</Typography>
-            )}
-          </TableCell>
-        </TableRow>
-
-        {isPmo ? (
+      {localStorage.getItem("USER_ROLE").includes("SUPERVISOR") ? null : (
+        <>
+          <TableRow>
+            <TableCell colSpan={3}></TableCell>
+          </TableRow>
           <TableRow>
             <TableCell colSpan={3}>
-              <Button
-                onClick={handlePmoMarks}
-                variant="contained"
-                color="primary"
-                size="large"
-                style={{ display: "block" }}
-              >
-                Save{" "}
-              </Button>
+              <Typography variant="h4">PMO Evaluation</Typography>
             </TableCell>
           </TableRow>
-        ) : null}
-      </>
+          <TableRow>
+            <TableCell colSpan={3}>
+              <Typography variant="body1" style={{ fontWeight: "bold" }}>
+                Project Management Office (Sub-section total:20)
+              </Typography>
+              <Typography>Meetings Deadlines, Attending Workshops</Typography>
+            </TableCell>
+          </TableRow>
+          {/* {localStorage.getItem("USER_ROLE").includes("PMO") ? (*/}
+          <>
+            <TableRow>
+              <TableCell style={{ fontWeight: "bold" }}>Total Marks</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>
+                Marks Obtained
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Remarks</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell colSpan={1}></TableCell>
+              <TableCell style={{ display: "flex" }}>
+                {pmoEvaluationData.students && pmoEvaluationData.students.length
+                  ? pmoEvaluationData.students.map(student => (
+                      <div
+                        style={{
+                          fontWeight: "bold",
+                          width: "6rem",
+                          marginRight: "1rem",
+                        }}
+                      >
+                        {student.rollNo}
+                      </div>
+                    ))
+                  : null}
+              </TableCell>
+              <TableCell colSpan={1}>{""}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>20</TableCell>
+              <TableCell>
+                {pmoEvaluationData.students && pmoEvaluationData.students.length
+                  ? pmoEvaluationData.students.map(student => {
+                      const value = pmoMarks[student.rollNo]
+                        ? pmoMarks[student.rollNo]
+                        : 0;
+                      return (
+                        <>
+                          {isPmo ? (
+                            <TextField
+                              style={{ width: "6rem", marginRight: "1rem" }}
+                              value={value}
+                              onChange={e => {
+                                changePmoMarks(student.rollNo, e.target.value);
+                              }}
+                            />
+                          ) : (
+                            <Typography
+                              style={{
+                                width: "6rem",
+                                marginRight: "1rem",
+                                display: "inline-block",
+                              }}
+                            >
+                              {value}
+                            </Typography>
+                          )}
+                        </>
+                      );
+                    })
+                  : null}
+              </TableCell>
+              <TableCell>
+                {isPmo ? (
+                  <TextareaAutosize
+                    minRows={4}
+                    value={pmoRemarks}
+                    onChange={e => setPmoRemarks(e.target.value)}
+                  />
+                ) : (
+                  <Typography variant="body1">{pmoRemarks}</Typography>
+                )}
+              </TableCell>
+            </TableRow>
+
+            {isPmo ? (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <Button
+                    onClick={handlePmoMarks}
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    style={{ display: "block" }}
+                  >
+                    Save{" "}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ) : null}
+          </>
+        </>
+      )}
       {/* Supervisor Marks */}
       <TableRow>
         <TableCell colSpan={3}></TableCell>
@@ -747,16 +756,18 @@ const DataBody = props => {
           </TableRow>
         ) : null}
       </>
-      <TableRow>
-        <TableCell colSpan={3}>
-          {/* <Typography variant="h6">
+      {localStorage.getItem("USER_ROLE").includes("SUPERVISOR") ? null : (
+        <TableRow>
+          <TableCell colSpan={3}>
+            {/* <Typography variant="h6">
             Detailed Report
           </Typography> */}
-          <Button variant="contained" onClick={handleDetailedReport}>
-            Show Detailed Report
-          </Button>
-        </TableCell>
-      </TableRow>
+            <Button variant="contained" onClick={handleDetailedReport}>
+              Show Detailed Report
+            </Button>
+          </TableCell>
+        </TableRow>
+      )}
     </>
   );
 };

@@ -5,7 +5,19 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
       },
+      commented_doc: {
+        type: DataTypes.STRING,
+      },
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "Pending",
+        //Approved, Revised, Pending
+      },
+      comment: {
+        type: DataTypes.STRING,
+      },
     },
+
     {
       tableName: "tbl_version",
       // createdAt: false,

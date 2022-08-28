@@ -6,70 +6,71 @@ const {
   Department,
   Group,
   Committee,
+  PMO,
 } = require("../models");
 const sequelize = require("sequelize");
 
 class FacultyController {
-  static removePMO = async (req, res) => {
-    const { id, facultyId } = req.body;
-    try {
-      const admin = await Admin.findOne({
-        where: {
-          id: id,
-        },
-      });
-      console.log(admin);
-      if (admin) {
-        if (id != admin.id) {
-          throw new Error("Invalid Admin Id");
-        }
-        const faculty = await FacultyMember.findOne({
-          where: {
-            id: facultyId,
-          },
-        });
-        console.log(faculty);
+  // static removePMO = async (req, res) => {
+  //   const { id, facultyId } = req.body;
+  //   try {
+  //     const admin = await Admin.findOne({
+  //       where: {
+  //         id: id,
+  //       },
+  //     });
+  //     console.log(admin);
+  //     if (admin) {
+  //       if (id != admin.id) {
+  //         throw new Error("Invalid Admin Id");
+  //       }
+  //       const faculty = await FacultyMember.findOne({
+  //         where: {
+  //           id: facultyId,
+  //         },
+  //       });
+  //       console.log(faculty);
 
-        if (faculty) {
-          faculty.update({
-            pmoOfDepartmentId: null,
-          });
-          const pmoRole = await Role.findOne({
-            where: {
-              title: "PMO",
-            },
-          });
-          const facultyRole = await Faculty_Role.findOne({
-            where: {
-              facultyId: facultyId,
-              roleId: pmoRole.id,
-            },
-          });
-          await facultyRole.destroy();
+  //       if (faculty) {
+  //         faculty.update({
+  //           pmoOfDepartmentId: null,
+  //         });
+  //         const pmoRole = await Role.findOne({
+  //           where: {
+  //             title: "PMO",
+  //           },
+  //         });
+  //         const facultyRole = await Faculty_Role.findOne({
+  //           where: {
+  //             facultyId: facultyId,
+  //             roleId: pmoRole.id,
+  //           },
+  //         });
+  //         await facultyRole.destroy();
 
-          res.json({
-            message: "PMO removed successfully",
-            faculty,
-          });
-        } else {
-          res.status(400).json({
-            message: "Invalid Faculty Id",
-          });
-        }
-      } else
-        res.status(400).json({
-          message: "Invalid Admin Id",
-        });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        message: "Error getting Roles",
-        error,
-      });
-    }
-  };
+  //         res.json({
+  //           message: "PMO removed successfully",
+  //           faculty,
+  //         });
+  //       } else {
+  //         res.status(400).json({
+  //           message: "Invalid Faculty Id",
+  //         });
+  //       }
+  //     } else
+  //       res.status(400).json({
+  //         message: "Invalid Admin Id",
+  //       });
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.status(500).json({
+  //       message: "Error getting Roles",
+  //       error,
+  //     });
+  //   }
+  // };
   static assignPMO = async (req, res) => {
-    const { id, facultyId, deptId } = req.body;
+    const { facultyId, deptId } = req.body;
     try {
       // const admin = await Admin.findOne({
       //   where: {
@@ -88,9 +89,9 @@ class FacultyController {
           },
         });
         console.log(faculty);
-        const havePMO = await FacultyMember.findOne({
+        const havePMO = await PMO.findOne({
           where: {
-            pmoOfDepartmentId: deptId,
+            deptId: deptId,
           },
         });
 
@@ -107,24 +108,33 @@ class FacultyController {
             },
           });
           if (havePMO) {
-            await havePMO.update({
-              pmoOfDepartmentId: null,
-            });
+            await havePMO.destroy();
+
             const preRole = await Faculty_Role.findOne({
               where: {
-                facultyId: havePMO.id,
+                facultyId: havePMO.pmoId,
                 roleId: pmoRole.id,
               },
             });
-            await preRole.destroy();
+            await havePMO.destroy();
           }
-          await faculty.update({
-            pmoOfDepartmentId: dept.id,
-          });
 
-          const facultyRole = await Faculty_Role.create({
-            facultyId: faculty.id,
-            roleId: pmoRole.id,
+          const facultyRole = await Faculty_Role.findOne({
+            where: {
+              facultyId: facultyId,
+              roleId: pmoRole.id,
+            },
+          });
+          if (!facultyRole) {
+            const facultyRole = await Faculty_Role.create({
+              facultyId: faculty.id,
+              roleId: pmoRole.id,
+            });
+          }
+
+          const pmo = await PMO.create({
+            pmoId: faculty.id,
+            deptId: deptId,
           });
 
           res.json({
@@ -322,8 +332,6 @@ class FacultyController {
           password,
           name,
           departmentId: dept.id,
-          // pmoOfDepartmentId:
-          // tempRoles && tempRoles.includes("PMO") ? departmentId : null,
         });
         await Faculty_Role.create({
           facultyId: facultyMember.dataValues.id,
@@ -419,7 +427,6 @@ class FacultyController {
       });
       const supervisors = await FacultyMember.findAll({
         where: {
-          pmoOfDepartmentId: null,
           id: {
             [sequelize.Op.in]: supervisorsIds.map(
               supervisor => supervisor.dataValues.facultyId
@@ -456,9 +463,9 @@ class FacultyController {
     // res.send(req.body);
     try {
       const faculty = await FacultyMember.findAll({
-        where: {
-          pmoOfDepartmentId: null,
-        },
+        // where: {
+        //   pmoOfDepartmentId: null,
+        // },
       });
       res.json({
         message: "Supervisors retrieved successfully",

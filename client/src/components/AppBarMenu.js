@@ -11,23 +11,52 @@ import Typography from "@mui/material/Typography";
 // import PersonAdd from "@mui/icons-material/PersonAdd";
 // import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
+import PersonIcon from "@mui/icons-material/Person";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { logoutUser } from "../store/actions/auth";
+import { useEffect } from "react";
+import Toast from "./Toast";
 
-export default function AppBarMenu() {
+export default function AppBarMenu(props) {
+  const { currentRole, setCurrentRole } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [roles, setRoles] = React.useState(null);
   const open = Boolean(anchorEl);
+  const [toast, setToast] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState("");
   const dispatch = useDispatch();
-  const histroy = useHistory();
+  const history = useHistory();
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    const getAllRoles = async () => {
+      if (
+        localStorage.getItem("USER_ROLES").includes("group") ||
+        localStorage.getItem("USER_ROLES").includes("HOD")
+      ) {
+        console.log("its a group");
+        return;
+      }
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/role/faculty-all"
+        );
+        setRoles(response.data.roles);
+        console.log(response.data.roles);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllRoles();
+  }, []);
 
   const logoutHandler = async () => {
     try {
@@ -39,7 +68,7 @@ export default function AppBarMenu() {
         localStorage.clear();
         dispatch(logoutUser());
 
-        histroy.replace("/login");
+        history.replace("/login");
         window.location.reload();
       }
     } catch (error) {
@@ -50,6 +79,9 @@ export default function AppBarMenu() {
 
   return (
     <React.Fragment>
+      {toast ? (
+        <Toast open={toast} setOpen={setToast} message={toastMessage} />
+      ) : null}
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
         {/* <Typography sx={{ minWidth: 100 }}>Contact</Typography>
         <Typography sx={{ minWidth: 100 }}>Profile</Typography> */}
@@ -76,6 +108,30 @@ export default function AppBarMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
+        {roles && roles.length
+          ? roles.map(role => (
+              <MenuItem
+                disabled={localStorage.getItem("USER_ROLE").includes(role)}
+                onClick={() => {
+                  console.log(role);
+                  localStorage.setItem("USER_ROLE", [role]);
+                  history.replace("/");
+                  setToastMessage("Logged in as " + role);
+                  setCurrentRole(role);
+                  setToast(true);
+                  // window.location.reload();
+                  // setTimeout(() => {
+                  //   // window.location.reload();
+                  // }, 1000);
+                }}
+              >
+                <ListItemIcon>
+                  <PersonIcon fontSize="small" />
+                </ListItemIcon>
+                Login as {role}
+              </MenuItem>
+            ))
+          : null}
         <MenuItem onClick={logoutHandler}>
           <ListItemIcon>
             <Logout fontSize="small" />

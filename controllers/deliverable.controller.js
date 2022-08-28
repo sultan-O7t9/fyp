@@ -205,7 +205,7 @@ class DeliverableController {
         : "Deliverable " +
           deliverableId +
           " has been updated. Log in to the system to view the updated details";
-      const deptId = faculty.dataValues.pmoOfDepartmentId;
+      const deptId = faculty.dataValues.departmentId;
       const students = await Student.findAll({
         departmentId: deptId,
       });
@@ -307,16 +307,17 @@ class DeliverableController {
         },
       });
       const deptId = faculty.dataValues.departmentId;
+      // const groups = await Group.findAll({
+      //   where: {
+      //     [Op.or]: [{ departmentId: deptId }, { supervisorId: userId }],
+      //   },
+      // });
       const groups = await Group.findAll({
-        // where: {
-        //   departmentId: deptId,
-        //   // pmoOfDepartmentId: deptId,
-
-        // },
         where: {
-          [Op.or]: [{ departmentId: deptId }, { supervisorId: userId }],
+          supervisorId: userId,
         },
       });
+
       console.log(groups.dataValues);
       //   console.log(Op.in);
       //   const projects = await Project.findAll({
@@ -602,7 +603,7 @@ class DeliverableController {
       });
       const subject = deliverable.dataValues.emailsubject;
       const body = deliverable.dataValues.emailbody;
-      const deptId = faculty.dataValues.pmoOfDepartmentId;
+      const deptId = faculty.dataValues.departmentId;
       const students = await Student.findAll({
         departmentId: deptId,
       });

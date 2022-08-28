@@ -115,7 +115,13 @@ const App = () => {
       console.log(data);
       localStorage.setItem("USER_ID", data.id);
       if (data.hasOwnProperty("role")) {
-        localStorage.setItem("USER_ROLE", data.role);
+        localStorage.setItem("USER_ROLES", data.role);
+        localStorage.setItem(
+          "USER_ROLE",
+          localStorage.getItem("USER_ROLE")
+            ? localStorage.getItem("USER_ROLE")
+            : data.role[0]
+        );
         setRoles(data.role);
       }
     }
@@ -155,7 +161,7 @@ const App = () => {
           <Route exact path="/groups/:id" component={GroupDetail} />
           <Route
             exact
-            path="/groups/proposal/:id"
+            path="/sup/deliverable/detail/:id"
             component={SupervisorProposal}
           />
           <Route

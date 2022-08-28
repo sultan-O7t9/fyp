@@ -22,6 +22,10 @@ import Link from "../components/Link";
 import Main from "../components/Main";
 import ManageGroup from "./ManageGroup";
 
+import NumberFilter from "@inovua/reactdatagrid-community/NumberFilter";
+import SelectFilter from "@inovua/reactdatagrid-community/SelectFilter";
+import DateFilter from "@inovua/reactdatagrid-community/DateFilter";
+
 import { IconButton } from "@mui/material";
 import React from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -59,6 +63,7 @@ const DataBody = ({ data, depts }) => {
   // const [filter, setFilter] = useState("All");
   const [gridData, setGridData] = useState(data);
   const [gridCols, setGridCols] = useState([]);
+  console.log("data", data, depts);
   // const [filteredData, setFilteredData] = useState([...data]);
   // const filters = ["All", ...depts];
 
@@ -73,6 +78,27 @@ const DataBody = ({ data, depts }) => {
   //     setFilteredData(data.filter(item => item.department === filter));
   //   }
   // }, [filter, data]);
+
+  const filterValue = [
+    { name: "department", operator: "startsWith", type: "string", value: "" },
+    { name: "supervisor", operator: "startsWith", type: "string", value: "" },
+    {
+      name: "bookletsStatus",
+      operator: "eq",
+      type: "select",
+      value: "Approved",
+    },
+    // { name: 'age', operator: 'gte', type: 'number', value: 21 },
+    // { name: 'city', operator: 'startsWith', type: 'string', value: '' },
+    // {
+    //   name: 'birthDate',
+    //   operator: 'before',
+    //   type: 'date',
+    //   value: ''
+    // },
+    // { name: 'country', operator: 'eq', type: 'select', value: 'ca' }
+  ];
+
   useEffect(() => {
     const columns = [
       {
@@ -98,6 +124,22 @@ const DataBody = ({ data, depts }) => {
         header: "Semester",
         defaultFlex: 1,
       },
+      // {
+      //   name: "department",
+      //   header: "Department",
+      //   defaultFlex: 1,
+
+      // },
+      {
+        name: "department",
+        header: "Department",
+        defaultFlex: 1,
+        filterEditor: SelectFilter,
+        filterEditorProps: {
+          placeholder: "All",
+          dataSource: depts.map(item => ({ label: item, id: item })),
+        },
+      },
       {
         name: "project",
         header: "Project",
@@ -114,6 +156,15 @@ const DataBody = ({ data, depts }) => {
       {
         name: "bookletsStatus",
         header: "Booklets Status",
+        filterEditor: SelectFilter,
+        filterEditorProps: {
+          placeholder: "All",
+          dataSource: [
+            { id: "Not Submitted", label: "Not Submitted" },
+            { id: "Approved", label: "Approved" },
+            { id: "Pending", label: "Pending" },
+          ],
+        },
         render: ({ value }) => {
           return value === "Approved" ? (
             <div style={{ color: "green" }}>{value}</div>
@@ -133,11 +184,12 @@ const DataBody = ({ data, depts }) => {
     setGridCols(columns);
 
     setGridData(data);
-  }, [data]);
+  }, [data, depts]);
 
   return (
     <ReactDataGrid
       idProperty="id"
+      defaultFilterValue={filterValue}
       columns={gridCols}
       dataSource={gridData}
       rowHeight={100}

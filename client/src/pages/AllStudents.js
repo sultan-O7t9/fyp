@@ -30,6 +30,10 @@ import { useHistory } from "react-router-dom";
 import AddStudent from "../components/AddStudent";
 import EditStudent from "../components/EditStudent";
 
+import NumberFilter from "@inovua/reactdatagrid-community/NumberFilter";
+import SelectFilter from "@inovua/reactdatagrid-community/SelectFilter";
+import DateFilter from "@inovua/reactdatagrid-community/DateFilter";
+
 const DATA = {
   heads: ["Group ID", "Members", "Project Title", "Supervisor"],
   data: [
@@ -69,6 +73,40 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [toDelete, setToDelete] = useState(null);
   const history = useHistory();
+  const [depts, setDepts] = useState([]);
+
+  const filterValue = [
+    { name: "dept", operator: "startsWith", type: "string", value: "" },
+    // { name: "supervisor", operator: "startsWith", type: "string", value: "" },
+    // {
+    //   name: "bookletsStatus",
+    //   operator: "eq",
+    //   type: "select",
+    //   value: "Approved",
+    // },
+    // { name: 'age', operator: 'gte', type: 'number', value: 21 },
+    // { name: 'city', operator: 'startsWith', type: 'string', value: '' },
+    // {
+    //   name: 'birthDate',
+    //   operator: 'before',
+    //   type: 'date',
+    //   value: ''
+    // },
+    // { name: 'country', operator: 'eq', type: 'select', value: 'ca' }
+  ];
+  useEffect(() => {
+    const getDepts = async () => {
+      const res = await axios.get("http://localhost:5000/api/dept/get-all");
+      console.log(res.data);
+      setDepts(
+        res.data.departments.map(dept => ({
+          label: dept.name,
+          id: dept.name,
+        }))
+      );
+    };
+    getDepts();
+  }, [data, history]);
 
   useEffect(() => {
     const dataSource = data.map(item => {
@@ -131,6 +169,11 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
         name: "dept",
         header: "Department",
         defaultFlex: 2,
+        filterEditor: SelectFilter,
+        filterEditorProps: {
+          placeholder: "All",
+          dataSource: depts,
+        },
       },
       {
         name: "group",
@@ -149,7 +192,7 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
     ];
     setGridCols(columns);
     setGridData(dataSource);
-  }, [data, history]);
+  }, [data, history, depts]);
 
   const handleDeleteStudent = async id => {
     try {
@@ -170,6 +213,7 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
     <>
       <ReactDataGrid
         idProperty="id"
+        defaultFilterValue={filterValue}
         columns={gridCols}
         dataSource={gridData}
         rowHeight={100}
@@ -276,20 +320,25 @@ const AllStudents = () => {
     const indexOfName = importedData.heads.findIndex(item =>
       item.includes("ame")
     );
+    const indexOfDepartment = importedData.heads.findIndex(item =>
+      item.includes("epart")
+    );
     // console.log(indexOfRoll, indexOfName);
     // //this will show us which column contains roll no and name
     // console.log(indexOfRoll, indexOfName);
     const dataHeads = [
       importedData.heads[indexOfRoll],
       importedData.heads[indexOfName],
+      importedData.heads[indexOfDepartment],
       "Group",
     ];
     const students = importedData.data
       .map(item => {
-        if (item[indexOfRoll] && item[indexOfName])
+        if (item[indexOfRoll] && item[indexOfName] && item[indexOfDepartment])
           return {
             rollNo: item[indexOfRoll],
             name: item[indexOfName],
+            department: item[indexOfDepartment],
           };
         else return null;
       })
@@ -299,6 +348,7 @@ const AllStudents = () => {
       item => !alreadyCreatedStudents.includes(item.rollNo)
     );
     console.log(studentsToCreate);
+    // return;
     // return;
     //Now send request to server and create studetns there, render the response array in table
     try {

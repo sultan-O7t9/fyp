@@ -4,6 +4,7 @@ const verifyToken = require("../utils/verifyToken");
 const Deliverable = require("../controllers/deliverable.controller.js");
 
 const multer = require("multer");
+const Version = require("../controllers/version.controller");
 const upload = multer();
 const Router = require("express").Router();
 
@@ -42,5 +43,9 @@ Router.delete(
   Deliverable.deleteGroupDeliverableSubmission
 );
 Router.post("/send-mail", Deliverable.sendMailToStudents);
+
+Router.post("/sup-add-comment", Version.addComment);
+Router.post("/sup-change-status", Version.changeEndorsementStatus);
+Router.post("/sup-add-doc", upload.single("file"), Version.uploadCommentedDoc);
 
 module.exports = Router;

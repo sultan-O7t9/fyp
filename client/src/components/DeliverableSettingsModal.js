@@ -39,8 +39,12 @@ const DeliverableSettingsModal = props => {
     let dd = null;
     if (deliverable.deadline) {
       const date = new Date(deliverable.deadline);
-      dd = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      const month = date.getMonth() + 1;
+      dd = `${date.getFullYear()}-${
+        month < 10 ? "0" + month : month
+      }-${date.getDate()}`;
     }
+    console.log(dd);
     setDeadlineInput(dd);
   }, [deliverable]);
 

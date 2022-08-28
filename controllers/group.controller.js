@@ -240,7 +240,7 @@ class GroupController {
   };
 
   static editGroup = async (req, res) => {
-    const { members, leader, supervisor, id } = req.body;
+    const { members, leader, supervisor, id, dept } = req.body;
     console.log(req.body);
     // return res.status(200);
     try {
@@ -248,6 +248,9 @@ class GroupController {
         where: {
           name: id,
         },
+      });
+      await group.update({
+        departmentId: dept,
       });
       const students = await Student.findAll({
         where: {
@@ -310,6 +313,7 @@ class GroupController {
         });
         await group.update({
           supervisorId: newSupervisor.dataValues.id,
+          departmentId: dept,
         });
 
         // newMembers.forEach(async member => {
@@ -376,7 +380,7 @@ class GroupController {
       const group = await Group.create({
         name: leader.dataValues.name + leader.dataValues.rollNo,
         supervisorId: req.body.supervisor,
-        departmentId: leader.dataValues.departmentId,
+        departmentId: req.body.dept,
         password: crypto.randomBytes(8).toString("hex").slice(0, 8),
       });
       console.log(group);
@@ -393,11 +397,13 @@ class GroupController {
         });
         const department = await Department.findOne({
           where: {
-            id: leader.dataValues.departmentId,
+            id: req.body.dept,
           },
         });
         await group.update({
-          name: `${department.dataValues.name}_${leader.dataValues.batchId}_${group.id}`,
+          name: `${department.dataValues.name}_${
+            new Date().getFullYear() - 2004
+          }_${group.id}`,
         });
         const leaderStudent = members.find(
           student => student.dataValues.leader == 1
@@ -646,6 +652,7 @@ class GroupController {
             bookletsStatus: group.dataValues.bookletsStatus,
             department: department ? department.dataValues.name : null,
             bookletsComment: group.dataValues.bookletsComment,
+            semesterId: group.dataValues.semesterId,
           };
         })
       );

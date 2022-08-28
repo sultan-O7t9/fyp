@@ -21,6 +21,7 @@ var crypto = require("crypto");
 class StudentController {
   static updateAStudent = async (req, res) => {
     const { name, rollNo, dept } = req.body;
+    console.log(req.body);
     try {
       const student = await Student.findOne({
         where: {
@@ -28,20 +29,24 @@ class StudentController {
         },
       });
       if (student) {
-        await Student.update(
-          {
-            name: name,
-            rollNo: rollNo,
-            dept: dept,
-          },
-          {
-            where: {
-              rollNo: rollNo,
-            },
-          }
-        );
+        await student.update({
+          name: name,
+          departmentId: dept,
+          rollNo: rollNo,
+        });
+        // await Student.update(
+        //   {
+        //     name: name,
+        //     rollNo: rollNo,
+        //     deptartmentId: dept,
+        //   },
+        //   {
+        //     where: {
+        //       rollNo: rollNo,
+        //     },
+        //   }
+        // );
       }
-
       res.status(200).json({
         message: "Student update successfully",
         student,
@@ -124,27 +129,26 @@ class StudentController {
     }
   };
   static getStudents = async (req, res) => {
-    const userId = req.user.id;
+    // const userId = req.user.id;
 
-    console.log(req.user);
+    // console.log(req.user);
     try {
-      let user;
-      if (typeof userId === "number") {
-        user = await FacultyMember.findOne({
-          where: {
-            id: userId,
-          },
-        });
-      } else {
-        user = await Student.findOne({
-          where: {
-            rollNo: userId,
-          },
-        });
-      }
+      // let user;
+      // if (typeof userId === "number") {
+      //   user = await FacultyMember.findOne({
+      //     where: {
+      //       id: userId,
+      //     },
+      //   });
+      // } else {
+      //   user = await Student.findOne({
+      //     where: {
+      //       rollNo: userId,
+      //     },
+      //   });
+      // }
       const students = await Student.findAll({
         where: {
-          departmentId: user.dataValues.departmentId,
           groupId: null,
         },
         attributes: ["name", "rollNo", "leader", "departmentId"],
@@ -196,19 +200,11 @@ class StudentController {
     const userId = req.user.id;
     console.log(req.user);
     try {
-      const user = await FacultyMember.findOne({
-        where: {
-          id: userId,
-        },
-      });
-      console.log(user.dataValues.departmentId);
+      // console.log(user.dataValues.departmentId);
       const students = await Student.findAll({
-        where: {
-          departmentId: user.dataValues.departmentId,
-        },
         attributes: ["name", "rollNo", "groupId", "departmentId"],
       });
-      console.log(students);
+      // console.log(students);
       const studentsWithGroups = students.filter(
         student => student.dataValues.groupId != null
       );
@@ -255,15 +251,15 @@ class StudentController {
   static createStudent = async (req, res) => {
     const facultyId = req.user.id;
     try {
-      const facultyMember = await FacultyMember.findOne({
-        where: {
-          id: facultyId,
-        },
-      });
-      console.log(facultyMember.dataValues.departmentId);
+      // const facultyMember = await FacultyMember.findOne({
+      //   where: {
+      //     id: facultyId,
+      //   },
+      // });
+      // console.log(facultyMember.dataValues.departmentId);
       //check if faculty member is pmo
-      if (!facultyMember.dataValues.pmoOfDepartmentId)
-        return res.status(403).send("You are not a Pmo");
+      // if (!facultyMember.dataValues.pmoOfDepartmentId)
+      //   return res.status(403).send("You are not a Pmo");
       //check if any student already exists in db
       const existedStudents = await Student.findAll({
         where: {
@@ -286,16 +282,42 @@ class StudentController {
       console.log(
         req.body.students.map(student => parseInt(student.rollNo.slice(0, 2)))
       );
-      const createdStudents = await Student.bulkCreate(
-        req.body.students.map(student => ({
-          name: student.name,
-          rollNo: student.rollNo,
-          leader: false,
-          password: crypto.randomBytes(8).toString("hex").slice(0, 8),
-          batchId: parseInt(student.rollNo.slice(0, 2)),
-          departmentId: facultyMember.dataValues.departmentId,
-        }))
+      const createdStudents = await Promise.all(
+        req.body.students.map(async student => {
+          const dept = await Department.findOne({
+            where: {
+              name: student.department,
+            },
+          });
+
+          return Student.create({
+            name: student.name,
+            rollNo: student.rollNo,
+            departmentId: dept ? dept.id : null,
+            leader: false,
+            password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+          });
+        })
       );
+
+      // const createdStudents = await Student.bulkCreate(
+      //   req.body.students.map( student => {
+      //     const studentDept = await Department.findOne({
+      //       where: {
+      //         name: student.department,
+      //       },
+      //     });
+
+      //     return {
+      //       name: student.name,
+      //       rollNo: student.rollNo,
+      //       leader: false,
+      //       password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+      //       batchId: parseInt(student.rollNo.slice(0, 2)),
+      //       departmentId: studentDept ? studentDept.id : null,
+      //     };
+      //   })
+      // );
       // const students = await Promise.all(
       //   req.body.students.map(async studentData => {
       //     const student = await Student.create({

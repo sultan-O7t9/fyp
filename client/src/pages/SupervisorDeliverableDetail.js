@@ -11,6 +11,10 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ReactDataGrid from "@inovua/reactdatagrid-community";
+
+import SelectFilter from "@inovua/reactdatagrid-community/SelectFilter";
+import "@inovua/reactdatagrid-community/index.css";
 import EditIcon from "@mui/icons-material/Edit";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
@@ -85,8 +89,21 @@ const DataHead = () => {
 const DataBody = () => {
   const roles = localStorage.getItem("USER_ROLE");
   const [submissionsData, setSubmissionsData] = useState([]);
+  const [gridData, setGridData] = useState([]);
+  const [gridCols, setGridCols] = useState([]);
+  const history = useHistory();
   const params = useParams();
+
   const deliverableId = params.id;
+
+  const filterValue = [
+    {
+      name: "status",
+      operator: "inlist",
+      type: "select",
+      emptyValue: "",
+    },
+  ];
   // const [filter, setFilter] = useState(null);
   // const filters = [
   //   { text: "Submitted", id: 1 },
@@ -113,6 +130,7 @@ const DataBody = () => {
           );
           console.log(res.data);
           newData = res.data.submissions;
+
           // if (!roles.includes("PMO")) {
           //   newData = res.data.submissions.filter(submission => {
           //     return submission.supervisorId == userId;
@@ -154,6 +172,136 @@ const DataBody = () => {
     }
   };
 
+  useEffect(() => {
+    console.log(submissionsData);
+    const dataSource = submissionsData.map(item => {
+      console.log(item);
+      return {
+        ...item,
+        status: item.submission.status,
+        actions: (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              size="small"
+              onClick={() => {
+                history.push("/sup/deliverable/detail/" + item.id, {
+                  deliverableId,
+                  groupId: item.id,
+                });
+                console.log(item);
+              }}
+              variant="outlined"
+            >
+              Show Details
+            </Button>
+          </div>
+        ),
+      };
+    });
+    const columns = [
+      {
+        name: "name",
+        header: "Name",
+        defaultFlex: 1,
+      },
+      {
+        name: "project",
+        header: "Project Title",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          return value.title;
+        },
+      },
+
+      {
+        name: "submission",
+        header: "Submited On",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          return new Date(value.createdAt).toDateString();
+        },
+      },
+      {
+        name: "submission",
+        header: "File",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          // return value.name;
+          return value ? (
+            <Button
+              onClick={() => {
+                let url = "http://localhost:5000/" + value.name;
+                let win = window.open(url, "_blank");
+                win.focus();
+              }}
+            >
+              {value.name}
+            </Button>
+          ) : (
+            "None"
+          );
+        },
+      },
+      {
+        name: "status",
+        header: "Status",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          const color =
+            value == "Pending"
+              ? "orange"
+              : value == "Approved"
+              ? "green"
+              : "red";
+          return (
+            <div
+              style={{
+                color: color,
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            >
+              {value}
+            </div>
+          );
+        },
+        filterEditor: SelectFilter,
+        filterEditorProps: {
+          placeholder: "All",
+          dataSource: [
+            { id: "Revised", label: "Revised" },
+            { id: "Approved", label: "Approved" },
+            { id: "Pending", label: "Pending" },
+          ],
+        },
+      },
+
+      // {
+      //   name: "project",
+      //   header: "Project",
+      //   defaultFlex: 2,
+      //   render: ({ value }) => {
+      //     return value ? value : "None";
+      //   },
+      // },
+
+      {
+        name: "actions",
+        defaultFlex: 2,
+        header: "Actions",
+      },
+    ];
+    setGridCols(columns);
+    setGridData(dataSource);
+  }, [submissionsData, history]);
+
   const sendMailToStudents = async () => {
     try {
       const res = await axios.post(
@@ -173,54 +321,70 @@ const DataBody = () => {
   };
 
   return (
-    <>
-      {/* <TableRow>
-        <TableCell colSpan={3}>
-          <Box>
-             <Button
-              variant="contained"
-              type="submit"
-              onClick={sendMailToStudents}
-            >
-              Send Mail
-            </Button> 
-          </Box>
-        </TableCell>
-      </TableRow> */}
-      {submissionsData.map((row, index) => (
-        <TableRow key={row.id}>
-          <TableCell>{row.name}</TableCell>
-          {/* <TableCell>{row.members}</TableCell> */}
-          <TableCell>
-            {row.project.hasOwnProperty("title") && row.project.title
-              ? row.project.title
-              : "None"}
-          </TableCell>
-          <TableCell>
-            {row.submission.createdAt
-              ? new Date(row.submission.createdAt).toLocaleString()
-              : "-"}
-          </TableCell>
-          <TableCell>
-            {row.hasOwnProperty("submission") && row.submission.name ? (
-              <form
-                onSubmit={e => {
-                  downloadSubmission(e, row.submission.name);
-                }}
-                className="form"
-              >
-                <Button variant="text" type="submit">
-                  {row.submission.name}
-                </Button>
-              </form>
-            ) : (
-              <Typography variant="body">None</Typography>
-            )}
-          </TableCell>
-        </TableRow>
-      ))}
-    </>
+    <ReactDataGrid
+      idProperty="id"
+      columns={gridCols}
+      // selected={selectedGroups}
+      // checkboxColumn
+      // onSelectionChange={onSelectionChange}
+      defaultFilterValue={filterValue}
+      dataSource={gridData}
+      rowHeight={100}
+      style={{
+        height: "calc(100vh - 230px)",
+      }}
+    />
   );
+
+  // return (
+  //   <>
+  //     {/* <TableRow>
+  //       <TableCell colSpan={3}>
+  //         <Box>
+  //            <Button
+  //             variant="contained"
+  //             type="submit"
+  //             onClick={sendMailToStudents}
+  //           >
+  //             Send Mail
+  //           </Button>
+  //         </Box>
+  //       </TableCell>
+  //     </TableRow> */}
+  //     {submissionsData.map((row, index) => (
+  //       <TableRow key={row.id}>
+  //         <TableCell>{row.name}</TableCell>
+  //         {/* <TableCell>{row.members}</TableCell> */}
+  //         <TableCell>
+  //           {row.project.hasOwnProperty("title") && row.project.title
+  //             ? row.project.title
+  //             : "None"}
+  //         </TableCell>
+  //         <TableCell>
+  //           {row.submission.createdAt
+  //             ? new Date(row.submission.createdAt).toLocaleString()
+  //             : "-"}
+  //         </TableCell>
+  //         <TableCell>
+  //           {row.hasOwnProperty("submission") && row.submission.name ? (
+  //             <form
+  //               onSubmit={e => {
+  //                 downloadSubmission(e, row.submission.name);
+  //               }}
+  //               className="form"
+  //             >
+  //               <Button variant="text" type="submit">
+  //                 {row.submission.name}
+  //               </Button>
+  //             </form>
+  //           ) : (
+  //             <Typography variant="body">None</Typography>
+  //           )}
+  //         </TableCell>
+  //       </TableRow>
+  //     ))}
+  //   </>
+  // );
 };
 
 const DataBody2 = props => {
@@ -600,7 +764,8 @@ const SupervisorDeliverableDetail = props => {
               ) : null}
             </Box>
           </Card>
-          <DataTable DataHead={DataHead} DataBody={DataBody} />
+          {/* <DataTable DataHead={DataHead} DataBody={DataBody} /> */}
+          <DataBody />
           {/* <DataTable
             DataHead={DataHead}
             DataBody={() => <DataBody2 showScheduleModal={showScheduleModal} />}

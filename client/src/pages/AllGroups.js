@@ -11,6 +11,7 @@ import {
 import { Box } from "@mui/system";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import AddSemester from "../components/AddSemester";
 import ContainerFluid from "../components/ContainerFluid";
 import DataTable from "../components/DataTable";
 import GroupExportTable from "../components/GroupExportTable";
@@ -19,7 +20,9 @@ import GroupsDataHead from "../components/GroupsDataHead";
 import ImportFromExcel from "../components/ImportFromExcel";
 import Link from "../components/Link";
 import Main from "../components/Main";
+import Select from "../components/Select";
 import Toast from "../components/Toast";
+import styles from "./auth.styles";
 import ManageGroup from "./ManageGroup";
 
 // const DATA = {
@@ -50,10 +53,59 @@ const AllGroups = () => {
   const isPMO = localStorage.getItem("USER_ROLE").includes("PMO");
 
   const [heads, setHeads] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showAddSemester, setShowAddSemester] = useState(false);
+  const [currentSemester, setCurrentSemester] = useState(null);
+  const [semesters, setSemesters] = useState([]);
+  const [selectedGroups, setSelectedGroups] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState(null);
 
   const [body, setBody] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showManageGroup, setShowManageGroup] = useState(false);
+
+  useEffect(() => {
+    const getCurrSemData = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/sem/get-current"
+        );
+        const cs = res.data.semester;
+        setCurrentSemester(cs.id);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getCurrSemData();
+  }, [isPMO, showManageGroup, showAddSemester]);
+  useEffect(() => {
+    const getAllSemData = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/sem/get-all");
+        const cs = res.data.semesters;
+        setSemesters(
+          cs.length
+            ? cs
+                .map(s => ({
+                  id: s.id,
+                  text: s.title,
+                  value: s.id,
+                }))
+                .concat({
+                  id: null,
+                  text: "None",
+                  value: null,
+                })
+            : [{ id: null, text: "None", value: null }]
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getAllSemData();
+  }, [isPMO, showAddSemester, showManageGroup]);
+
   useEffect(() => {
     const headers = isPMO
       ? [
@@ -77,19 +129,25 @@ const AllGroups = () => {
           "",
         ];
     if (!isPMO) setHeads(headers);
-  }, [isPMO]);
+  }, [isPMO, showManageGroup, showAddSemester]);
 
   useEffect(() => {
     setIsLoading(true);
 
     axios
-      .get(
-        "http://localhost:5000/api/group/get-all/" +
-          localStorage.getItem("USER_ID")
-      )
+      .get("http://localhost:5000/api/group/get-groups/")
       .then(res => {
         console.log(res.data.groups);
-        setBody(res.data.groups);
+        let filteredGroups = currentSemester
+          ? res.data.groups.filter(g => g.semesterId === currentSemester)
+          : res.data.groups;
+        if (localStorage.getItem("USER_ROLE").includes("SUPERVISOR")) {
+          filteredGroups = filteredGroups.filter(
+            g => g.supervisorId != localStorage.getItem("USER_ID")
+          );
+          console.log(filteredGroups);
+        }
+        setBody(filteredGroups);
       })
       .catch(err => {
         console.log(err);
@@ -97,7 +155,7 @@ const AllGroups = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [showManageGroup]);
+  }, [showManageGroup, currentSemester, showAddSemester, selectedSemester]);
 
   const editGroupHandler = group => {
     setShowManageGroup(group ? group : true);
@@ -167,76 +225,208 @@ const AllGroups = () => {
     // }
   };
 
+  const selectCurrentSemesterHandler = async sem => {
+    setCurrentSemester(sem);
+    try {
+      const res = axios.post("http://localhost:5000/api/sem/current", {
+        semesterId: sem,
+      });
+      console.log(res.data);
+      setToastMessage("Current Semester changed successfully");
+      setOpen(true);
+    } catch (err) {
+      console.log(err);
+      setToastMessage("Error changing current semester");
+      setOpen(true);
+    }
+  };
+  const selectSelectedSemesterHandler = async sem => {
+    setSelectedSemester(sem);
+    console.log(sem, selectedGroups);
+    const data = {
+      groups: selectedGroups,
+      semesterId: sem,
+    };
+    try {
+      const res = axios.post(
+        "http://localhost:5000/api/sem/update-grp-sem",
+        data
+      );
+      console.log(res.data);
+      // setCurrentSemester(sem);
+      setToastMessage("Semester of selected groups changed successfully");
+      setOpen(true);
+    } catch (err) {
+      console.log(err);
+      setToastMessage("Error changing semester of selected groups");
+      setOpen(true);
+    }
+  };
+
   return (
-    <ContainerFluid maxWidth="lg">
-      {showManageGroup ? (
-        <ManageGroup group={showManageGroup} setDisplay={setShowManageGroup} />
+    <>
+      {open ? (
+        <Toast open={open} setOpen={setOpen} message={toastMessage} />
       ) : null}
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h3">Groups</Typography>
+      {showAddSemester ? <AddSemester setDisplay={setShowAddSemester} /> : null}
+      <ContainerFluid maxWidth="xl">
+        {showManageGroup ? (
+          <ManageGroup
+            group={showManageGroup}
+            setDisplay={setShowManageGroup}
+          />
+        ) : null}
+        <Main styles={{ padding: "1.5rem" }}>
+          <Box
+            sx={{ marginBottom: "3rem" }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h3">Groups</Typography>
+            </Box>
+            <Box style={{ display: "flex", flexDirection: "column" }}>
+              {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+                <Box style={{ marginBottom: ".5rem" }}>
+                  <ImportFromExcel
+                    label="Import Groups"
+                    importData={importDataHandler}
+                    // disabled={body.length > 0}
+                  />
+                </Box>
+              ) : null}
+              {body.length > 0 ? (
+                <>
+                  <GroupExportTable
+                    label="Export Groups"
+                    filename={("groups_" + new Date().toLocaleString()).replace(
+                      " ",
+                      "_"
+                    )}
+                    head={heads.filter(head => head !== "Booklets Comment")}
+                    body={body.map(row => ({
+                      id: row.id,
+                      members: row.members.map(member => member.rollNo),
+                      project: row.project ? row.project.title : "None",
+                      supervisor: row.supervisor ? row.supervisor : "None",
+                      booklets: row.bookletsStatus
+                        ? row.bookletsStatus
+                        : "None",
+                      bookletsComment: row.bookletsComment
+                        ? row.bookletsComment
+                        : "",
+                    }))}
+                  />
+                </>
+              ) : null}
+              {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+                <Button
+                  style={{ marginTop: ".5rem" }}
+                  variant="contained"
+                  color="primary"
+                  onClick={() => editGroupHandler()}
+                >
+                  Add Group
+                </Button>
+              ) : null}
+            </Box>
           </Box>
-          <Box style={{ display: "flex", flexDirection: "column" }}>
-            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
-              <ImportFromExcel
-                label="Import Groups"
-                importData={importDataHandler}
-                // disabled={body.length > 0}
-              />
-            ) : null}
-            {body.length > 0 ? (
-              <>
-                <GroupExportTable
-                  label="Export Groups"
-                  filename={("groups_" + new Date().toLocaleString()).replace(
-                    " ",
-                    "_"
-                  )}
-                  head={heads.filter(head => head !== "Booklets Comment")}
-                  body={body.map(row => ({
-                    id: row.id,
-                    members: row.members.map(member => member.rollNo),
-                    project: row.project ? row.project.title : "None",
-                    supervisor: row.supervisor ? row.supervisor : "None",
-                    booklets: row.bookletsStatus ? row.bookletsStatus : "None",
-                    bookletsComment: row.bookletsComment
-                      ? row.bookletsComment
-                      : "",
-                  }))}
-                />
-              </>
-            ) : null}
-            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
-              <Button
-                style={{ marginTop: ".5rem" }}
-                variant="contained"
-                color="primary"
-                onClick={() => editGroupHandler()}
-              >
-                Add Group
-              </Button>
-            ) : null}
-          </Box>
-        </Box>
-        <DataTable
-          DataHead={() => <GroupsDataHead heads={heads} />}
-          DataBody={() => (
-            <GroupsDataBody
-              isPMO={isPMO}
-              data={body}
-              setData={setBody}
-              editGroup={editGroupHandler}
-            />
+          {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+            <>
+              <Box sx={{ marginBottom: "3rem" }}>
+                <Box
+                  style={{
+                    marginBottom: "1rem",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "50%",
+                  }}
+                >
+                  <Typography variant="h6">Semester</Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      setShowAddSemester(true);
+                    }}
+                  >
+                    Add New Semester
+                  </Button>
+                </Box>
+                <Box
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "50%",
+                  }}
+                >
+                  <Select
+                    label="Current Semester"
+                    defaultValue={null}
+                    style={styles.input}
+                    value={currentSemester}
+                    setValue={selectCurrentSemesterHandler}
+                    items={semesters}
+                  />
+                </Box>
+              </Box>
+              {selectedGroups.length ? (
+                <Box
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "50%",
+                  }}
+                >
+                  <Typography variant="h6">
+                    {" "}
+                    Set semester of selected groups to:{" "}
+                  </Typography>
+                  <Select
+                    label="Semesters"
+                    style={styles.input}
+                    defaultValue={null}
+                    value={selectedSemester}
+                    setValue={selectSelectedSemesterHandler}
+                    items={semesters}
+                  />
+                </Box>
+              ) : null}
+            </>
+          ) : (
+            <Box
+              style={{
+                marginBottom: "1rem",
+                display: "flex",
+                justifyContent: "space-between",
+                width: "50%",
+              }}
+            >
+              <Typography variant="h6">
+                Current Semester:{" "}
+                {semesters && semesters.length && currentSemester
+                  ? semesters.find(sem => sem.id == currentSemester).text
+                  : "None"}
+              </Typography>
+            </Box>
           )}
-        />
-      </Main>
-    </ContainerFluid>
+
+          {/* <DataTable
+          // DataHead={() => <GroupsDataHead heads={heads} />}
+          
+          )} */}
+
+          <GroupsDataBody
+            isPMO={isPMO}
+            data={body}
+            setData={setBody}
+            selected={selectedGroups}
+            setSelected={setSelectedGroups}
+            editGroup={editGroupHandler}
+          />
+        </Main>
+      </ContainerFluid>
+    </>
   );
 };
 

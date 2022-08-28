@@ -4,6 +4,7 @@ const {
   FacultyMember,
   Batch,
   Faculty_Role,
+  PMO,
 } = require("../models");
 
 class DepratmentController {
@@ -13,11 +14,19 @@ class DepratmentController {
 
       const detailedDepartments = await Promise.all(
         departments.map(async department => {
-          const pmo = await FacultyMember.findOne({
+          const pmoOfDept = await PMO.findOne({
             where: {
-              pmoOfDepartmentId: department.id,
+              deptId: department.id,
             },
           });
+          let pmo;
+          if (pmoOfDept)
+            pmo = await FacultyMember.findOne({
+              where: {
+                id: pmoOfDept.pmoId,
+              },
+            });
+
           return {
             ...department.dataValues,
             pmo: pmo ? pmo.dataValues.name : null,
@@ -108,23 +117,31 @@ class DepratmentController {
         },
       });
       if (dept) {
-        const pmo = await FacultyMember.findOne({
+        const pmoDept = await PMO.findOne({
           where: {
-            pmoOfDepartmentId: deptId,
+            deptId: deptId,
           },
         });
-        if (pmo) {
-          const faculty_role = await Faculty_Role.findOne({
+        if (pmoDept) {
+          const pmo = await FacultyMember.findOne({
             where: {
-              facultyId: pmo.id,
-              roleId: 1,
+              id: pmoDept.pmoId,
             },
           });
-          if (faculty_role) {
-            await faculty_role.destroy();
+          if (pmo) {
+            const faculty_role = await Faculty_Role.findOne({
+              where: {
+                facultyId: pmo.id,
+                roleId: 1,
+              },
+            });
+            if (faculty_role) {
+              await faculty_role.destroy();
+            }
           }
-        }
 
+          await pmoDept.destroy();
+        }
         await dept.destroy();
       }
       res.json({

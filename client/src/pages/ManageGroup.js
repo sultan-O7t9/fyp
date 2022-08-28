@@ -114,11 +114,37 @@ const ManageGroup = props => {
   //   "Supervisor",
   // ]);
   // const [body, setBody] = useState(DATA.data);
+  console.log("GRP", group);
   const [students, setStudents] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [members, setMembers] = useState([]);
   const [leader, setLeader] = useState("");
   const [supervisor, setSupervisor] = useState("");
+  const [depts, setDepts] = useState([]);
+  const [dept, setDept] = useState("");
+
+  useEffect(() => {
+    const getDepts = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/dept/get-all");
+        setDepts(
+          res.data.departments.map(dept => ({
+            value: dept.id,
+            text: dept.title + " (" + dept.name + ")",
+            id: dept.id,
+          }))
+        );
+        if (group.hasOwnProperty("department") && group.department !== null) {
+          setDept(
+            res.data.departments.find(dept => dept.name === group.department).id
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getDepts();
+  }, [group]);
 
   useEffect(() => {
     console.log(group);
@@ -170,33 +196,23 @@ const ManageGroup = props => {
     setLeader(leader);
   };
 
-  const teamItems = group.hasOwnProperty("id")
-    ? students
-        .map(student => {
-          return {
-            id: student.rollNo,
-            value: student.rollNo,
-            text: student.rollNo,
-          };
-        })
-        .concat(
-          group.members.map(member => {
-            return {
-              id: member.rollNo,
-              value: member.rollNo,
-              text: member.rollNo,
-            };
-          })
-        )
-    : students.map(student => {
-        return {
-          id: student.rollNo,
-          value: student.rollNo,
-          text: student.rollNo,
-        };
-      });
+  const teamItems = students.map(student => {
+    return {
+      id: student.rollNo,
+      value: student.rollNo,
+      text: student.rollNo,
+    };
+  });
 
   const editGroupHandler = async () => {
+    const data = {
+      id: group.id,
+      members: members,
+      leader: leader,
+      supervisor: supervisor,
+      department: dept,
+    };
+    console.log(data);
     try {
       if (group.hasOwnProperty("id")) {
         const result = await axios.put(
@@ -206,6 +222,7 @@ const ManageGroup = props => {
             leader: leader,
             supervisor: supervisor,
             id: group.id,
+            dept: dept,
           }
         );
         console.log(result);
@@ -216,6 +233,7 @@ const ManageGroup = props => {
             members: members,
             leader: leader,
             supervisor: supervisor,
+            dept: dept,
           }
         );
         console.log(result);
@@ -257,6 +275,13 @@ const ManageGroup = props => {
               value: member,
               text: member,
             }))}
+          />
+          <Select
+            label="Department"
+            style={styles.input}
+            value={dept}
+            setValue={setDept}
+            items={depts}
           />
           <Select
             label="Supervisor"

@@ -23,6 +23,11 @@ import axios from "axios";
 import UploadFile from "../components/UploadFile";
 import Toast from "../components/Toast";
 
+import ReactDataGrid from "@inovua/reactdatagrid-community";
+import "@inovua/reactdatagrid-community/index.css";
+import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+// import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+
 const DataHead = () => null;
 
 const DataBody = () => {
@@ -35,6 +40,10 @@ const DataBody = () => {
   const [submissionData, setSubmissionData] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [gridData, setGridData] = useState([]);
+  const [gridCols, setGridCols] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
@@ -46,7 +55,7 @@ const DataBody = () => {
             groupId: localStorage.getItem("USER_ID"),
           }
         );
-        console.log(deliverableRes.data.deliverable);
+        console.log(deliverableRes.data.versions);
         if (deliverableRes.data.get)
           setSubmissionData(deliverableRes.data.versions.reverse());
       } catch (err) {
@@ -87,6 +96,121 @@ const DataBody = () => {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    const data = [];
+    const dataSource = submissionData.length
+      ? submissionData.map(item => {
+          return {
+            ...item,
+            actions: (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setShowDeleteModal(true);
+                    setToDelete(item);
+                  }}
+                  variant="contained"
+                  color="error"
+                >
+                  Delete
+                </Button>
+              </div>
+            ),
+          };
+        })
+      : [];
+    const columns = [
+      // {
+      //   name: "id",
+      //   header: "ID",
+      //   defaultVisible: false,
+      // },
+      {
+        name: "name",
+        header: "File",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          return (
+            <Button
+              onClick={() => {
+                let url = "http://localhost:5000/" + value;
+                let win = window.open(url, "_blank");
+                win.focus();
+              }}
+            >
+              {value}
+            </Button>
+          );
+        },
+      },
+      {
+        name: "status",
+        header: "Endorsement",
+        defaultFlex: 1,
+        render: ({ value }) => {
+          const color =
+            value == "Approved"
+              ? "green"
+              : value == "Pending"
+              ? "orange"
+              : "red";
+          return (
+            <div
+              style={{
+                color: color,
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            >
+              {value}
+            </div>
+          );
+        },
+      },
+      {
+        name: "comment",
+        header: "Comment",
+        defaultFlex: 2,
+        render: ({ value }) => (value ? value : "None"),
+      },
+      {
+        name: "commented_doc",
+        header: "Commented Document",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          return value ? (
+            <Button
+              onClick={() => {
+                let url = "http://localhost:5000/" + value;
+                let win = window.open(url, "_blank");
+                win.focus();
+              }}
+            >
+              {value}
+            </Button>
+          ) : (
+            "None"
+          );
+        },
+      },
+      {
+        name: "actions",
+        defaultFlex: 1,
+        header: "Actions",
+      },
+    ];
+    setGridCols(columns);
+    setGridData(dataSource);
+  }, [history, submissionData]);
 
   const submitProposal = () => {
     console.log("Uploading template file");
@@ -136,13 +260,27 @@ const DataBody = () => {
         setShowToast(true);
         setToastMessage(file + " deleted successfully");
       }
+      setShowDeleteModal(false);
     } catch (err) {
       console.log(err);
+      setShowToast(true);
+      setToastMessage("Error deleting " + file);
+      setShowDeleteModal(false);
     }
   };
 
   return (
     <>
+      {showDeleteModal ? (
+        <DeleteConfirmationDialog
+          itemType="Group"
+          item={toDelete.id}
+          handleDelete={() => {
+            deleteVersion(toDelete.name);
+          }}
+          setOpen={setShowDeleteModal}
+        />
+      ) : null}
       {showToast ? (
         <Toast open={showToast} setOpen={setShowToast} message={toastMessage} />
       ) : null}
@@ -222,6 +360,20 @@ const DataBody = () => {
       </TableRow>
       <TableRow>
         <TableCell colSpan={2}>
+          <ReactDataGrid
+            idProperty="id"
+            columns={gridCols}
+            // selected={selectedGroups}
+            // checkboxColumn
+            // onSelectionChange={onSelectionChange}
+            dataSource={gridData}
+            rowHeight={100}
+            style={{
+              height: "calc(100vh - 230px)",
+            }}
+          />
+        </TableCell>
+        {/* <TableCell colSpan={2}>
           {submissionData.length > 0 ? (
             <ul>
               {submissionData.map((submission, index) => (
@@ -260,31 +412,17 @@ const DataBody = () => {
           ) : (
             <Typography variant="body">No submissions</Typography>
           )}
-          {/* <DataTable>
-            {submissionData.length > 0 ? (
-              submissionData.map((submission, index) => (
-                <TableRow key={index}>
-                  <TableCell></TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell>
-                  <Typography variant="body">No submissions</Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </DataTable> */}
-        </TableCell>
+          
+        </TableCell> */}
       </TableRow>
     </>
   );
 };
 
-const D2SubmissionPage = () => {
+const ProposalSubmissionPage = () => {
   const groupName = localStorage.getItem("GROUP_NAME");
   return (
-    <ContainerFluid title={groupName}>
+    <ContainerFluid title={groupName} maxWidth="lg">
       <Main styles={{ padding: "1.5rem" }}>
         <Box
           sx={{ marginBottom: "3rem" }}
@@ -308,4 +446,4 @@ const D2SubmissionPage = () => {
   );
 };
 
-export default D2SubmissionPage;
+export default ProposalSubmissionPage;

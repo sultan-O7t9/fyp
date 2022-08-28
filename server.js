@@ -24,6 +24,7 @@ app.use("/api/committee", require("./routes/committee.routes"));
 app.use("/api/project", require("./routes/project.routes"));
 app.use("/api/deliverable", require("./routes/deliverable.routes"));
 app.use("/api/evaluation", require("./routes/evaluation.routes"));
+app.use("/api/sem", require("./routes/semester.routes"));
 
 const port = process.env.PORT || 8080;
 
