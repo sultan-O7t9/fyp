@@ -347,6 +347,10 @@ const DataBody = () => {
               color="primary"
               variant="contained"
               onClick={submitProposal}
+              disabled={
+                deliverableData.deadline &&
+                new Date(deliverableData.deadline) < new Date()
+              }
             >
               Upload Deliverable
             </Button>
