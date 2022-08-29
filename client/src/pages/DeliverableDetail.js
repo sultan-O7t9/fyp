@@ -31,6 +31,7 @@ import ReactDataGrid from "@inovua/reactdatagrid-community";
 
 import SelectFilter from "@inovua/reactdatagrid-community/SelectFilter";
 import "@inovua/reactdatagrid-community/index.css";
+import { useCallback } from "react";
 
 const DATA = {
   // heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
@@ -96,6 +97,16 @@ const DataBody = () => {
   const history = useHistory();
   const params = useParams();
 
+  const toArray = selected => {
+    return Object.keys(selected).map(id => id);
+  };
+
+  const [selectedGroups, setSelectedGroups] = useState([]);
+  const onSelectionChange = useCallback(({ selected }) => {
+    console.log("selected", selected);
+    setSelectedGroups(selected);
+  }, []);
+
   const deliverableId = params.id;
 
   const filterValue = [
@@ -148,11 +159,16 @@ const DataBody = () => {
           console.log(res.data);
           newData = res.data.submissions;
         }
-        // newData.filter(submission => {
-        //   return submission.supervisorId == userId;
-        // });
-
-        setSubmissionsData(newData);
+        // if (
+        //   newData.hasOwnProperty("submission") &&
+        //   !newData.submission.hasOwnProperty("name")
+        // )
+        //   return;
+        setSubmissionsData(
+          newData.filter(data => {
+            return data.submission.name;
+          })
+        );
       } catch (error) {
         console.log(error);
       }
@@ -307,7 +323,7 @@ const DataBody = () => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/deliverable/send-mail",
-        { deliverableId, userId }
+        { deliverableId, userId, groups: toArray(selectedGroups) }
       );
       console.log(res.data.get);
       if (res.data.get) {
@@ -322,19 +338,51 @@ const DataBody = () => {
   };
 
   return (
-    <ReactDataGrid
-      idProperty="id"
-      columns={gridCols}
-      // selected={selectedGroups}
-      // checkboxColumn
-      // onSelectionChange={onSelectionChange}
-      defaultFilterValue={filterValue}
-      dataSource={gridData}
-      rowHeight={100}
-      style={{
-        height: "calc(100vh - 230px)",
-      }}
-    />
+    <>
+      <Card
+        variant="outlined"
+        style={{
+          marginBottom: "2rem",
+          padding: "1rem 2rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Typography variant="h6">Submission Details</Typography>
+          {toArray(selectedGroups).length ? (
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={sendMailToStudents}
+            >
+              Send Mail
+            </Button>
+          ) : null}
+        </Box>
+      </Card>
+
+      <ReactDataGrid
+        idProperty="id"
+        columns={gridCols}
+        selected={selectedGroups}
+        checkboxColumn
+        onSelectionChange={onSelectionChange}
+        defaultFilterValue={filterValue}
+        dataSource={gridData}
+        rowHeight={100}
+        style={{
+          height: "calc(100vh - 230px)",
+        }}
+      />
+    </>
   );
 
   // return (
@@ -772,20 +820,7 @@ const DeliverableDetail = props => {
             DataHead={DataHead}
             DataBody={() => <DataBody2 showScheduleModal={showScheduleModal} />}
           /> */}
-          <Card
-            variant="outlined"
-            style={{
-              marginBottom: "2rem",
-              padding: "1rem 2rem",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <Typography variant="h6">Submission Details</Typography>
-            </Box>
-          </Card>
+
           <DataBody />
         </Main>
       </ContainerFluid>

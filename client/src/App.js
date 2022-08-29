@@ -14,6 +14,7 @@ import AdminManageFaculty from "./pages/AdminManageFaculty";
 import AllCommittees from "./pages/AllCommittees";
 import AllGroups from "./pages/AllGroups";
 import AllStudents from "./pages/AllStudents";
+import CommunicationPage from "./pages/CommunicationPage";
 import D2EvaluationPage from "./pages/D2EvaluationPage";
 import D2SubmissionPage from "./pages/D2SubmissionPage";
 import D3EvaluationPage from "./pages/D3EvaluationPage";
@@ -190,6 +191,7 @@ const App = () => {
           <Route exact path="/d3/eval/" component={D3EvaluationPage} />
           <Route exact path="/students" component={AllStudents} />
           <Route exact path="/committees" component={AllCommittees} />
+          <Route exact path="/comm" component={CommunicationPage} />
         </MainLayout>
       )}
       {/* {roles && roles.includes("STUDENT") ? ( */}

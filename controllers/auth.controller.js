@@ -46,14 +46,72 @@ module.exports.initializeApp = async (req, res) => {
       });
       await Deliverable.create({
         title: "Deliverable 01",
+        emailsubject: "Submission of Final Year Project's Proposal - FYP ",
+        emailbody: `
+        The deadline and template file to submit FYP Proposal has been updated on PMS. Login for further details.
+          
+          Submission Procedure:
+              1. Docx file of FYP Proposal should be uploaded against Deliverable 1.
+              2. The file name should be the same as your project title.
+              3. Submit required docs before/on the deadline.
+          `,
         id: 1,
       });
+      // const emailSubject = email.subject
+      //   ? email.subject
+      //   : `Submission of ${
+      //       deliverableId == 1
+      //         ? "Final Year Project's Proposal"
+      //         : deliverableId == 2
+      //         ? " Feasibility Report, SRS and Design Documents(D2) along with 30% Implementation"
+      //         : "D3 (Complete Document incl. Test Document and User Manual along with Working System)"
+      //     } - FYP `;
+      // const emailBody = email.body
+      //   ? email.body
+      //   : `The deadline and template file to submit ${
+      //       deliverableId == 1
+      //         ? "FYP Proposal"
+      //         : deliverableId == 2
+      //         ? "Feasibility Report, SRS and Design Documents(D2) along with 30% Implementation"
+      //         : "Complete Documentation incl. D2 chapters, Test Document and User Manual(D3) along with 30% Implementation"
+      //     } has been updated on PMS. Login for further details.
+
+      // Submission Procedure:
+      //     1. ${
+      //       deliverableId == 1
+      //         ? "Docx file of FYP Proposal"
+      //         : "Zip file including docx file of Documentation and zip file of code"
+      //     }  should be uploaded against Deliverable ${deliverableId}.
+      //     2. The file name should be the same as your project title.
+      //     3. Submit required docs before/on the deadline.
+      // `;
+
       await Deliverable.create({
         title: "Deliverable 02",
+        emailsubject:
+          "Feasibility Report, SRS and Design Documents(D2) along with 30% Implementation",
+        emailbody: `
+        The deadline and template file to submit Feasibility Report, SRS and Design Documents(D2) along with 30% Implementation has been updated on PMS. Login for further details.
+          
+          Submission Procedure:
+              1. Zip file including docx file of Documentation and zip file of code.
+              2. The file name should be the same as your project title.
+              3. Submit required docs before/on the deadline.
+          `,
         id: 2,
       });
       await Deliverable.create({
         title: "Deliverable 03",
+        emailsubject:
+          "D3 (Complete Documentation incl. D2 Chapters, Test Document and User Manual along with Working System)",
+        emailbody: `
+        The deadline and template file to submit D3 (Complete Documentation incl. D2 Chapters, Test Document and User Manual along with Working System) has been updated on PMS. Login for further details.
+          
+          Submission Procedure:
+              1. Zip file including docx file of Documentation and zip file of code.
+              2. The file name should be the same as your project title.
+              3. Submit required docs before/on the deadline.
+          `,
         id: 3,
       });
       //Eval Type

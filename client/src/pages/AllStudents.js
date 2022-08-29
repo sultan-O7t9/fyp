@@ -160,11 +160,11 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
         header: "Roll #",
         defaultFlex: 2,
       },
-      {
-        name: "batch",
-        header: "Batch",
-        defaultFlex: 1,
-      },
+      // {
+      //   name: "batch",
+      //   header: "Batch",
+      //   defaultFlex: 1,
+      // },
       {
         name: "dept",
         header: "Department",

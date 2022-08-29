@@ -188,39 +188,109 @@ class DeliverableController {
           id: deliverableId,
         },
       });
+      const emailSubject = email.subject
+        ? email.subject
+        : `Submission of ${
+            deliverableId == 1
+              ? "Final Year Project's Proposal"
+              : deliverableId == 2
+              ? " Feasibility Report, SRS and Design Documents(D2) along with 30% Implementation"
+              : "D3 (Complete Document incl. Test Document and User Manual along with Working System)"
+          } - FYP `;
+      const emailBody = email.body
+        ? email.body
+        : `The deadline and template file to submit ${
+            deliverableId == 1
+              ? "FYP Proposal"
+              : deliverableId == 2
+              ? "Feasibility Report, SRS and Design Documents(D2) along with 30% Implementation"
+              : "Complete Documentation incl. D2 chapters, Test Document and User Manual(D3) along with 30% Implementation"
+          } has been updated on PMS. Login for further details.
+      
+      Submission Procedure:
+          1. ${
+            deliverableId == 1
+              ? "Docx file of FYP Proposal"
+              : "Zip file including docx file of Documentation and zip file of code"
+          }  should be uploaded against Deliverable ${deliverableId}.
+          2. The file name should be the same as your project title.
+          3. Submit required docs before/on the deadline.
+      `;
       await deliverable.update({
         deadline,
-        emailbody: email.body,
-        emailsubject: email.subject,
+        emailbody: emailBody,
+        emailsubject: emailSubject,
       });
       const faculty = await FacultyMember.findOne({
         where: {
           id: userId,
         },
       });
-      const subject = deliverable.dataValues.emailsubject
-        ? deliverable.dataValues.emailsubject
-        : "Deliverable " + deliverableId + " has been updated";
-      const body = deliverable.dataValues.emailbody
-        ? deliverable.dataValues.emailbody
-        : "Deliverable " +
-          deliverableId +
-          " has been updated. Log in to the system to view the updated details";
-      const deptId = faculty.dataValues.departmentId;
-      const students = await Student.findAll({
-        departmentId: deptId,
+
+      // const subject = deliverable.dataValues.emailsubject
+      //   ? deliverable.dataValues.emailsubject
+      //   : "Deliverable " + deliverableId + " has been updated";
+      // const body = deliverable.dataValues.emailbody
+      //   ? deliverable.dataValues.emailbody
+      //   : "Deliverable " +
+      //     deliverableId +
+      //     " has been updated. Log in to the system to view the updated details";
+      // const deptId = faculty.dataValues.departmentId;
+      // const students = await Student.findAll({
+      //   departmentId: deptId,
+      // });
+      const currentSemester = await Semester.findOne({
+        where: {
+          current: true,
+        },
       });
-      const filteredStudents = students.filter(
-        student => student.dataValues.departmentId == deptId
-      );
+      let groups;
+      if (currentSemester)
+        groups = await Group.findAll({
+          where: {
+            semesterId: currentSemester.dataValues.id,
+          },
+        });
+      else {
+        const pmo = await PMO.findAll({
+          where: {
+            pmoId: userId,
+          },
+        });
+
+        const depts = await Department.findAll({
+          where: {
+            id: {
+              [sequelize.Op.in]: pmo.map(p => p.dataValues.deptId),
+            },
+          },
+        });
+        groups = await Group.findAll({
+          where: {
+            departmentId: {
+              [sequelize.Op.in]: depts.map(d => d.dataValues.id),
+            },
+          },
+        });
+      }
+      // const filteredStudents = students.filter(
+      //   student => student.dataValues.departmentId == deptId
+      // );
+      const filteredStudents = await Student.findAll({
+        where: {
+          groupId: {
+            [sequelize.Op.in]: groups.map(g => g.dataValues.id),
+          },
+        },
+      });
+
       sendMail(
         filteredStudents.map(student => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",
-            subject: subject + " Ignore",
+            subject: emailSubject,
             body: `
-          ${body}
-
+          ${emailBody}
 
           Regards,
           ${faculty.dataValues.name}
@@ -677,7 +747,7 @@ class DeliverableController {
     }
   };
   static sendMailToStudents = async (req, res) => {
-    const { deliverableId, userId } = req.body;
+    const { deliverableId, userId, groups } = req.body;
 
     try {
       const faculty = await FacultyMember.findOne({
@@ -692,18 +762,57 @@ class DeliverableController {
       });
       const subject = deliverable.dataValues.emailsubject;
       const body = deliverable.dataValues.emailbody;
-      const deptId = faculty.dataValues.departmentId;
-      const students = await Student.findAll({
-        departmentId: deptId,
+
+      // const currentSemester = await Semester.findOne({
+      //   where: {
+      //     current: true,
+      //   },
+      // });
+      // let groups;
+      // if (currentSemester)
+      //   groups = await Group.findAll({
+      //     where: {
+      //       semesterId: currentSemester.dataValues.id,
+      //     },
+      //   });
+      // else {
+      //   const pmo = await PMO.findAll({
+      //     where: {
+      //       pmoId: userId,
+      //     },
+      //   });
+
+      //   const depts = await Department.findAll({
+      //     where: {
+      //       id: {
+      //         [sequelize.Op.in]: pmo.map(p => p.dataValues.deptId),
+      //       },
+      //     },
+      //   });
+      //   groups = await Group.findAll({
+      //     where: {
+      //       departmentId: {
+      //         [sequelize.Op.in]: depts.map(d => d.dataValues.id),
+      //       },
+      //     },
+      //   });
+      // }
+      // const filteredStudents = students.filter(
+      //   student => student.dataValues.departmentId == deptId
+      // );
+      const filteredStudents = await Student.findAll({
+        where: {
+          groupId: {
+            [sequelize.Op.in]: groups,
+          },
+        },
       });
-      const filteredStudents = students.filter(
-        student => student.dataValues.departmentId == deptId
-      );
+
       sendMail(
         filteredStudents.map(student => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",
-            subject: subject + " Ignore",
+            subject: subject,
             body: `
           ${body}
 

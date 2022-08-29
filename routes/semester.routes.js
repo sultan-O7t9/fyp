@@ -10,5 +10,7 @@ Router.post("/create", Semester.createSemester);
 Router.post("/current", Semester.setCurrentSemester);
 Router.get("/get-current", Semester.getCurrentSemester);
 Router.post("/update-grp-sem", Semester.updateGroupSemester);
+Router.get("/get-all-grp", Semester.getSemestersWithGroups);
+Router.post("/send-mail", Semester.sendMailToStudents);
 
 module.exports = Router;

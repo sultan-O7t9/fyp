@@ -156,12 +156,19 @@ const ManageGroup = props => {
       .get("http://localhost:5000/api/student/get-students")
       .then(res => {
         console.log(res.data.students);
-        setStudents([
-          // ...group.members.map(member => ({ rollNo: member })),
-          ...res.data.students,
-        ]);
-        setMembers(group.members.map(member => member.rollNo));
-        setLeader(group.members.find(member => member.leader == true).rollNo);
+        const sts = group.hasOwnProperty("members")
+          ? res.data.students.concat(group.members)
+          : res.data.students;
+        const mms = group.hasOwnProperty("members")
+          ? group.members.map(member => member.rollNo)
+          : [];
+        const l = group.hasOwnProperty("members")
+          ? group.members.find(member => member.leader == true).rollNo
+          : "";
+        console.log(group.members);
+        setStudents(sts);
+        setMembers(mms);
+        setLeader(l);
       })
       .catch(err => {
         console.log(err);

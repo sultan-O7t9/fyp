@@ -403,7 +403,7 @@ const GroupsDataBody = ({
           height: "calc(100vh - 230px)",
         }}
       />
-      <p>Selected rows: {JSON.stringify(toArray(selectedGroups))}.</p>
+      {/* <p>Selected rows: {JSON.stringify(toArray(selectedGroups))}.</p> */}
       {showDeleteModal ? (
         <DeleteConfirmationDialog
           itemType="Group"

@@ -66,7 +66,14 @@ const Dashboard = () => {
       ) : ( */}
       <ContainerFluid title="Dasboard">
         <Main>
-          <Box sx={{ padding: "3rem" }}>
+          <Box
+            sx={{
+              padding: "3rem",
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+            }}
+          >
             {deliverables.map((deliverable, index) => {
               return (
                 <ItemCard
@@ -76,6 +83,10 @@ const Dashboard = () => {
                 />
               );
             })}
+            <ItemCard
+              index={""}
+              item={{ id: 1, title: "Communication", link: "/comm" }}
+            />
           </Box>
         </Main>
       </ContainerFluid>

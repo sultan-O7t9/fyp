@@ -88,7 +88,7 @@ const DeliverableSettingsModal = props => {
       title: deliverable.title,
       email: {
         body: emailBody ? emailBody : deliverable.email.body,
-        recipients: null,
+        // recipients: null,
         subject: emailSubject ? emailSubject : deliverable.email.subject,
       },
     };

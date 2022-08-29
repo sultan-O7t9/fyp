@@ -1,10 +1,55 @@
 const sequelize = require("sequelize");
 
-const { Semester, Group } = require("../models");
+const { Semester, Group, FacultyMember, Student } = require("../models");
+const { sendMail } = require("../utils/sendMails");
 
 // Router.post("/current", Semester.setCurrentSemester);
 
 class SemesterController {
+  static sendMailToStudents = async (req, res) => {
+    const { message, subject, groups, userId } = req.body;
+    try {
+      const students = await Student.findAll({
+        where: {
+          groupId: {
+            [sequelize.Op.in]: groups,
+          },
+        },
+      });
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
+      sendMail(
+        students.map(student => {
+          return {
+            email: student.dataValues.rollNo + "@uog.edu.pk",
+            subject: subject,
+            body: `
+          ${message}
+
+
+          Regards,
+          ${faculty.dataValues.name}
+          `,
+          };
+        })
+      );
+
+      res.json({
+        message: "Mail sent successfully",
+        mail: true,
+        students,
+      });
+    } catch (err) {
+      res.json({
+        message: "Error in sending mail",
+        err,
+      });
+    }
+  };
   static updateGroupSemester = async (req, res) => {
     const { groups, semesterId } = req.body;
     try {
@@ -73,6 +118,43 @@ class SemesterController {
         message: "Error creating semester",
         error,
         create: false,
+      });
+    }
+  };
+  static getSemestersWithGroups = async (req, res) => {
+    try {
+      const semesters = await Semester.findAll();
+      if (semesters) {
+        const groups = await Group.findAll({
+          attributes: ["id", "name", "semesterId"],
+        });
+        res.json({
+          message: "Semesters retrieved successfully",
+          get: true,
+          semesters: semesters.map(semester => {
+            return {
+              ...semester.dataValues,
+              groups: groups.filter(group => group.semesterId === semester.id),
+              // .concat([
+              //   {
+              //     id: null,
+              //     name: "All",
+              //   },
+              // ]),
+            };
+          }),
+        });
+      } else {
+        res.json({
+          message: "No semesters found",
+          get: false,
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: "Error getting semesters",
+        error,
+        get: false,
       });
     }
   };

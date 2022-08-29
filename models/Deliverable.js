@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
       },
       emailsubject: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
       },
       emailbody: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
       },
     },
     {
