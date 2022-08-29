@@ -18,6 +18,7 @@ Router.get("/get/dept", Group.getGroupsByDepartment);
 Router.post("/change/password", Group.changePassword);
 
 Router.get("/get-groups", Group.getAllGroups);
+Router.post("/get-groups-sup", Group.getAllGroupsBySup);
 Router.get("/get/:id", Group.getGroupById);
 Router.get("/get-all/:id", Group.getAllGroupsByFacultyDepartment);
 Router.get("/get-student-group", verifyToken, Group.getGroupByStudent);

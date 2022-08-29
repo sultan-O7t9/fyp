@@ -32,6 +32,10 @@ Router.post(
   "/get-grp-submission-sup",
   Deliverable.getGroupsDeliverableSubmissionBySupervisor
 );
+Router.post(
+  "/get-grp-submission-sem",
+  Deliverable.getGroupsDeliverableSubmissionByCurrentSemester
+);
 
 Router.post(
   "/submit-grp-submission",

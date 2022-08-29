@@ -669,6 +669,76 @@ class GroupController {
       });
     }
   };
+  static getAllGroupsBySup = async (req, res) => {
+    const { userId } = req.body;
+    console.log("-------------", userId);
+    try {
+      const groups = await Group.findAll({
+        where: {
+          supervisorId: userId,
+        },
+      });
+      console.log(groups);
+      const detailedGroups = await Promise.all(
+        groups.map(async group => {
+          const supervisor = await FacultyMember.findOne({
+            where: {
+              id: group.dataValues.supervisorId,
+            },
+          });
+          const department = await Department.findOne({
+            where: {
+              id: group.dataValues.departmentId,
+            },
+          });
+          if (group.dataValues.projectId) {
+            const project = await Project.findOne({
+              where: {
+                id: group.dataValues.projectId,
+              },
+            });
+            group.dataValues.project = project.dataValues.title;
+          } else {
+            group.dataValues.project = null;
+          }
+          //Get members
+          const members = await group.getStudents();
+          group.dataValues.members = members.map(member => {
+            return {
+              rollNo: member.dataValues.rollNo,
+              name: member.dataValues.name,
+              email: member.dataValues.email,
+              leader: member.dataValues.leader,
+            };
+          });
+
+          return {
+            id: group.dataValues.name,
+            committeeId: group.dataValues.committeeId,
+            project: group.dataValues.project,
+            members: group.dataValues.members,
+            supervisor: supervisor.dataValues.name,
+            bookletsStatus: group.dataValues.bookletsStatus,
+            department: department ? department.dataValues.name : null,
+            bookletsComment: group.dataValues.bookletsComment,
+            semesterId: group.dataValues.semesterId,
+          };
+        })
+      );
+      console.log(detailedGroups);
+
+      res.json({
+        message: "Groups fetched successfully",
+        groups: detailedGroups,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting groups",
+        error,
+      });
+    }
+  };
 
   static approveGroupRequest = async (req, res) => {};
 

@@ -17,6 +17,7 @@ const {
   Group,
   Project,
   Student,
+  Semester,
 } = require("../models");
 const { Op } = require("sequelize");
 
@@ -515,6 +516,94 @@ class DeliverableController {
         submissions: subs,
         get: true,
       });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting versions",
+        error,
+        get: false,
+      });
+    }
+  };
+  static getGroupsDeliverableSubmissionByCurrentSemester = async (req, res) => {
+    console.log("---------------------------------------");
+    const { deliverableId } = req.body;
+    console.table({ ID: deliverableId });
+    try {
+      // console.log(deliverableId, groupId);
+      // try{}
+
+      const currentSemester = await Semester.findOne({
+        where: {
+          current: true,
+        },
+      });
+      console.log(currentSemester.id);
+      if (currentSemester) {
+        const groups = await Group.findAll({
+          where: {
+            semesterId: currentSemester.dataValues.id,
+          },
+        });
+        console.log(groups.map(g => g.name));
+
+        const subs = [];
+
+        await Promise.all(
+          groups.map(async group => {
+            const versions = await Version.findAll({
+              where: {
+                deliverableId,
+                groupId: group.dataValues.id,
+              },
+            });
+            versions.sort((a, b) => {
+              return new Date(a.dataValues.id) - new Date(b.dataValues.id);
+            });
+            //   versions.reverse();
+            const project = await Project.findOne({
+              where: {
+                id: group.dataValues.projectId,
+              },
+            });
+            const data = {
+              ...group.dataValues,
+              submission: versions.length > 0 ? versions.pop() : {},
+              project: project
+                ? project.dataValues
+                : {
+                    id: null,
+                    title: null,
+                    description: null,
+                  },
+            };
+            subs.push(data);
+          })
+        );
+        //   console.log(subs);
+        //   const submissions = await Version.findAll({
+        //     where: {
+        //       deliverableId,
+        //       groupId: {
+        //         [Op.in]: groups.map(group => group.id),
+        //       },
+        //     },
+        //   });
+        //   console.log(submissions.dataValues);
+        //   console.log(versions.dataValues);
+
+        res.json({
+          message: "Versions fetched successfully",
+          submissions: subs,
+          get: true,
+        });
+      } else {
+        res.json({
+          message: "Versions fetched successfully",
+          submissions: [],
+          get: true,
+        });
+      }
     } catch (error) {
       console.log(error);
       res.status(500).json({

@@ -133,28 +133,61 @@ const AllGroups = () => {
 
   useEffect(() => {
     setIsLoading(true);
-
-    axios
-      .get("http://localhost:5000/api/group/get-groups/")
-      .then(res => {
-        console.log(res.data.groups);
-        let filteredGroups = currentSemester
-          ? res.data.groups.filter(g => g.semesterId === currentSemester)
-          : res.data.groups;
-        if (localStorage.getItem("USER_ROLE").includes("SUPERVISOR")) {
-          filteredGroups = filteredGroups.filter(
-            g => g.supervisorId != localStorage.getItem("USER_ID")
+    const getGroups = async () => {
+      try {
+        let filteredGroups = [];
+        if (localStorage.getItem("USER_ROLE").includes("PMO")) {
+          const res = await axios.get(
+            "http://localhost:5000/api/group/get-groups/"
           );
-          console.log(filteredGroups);
+          console.log(res.data.groups);
+          filteredGroups = currentSemester
+            ? res.data.groups.filter(g => g.semesterId === currentSemester)
+            : res.data.groups;
+        } else if (localStorage.getItem("USER_ROLE").includes("SUPERVISOR")) {
+          const userId = localStorage.getItem("USER_ID");
+          console.log("USER_ID", userId);
+          const res2 = await axios.post(
+            "http://localhost:5000/api/group/get-groups-sup/",
+            {
+              userId,
+            }
+          );
+          console.log(res2.data);
+          filteredGroups = currentSemester
+            ? res2.data.groups.filter(g => g.semesterId === currentSemester)
+            : res2.data.groups;
         }
         setBody(filteredGroups);
-      })
-      .catch(err => {
-        console.log(err);
-      })
-      .finally(() => {
+      } catch (error) {
+        console.log(error);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+    getGroups();
+
+    // axios
+    //   .get("http://localhost:5000/api/group/get-groups/")
+    //   .then(res => {
+    //     console.log(res.data.groups);
+    //     let filteredGroups = currentSemester
+    //       ? res.data.groups.filter(g => g.semesterId === currentSemester)
+    //       : res.data.groups;
+    //     if (localStorage.getItem("USER_ROLE").includes("SUPERVISOR")) {
+    //       filteredGroups = filteredGroups.filter(
+    //         g => g.supervisorId != localStorage.getItem("USER_ID")
+    //       );
+    //       console.log(filteredGroups);
+    //     }
+    //     setBody(filteredGroups);
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   })
+    //   .finally(() => {
+    //     setIsLoading(false);
+    //   });
   }, [showManageGroup, currentSemester, showAddSemester, selectedSemester]);
 
   const editGroupHandler = group => {

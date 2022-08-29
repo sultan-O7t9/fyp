@@ -113,6 +113,7 @@ const DeliverableSettingsModal = props => {
     const data = new FormData();
     data.append("file", file);
     data.append("deliverableId", deliverable.id);
+    console.log(file);
 
     try {
       const res = await axios.post(
@@ -216,6 +217,12 @@ const DeliverableSettingsModal = props => {
                     <form onSubmit={downloadTemplateFile} className="form">
                       <Button variant="text" type="submit">
                         {deliverable.template}
+                      </Button>
+                    </form>
+                  ) : file.name ? (
+                    <form onSubmit={downloadTemplateFile} className="form">
+                      <Button variant="text" type="submit">
+                        {file.name}
                       </Button>
                     </form>
                   ) : (
