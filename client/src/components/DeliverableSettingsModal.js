@@ -60,7 +60,8 @@ const DeliverableSettingsModal = props => {
   const handleDateChange = e => {
     console.log(e.target.value);
     const dd = new Date(e.target.value);
-    if (dd < new Date()) return;
+    // if (dd < new Date()) return;
+    if (false) return;
     else {
       setDeadlineInput(e.target.value);
       setDeliverableDeadline(dd);

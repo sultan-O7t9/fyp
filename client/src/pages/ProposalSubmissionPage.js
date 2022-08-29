@@ -344,6 +344,10 @@ const DataBody = () => {
           </TableCell>
           <TableCell>
             <Button
+              disabled={
+                deliverableData.deadline &&
+                new Date(deliverableData.deadline) < new Date()
+              }
               color="primary"
               variant="contained"
               onClick={submitProposal}
