@@ -132,11 +132,6 @@ class CommitteeReviewController {
         },
       });
 
-      // if (
-      //   file.detectedFileExtension != ".docx" ||
-      //   file.detectedFileExtension != ".doc"
-      // )
-      //   new Error("Invalid file type");
       const fileTitle = file.originalname;
       //   const version_id = submittedVersion.id;
       const title = fileTitle.split(".")[0];

@@ -112,14 +112,6 @@ class DeliverableController {
         },
       });
 
-      //   console.log(file);
-      //   fileExtension = file.detectedFileExtension;
-      //   console.log("EX", fileExtension);
-      if (
-        file.detectedFileExtension != ".docx" ||
-        file.detectedFileExtension != ".doc"
-      )
-        new Error("Invalid file type");
       const title = deliverable.title;
 
       const fileName =

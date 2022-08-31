@@ -876,7 +876,7 @@ class GroupController {
     const { file } = req;
     try {
       console.log(file);
-      if (file.detectedFileExtension != ".pdf") new Error("Invalid file type");
+
       const fileName = `123.pdf`;
       // await pipeline(
       //   file.buffer,
