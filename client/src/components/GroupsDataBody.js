@@ -335,11 +335,11 @@ const GroupsDataBody = ({
         header: "Dept",
         defaultFlex: 1,
       },
-      {
-        name: "semesterTitle",
-        header: "Semester",
-        defaultFlex: 1,
-      },
+      // {
+      //   name: "semesterTitle",
+      //   header: "Semester",
+      //   defaultFlex: 1,
+      // },
       {
         name: "project",
         header: "Project",

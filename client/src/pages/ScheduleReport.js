@@ -69,20 +69,6 @@ export const ScheduleReportComponent = ({
       })
     );
 
-    // for (let i = 0; i < tables; i++) {
-    //   pdf.addPage();
-    //   const tbl = document.getElementById(tables[i]);
-    //   const canvas = await html2canvas(tbl);
-    //   pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0);
-
-    //   // .then(canvas => {
-    //   //   pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0);
-    //   // })
-    //   // .then(() => {})
-    //   // .catch(err => {
-    //   //   console.log(err);
-    //   // });
-    // }
     console.log(pdf);
     pdf.save(
       "Deliverable_" +
@@ -91,15 +77,7 @@ export const ScheduleReportComponent = ({
         new Date() +
         ".pdf".replace(" ", "_")
     );
-    //   html2canvas(tableToDisplay).then(canvas => {
-    //     const imgData = canvas.toDataURL("image/png");
-    //     const pdf = new jsPDF("l", "px", [canvas.width, canvas.height]);
-    //     pdf.addImage(imgData, "PNG", 0, 0);
-    //     pdf.save("schedule-report.pdf");
-    //   });
   };
-
-  //   return <div>Here create tables of Schedules and save them as pdf</div>;
 
   const tDataStyles = {
     border: "1px solid rgb(57, 56, 56)",
@@ -125,16 +103,7 @@ export const ScheduleReportComponent = ({
           console.log(mainItem[date]);
 
           tables.push("tbl-exp-" + index);
-          //   pdf
-          //   const tableToDisplay = document.getElementById("tbl-exp-" + index);
-          //   html2canvas(tableToDisplay).then(canvas => {
-          //     const imgData = canvas.toDataURL("image/png");
-          //     const pdf = new jsPDF("l", "px", [canvas.width, canvas.height]);
-          //     pdf.addImage(imgData, "PNG", 0, 0);
-          //     pdf.save("schedule-report.pdf");
-          //   });
 
-          // pdf
           return (
             <div key={index}>
               <table
