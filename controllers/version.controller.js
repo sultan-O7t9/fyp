@@ -13,6 +13,11 @@ const { promisify } = require("util");
 const pipeline = promisify(require("stream").pipeline);
 const path = require("path");
 
+// var fs = require('fs');
+const pdf = require("html-pdf");
+const sequelize = require("sequelize");
+const { sendMail, sendMailWithAttachment } = require("../utils/sendMails");
+
 const dir = path.join(__dirname, "../uploads");
 
 class VersionController {
@@ -112,6 +117,84 @@ class VersionController {
       console.log(error);
       res.status(500).json({
         message: "Error uploading file",
+        error,
+        upload: false,
+      });
+    }
+  };
+
+  static shareSchedule = async (req, res) => {
+    const { tables, deliverableId, deliverableData, dim } = req.body;
+
+    try {
+      const students = deliverableData.map(sch =>
+        sch.group.groupMembers.map(student => student.rollNo + "@uog.edu.pk")
+      );
+      const studentsList = students.flat();
+      const committees = deliverableData.map(sch =>
+        sch.committee.evaluators.map(evaluator => evaluator.id)
+      );
+      const evalsList = [...new Set(committees.flat())];
+      const evaluators = await FacultyMember.findAll({
+        where: {
+          id: {
+            [sequelize.Op.or]: evalsList,
+          },
+        },
+      });
+      const committeeMembers = evaluators.map(evaluator => evaluator.email);
+      // for(student of students)
+      console.log(studentsList, committeeMembers);
+      const allRecipiants = studentsList.concat(committeeMembers);
+      console.log(allRecipiants);
+      //
+      const html = tables;
+      console.log(html);
+      const options = {
+        height: dim.height + "px", // allowed units: mm, cm, in, px
+        width: dim.width + "px",
+      };
+      console.log(options);
+      console.log(dir);
+      const filePath = path.join(
+        dir,
+        "Sched_" + new Date().getTime().toString() + ".pdf"
+      );
+
+      const fileName = new Date().getTime().toString() + ".html";
+      const filePathHTML = path.join(dir, fileName);
+      fs.writeFileSync(filePathHTML, html, err => {
+        if (err) throw err;
+      });
+      const htmlFile = fs.readFileSync(filePathHTML, "utf8");
+      pdf.create(htmlFile, options).toFile(filePath, function (err, res) {
+        if (err) return console.log(err);
+        console.log(res); // { filename: '/app/businesscard.pdf' }
+        sendMailWithAttachment(
+          ["18094198-079@uog.edu.pk"].map(student => {
+            return {
+              email: student,
+              subject: "Schedule for Deliverable " + deliverableId,
+              html: html,
+              path: filePathHTML,
+              // name: "Sched_Deliverable_" + deliverableId + ".pdf",
+              body: `
+              The Evaluation Schedule for Deliverable ${deliverableId} is attached herewith.
+               `,
+            };
+          })
+        );
+        console.log("Email sent");
+      });
+
+      res.json({
+        message: "Schedule shared successfully",
+        share: true,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error sharing schedule",
         error,
         upload: false,
       });

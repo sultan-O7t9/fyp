@@ -7,6 +7,7 @@ import {
   ListItem,
   TableCell,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
@@ -108,15 +109,17 @@ const DataBody = ({ data, editCommittee, setData }) => {
             <EditIcon />
           </IconButton> */}
 
-          <IconButton
-            onClick={() => {
-              deleteCommittee(row.id);
-            }}
-            color="error"
-            variant="outlined"
-          >
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Delete Committee">
+            <IconButton
+              onClick={() => {
+                deleteCommittee(row.id);
+              }}
+              color="error"
+              variant="outlined"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
         {/* <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell> */}
       </TableRow>

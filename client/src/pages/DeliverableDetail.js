@@ -32,6 +32,7 @@ import ReactDataGrid from "@inovua/reactdatagrid-community";
 import SelectFilter from "@inovua/reactdatagrid-community/SelectFilter";
 import "@inovua/reactdatagrid-community/index.css";
 import { useCallback } from "react";
+import ExtensionModal from "../components/ExtensionModal";
 
 const DATA = {
   // heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
@@ -268,7 +269,7 @@ const DataBody = () => {
       },
       {
         name: "status",
-        header: "Status",
+        header: "Supervisor Review",
         defaultFlex: 2,
         render: ({ value }) => {
           const color =
@@ -606,6 +607,8 @@ const DeliverableDetail = props => {
   const [toastMessage, setToastMessage] = useState("");
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showExtensionModal, setShowExtensionModal] = useState(false);
+  const history = useHistory();
   // const history=useHistory();
   const params = useParams();
   const deliverableId = params.id;
@@ -676,6 +679,14 @@ const DeliverableDetail = props => {
 
   return (
     <>
+      {showExtensionModal ? (
+        <ExtensionModal
+          deliverableId={deliverableId}
+          setDisplay={setShowExtensionModal}
+          setToastMessage={setToastMessage}
+          setShowToast={setShowToast}
+        />
+      ) : null}
       {showToast ? (
         <Toast open={showToast} setOpen={setShowToast} message={toastMessage} />
       ) : null}
@@ -739,14 +750,44 @@ const DeliverableDetail = props => {
                 </Typography> */}
               </Box>
             </Box>
-            <Box>
+            <Box style={{ display: "flex", flexDirection: "column" }}>
               {roles.includes("PMO") ? (
+                <>
+                  <Button
+                    style={{ width: "100%", marginBottom: "0.5rem" }}
+                    variant="contained"
+                    onClick={handleSettings}
+                    color="primary"
+                  >
+                    Settings
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      setShowExtensionModal(true);
+                    }}
+                  >
+                    Deadline Extension Requests
+                  </Button>
+                  <Button
+                    style={{ marginTop: "0.5rem" }}
+                    variant="contained"
+                    onClick={() => {
+                      history.push("/deliverable/sched/" + deliverableId);
+                    }}
+                  >
+                    Show Evaluation Schedule
+                  </Button>
+                </>
+              ) : null}
+              {roles.includes("EVALUATOR") ? (
                 <Button
                   variant="contained"
-                  onClick={handleSettings}
-                  color="primary"
+                  onClick={() => {
+                    history.push("/deliverable/sched/" + deliverableId);
+                  }}
                 >
-                  Settings
+                  Show Evaluation Schedule
                 </Button>
               ) : null}
             </Box>

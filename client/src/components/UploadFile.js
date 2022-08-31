@@ -12,7 +12,7 @@ import {
 const UploadFile = props => {
   // const [file, setFile] = useState({});
   // const [name, setName] = useState("");
-  const { handleSubmitFile, setDisplay, setFile, file } = props;
+  const { handleSubmitFile, setDisplay, setFile, file, notSubmit } = props;
 
   const handleFileInputChange = e => {
     const value = e.target.files[0];
@@ -49,6 +49,7 @@ const UploadFile = props => {
               <Typography variant="h4">Upload File</Typography>
               <form
                 onSubmit={e => {
+                  e.preventDefault();
                   handleSubmitFile(e);
                 }}
                 className="form"
@@ -61,14 +62,25 @@ const UploadFile = props => {
                   />
                 </div>
 
-                <Button
-                  variant="contained"
-                  style={{ marginRight: "1rem" }}
-                  type="submit"
-                  disabled={!file.name}
-                >
-                  Submit
-                </Button>
+                {notSubmit ? (
+                  <Button
+                    variant="contained"
+                    style={{ marginRight: "1rem" }}
+                    disabled={!file.name}
+                    onClick={handleSubmitFile}
+                  >
+                    Submit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    style={{ marginRight: "1rem" }}
+                    type="submit"
+                    disabled={!file.name}
+                  >
+                    Submit
+                  </Button>
+                )}
                 <Button
                   variant="contained"
                   color="error"

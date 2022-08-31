@@ -111,6 +111,7 @@ export default function AppBarMenu(props) {
         {roles && roles.length
           ? roles.map(role => (
               <MenuItem
+                key={role}
                 disabled={localStorage.getItem("USER_ROLE").includes(role)}
                 onClick={() => {
                   console.log(role);

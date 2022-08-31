@@ -34,6 +34,7 @@ const AdminLogin = () => {
       );
       // console.log(response.data);
       localStorage.setItem("ADMIN_ID", response.data.id);
+      localStorage.setItem("USER_ROLE", ["HOD"]);
       history.replace("/admin/faculty", response.data);
       dispatch(loginUser(response.data));
     } catch (error) {

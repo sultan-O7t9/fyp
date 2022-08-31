@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   IconButton,
   List,
@@ -261,12 +262,21 @@ const GroupsDataBody = ({
               width: "100%",
               height: "100%",
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "space-evenly",
+              alignItems: "center",
             }}
           >
             {localStorage.getItem("USER_ROLE").includes("PMO") ? (
-              <>
+              <Box
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: "100%",
+                }}
+              >
                 <Button
+                  style={{ marginBottom: "0.5rem" }}
                   variant="contained"
                   size="small"
                   onClick={() => {
@@ -286,7 +296,7 @@ const GroupsDataBody = ({
                 >
                   Delete
                 </Button>
-              </>
+              </Box>
             ) : null}
             <Button
               size="small"
@@ -326,7 +336,7 @@ const GroupsDataBody = ({
         defaultFlex: 1,
       },
       {
-        name: "semester",
+        name: "semesterTitle",
         header: "Semester",
         defaultFlex: 1,
       },

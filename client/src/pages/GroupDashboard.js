@@ -17,6 +17,7 @@ import Main from "../components/Main";
 import MenuButton from "../components/MenuButton";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import ItemCard from "../components/ItemCard";
 
 const DataHead = () => null;
 
@@ -69,59 +70,115 @@ const DataBody = () => {
     getDeliverablesData();
   }, [groupID, history]);
 
+  const deliverables = [
+    {
+      id: 1,
+      title: "Deliverable 1",
+      link: "/main/proposal",
+      deadline: proposalDeadline,
+    },
+    {
+      id: 2,
+      title: "Deliverable 2",
+      link: "/main/d2",
+      deadline: d2Deadline,
+    },
+    {
+      id: 3,
+      title: "Deliverable 3",
+      link: "/main/d3",
+      deadline: d3Deadline,
+    },
+  ];
   return (
-    <>
-      <TableRow>
-        <TableCell colSpan={2}>
-          <Typography variant="h6">Project: {projectData.title}</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell>
-          <Button color="primary" variant="outlined">
-            <Link to="/main/proposal">1st Deliverable: Project Proposal</Link>
-          </Button>
-        </TableCell>
+    <ContainerFluid title={"Project: " + projectData.title}>
+      <Main>
+        <Box
+          sx={{
+            padding: "3rem",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+          }}
+        >
+          {deliverables.map((deliverable, index) => {
+            return (
+              <ItemCard
+                manual={true}
+                key={deliverable.id}
+                index={"Deliverable " + (index + 1)}
+                item={deliverable}
+              />
+            );
+          })}
 
-        <TableCell>
-          <Typography variant="subtitle2">
-            {" "}
-            Deadline: {proposalDeadline}
-          </Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell>
-          <Button color="primary" variant="outlined">
-            <Link to="/main/d2">2nd Deliverable: Documentation</Link>
-          </Button>
-        </TableCell>
-
-        <TableCell>
-          <Typography variant="subtitle2"> Deadline: {d2Deadline}</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell>
-          <Button color="primary" variant="outlined">
-            <Link to="/main/d3">3rd Deliverable: Working System</Link>
-          </Button>
-        </TableCell>
-        <TableCell>
-          <Typography variant="subtitle2"> Deadline: {d3Deadline}</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell>
-          <Button color="primary" variant="contained" size="large">
-            <Link style={{ color: "white" }} to={"/main/group/" + groupID}>
-              Show Details
-            </Link>
-          </Button>
-        </TableCell>
-      </TableRow>
-    </>
+          <ItemCard
+            index={""}
+            manual={true}
+            item={{
+              id: 1,
+              title: "Group Details",
+              link: "/main/group/" + groupID,
+            }}
+          />
+        </Box>
+      </Main>
+    </ContainerFluid>
   );
+
+  // return (
+  //   <>
+  //     <TableRow>
+  //       <TableCell colSpan={2}>
+  //         <Typography variant="h6">Project: {projectData.title}</Typography>
+  //       </TableCell>
+  //     </TableRow>
+  //     <TableRow>
+  //       <TableCell>
+  //         <Button color="primary" variant="outlined">
+  //           <Link to="/main/proposal">1st Deliverable: Project Proposal</Link>
+  //         </Button>
+  //       </TableCell>
+
+  //       <TableCell>
+  //         <Typography variant="subtitle2">
+  //           {" "}
+  //           Deadline: {proposalDeadline}
+  //         </Typography>
+  //       </TableCell>
+  //     </TableRow>
+  //     <TableRow>
+  //       <TableCell>
+  //         <Button color="primary" variant="outlined">
+  //           <Link to="/main/d2">2nd Deliverable: Documentation</Link>
+  //         </Button>
+  //       </TableCell>
+
+  //       <TableCell>
+  //         <Typography variant="subtitle2"> Deadline: {d2Deadline}</Typography>
+  //       </TableCell>
+  //     </TableRow>
+  //     <TableRow>
+  //       <TableCell>
+  //         <Button color="primary" variant="outlined">
+  //           <Link to="/main/d3">3rd Deliverable: Working System</Link>
+  //         </Button>
+  //       </TableCell>
+  //       <TableCell>
+  //         <Typography variant="subtitle2"> Deadline: {d3Deadline}</Typography>
+  //       </TableCell>
+  //     </TableRow>
+  //     <TableRow>
+  //       <TableCell>
+  //         <Button color="primary" variant="contained" size="large">
+  //           <Link style={{ color: "white" }} to={"/main/group/" + groupID}>
+  //             Show Details
+  //           </Link>
+  //         </Button>
+  //       </TableCell>
+  //     </TableRow>
+  //   </>
+  // );
 };
 
 const GroupDashboard = () => {
@@ -143,29 +200,30 @@ const GroupDashboard = () => {
     getData();
   }, [groupID]);
 
-  return (
-    <ContainerFluid title={groupData.name}>
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          {/* <Box>
-            <Typography variant="h3">SE_18_1 Proposal</Typography>
-          </Box> */}
-          {/* <Box>
-            <Button variant="contained" color="primary">
-              Settings
-            </Button>
-          </Box> */}
-        </Box>
+  return <DataBody />;
+  // return (
+  //   <ContainerFluid title={groupData.name}>
+  //     <Main styles={{ padding: "1.5rem" }}>
+  //       <Box
+  //         sx={{ marginBottom: "3rem" }}
+  //         display="flex"
+  //         justifyContent="space-between"
+  //         alignItems="center"
+  //       >
+  //         {/* <Box>
+  //           <Typography variant="h3">SE_18_1 Proposal</Typography>
+  //         </Box> */}
+  //         {/* <Box>
+  //           <Button variant="contained" color="primary">
+  //             Settings
+  //           </Button>
+  //         </Box> */}
+  //       </Box>
 
-        <DataTable DataHead={DataHead} DataBody={DataBody} />
-      </Main>
-    </ContainerFluid>
-  );
+  //       <DataTable DataHead={DataHead} DataBody={DataBody} />
+  //     </Main>
+  //   </ContainerFluid>
+  // );
 };
 
 export default GroupDashboard;

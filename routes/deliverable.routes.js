@@ -5,6 +5,8 @@ const Deliverable = require("../controllers/deliverable.controller.js");
 
 const multer = require("multer");
 const Version = require("../controllers/version.controller");
+const Extension = require("../controllers/extension.controller");
+const DeliverableController = require("../controllers/deliverable.controller.js");
 const upload = multer();
 const Router = require("express").Router();
 
@@ -51,5 +53,14 @@ Router.post("/send-mail", Deliverable.sendMailToStudents);
 Router.post("/sup-add-comment", Version.addComment);
 Router.post("/sup-change-status", Version.changeEndorsementStatus);
 Router.post("/sup-add-doc", upload.single("file"), Version.uploadCommentedDoc);
+Router.post("/get-logs", DeliverableController.getLogs);
+Router.post("/set-logs", DeliverableController.setLogs);
+
+Router.post("/share-sched", Version.shareSchedule);
+
+Router.post("/ex-get-grp", Extension.getExtension);
+Router.post("/req-ex", Extension.requestExtension);
+Router.post("/ex-status", Extension.changeStatus);
+Router.post("/ex-get", Extension.getExtensions);
 
 module.exports = Router;

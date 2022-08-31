@@ -385,7 +385,12 @@ const AllStudents = () => {
 
   return (
     <>
-      {showAddStudent ? <AddStudent setDisplay={setShowAddStudent} /> : null}
+      {showAddStudent ? (
+        <AddStudent
+          setDisplay={setShowAddStudent}
+          students={body ? body.map(b => b.rollNo) : []}
+        />
+      ) : null}
       {showEditStudent ? (
         <EditStudent student={toEdit} setDisplay={setShowEditStudent} />
       ) : null}

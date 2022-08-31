@@ -9,8 +9,30 @@ const {
   PMO,
 } = require("../models");
 const sequelize = require("sequelize");
+const { sendMail } = require("../utils/sendMails");
 
 class FacultyController {
+  static getAllSupervisorById = async (req, res) => {
+    const { id } = req.body;
+    console.log("facultyID", id);
+    try {
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: id,
+        },
+      });
+      console.log(faculty);
+      res.json({
+        message: "Supervisor retrieved successfully",
+        faculty: faculty,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        error,
+      });
+    }
+  };
   // static removePMO = async (req, res) => {
   //   const { id, facultyId } = req.body;
   //   try {
@@ -343,6 +365,25 @@ class FacultyController {
         //     roleId: role,
         //   });
         // });
+
+        sendMail(
+          [facultyMember].map(faculty => {
+            return {
+              // email: faculty.dataValues.email,
+              email: "18094198-079@uog.edu.pk",
+              subject: "Faculty Member Registration",
+              body: `
+              
+               Your account has been created, successfully.
+                  
+               Your credentials are: 
+                  Email: ${faculty.dataValues.email}
+                  Password:${faculty.dataValues.password}
+               `,
+            };
+          })
+        );
+
         res.json({
           message: "Faculty Member registered successfully",
           facultyMember,
@@ -500,6 +541,25 @@ class FacultyController {
             ? committeeId
             : faculty.dataValues.committeeId,
         });
+
+        sendMail(
+          [faculty].map(faculty => {
+            return {
+              // email: faculty.dataValues.email,
+              email: "18094198-079@uog.edu.pk",
+              subject: "Faculty Member Registration",
+              body: `
+              
+               Your account has been updated, successfully.
+                  
+               Your credentials are: 
+                  Email: ${faculty.dataValues.email}
+                  Password:${faculty.dataValues.password}
+               `,
+            };
+          })
+        );
+
         res.json({
           message: "Faculty updated successfully",
           faculty,

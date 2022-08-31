@@ -16,6 +16,7 @@ import Select from "./Select";
 
 const EditStudent = props => {
   const { setDisplay, student } = props;
+
   console.log(student);
   const [committee, setCommittee] = useState([]);
   const [evaluationDate, setEvaluationDate] = useState("");

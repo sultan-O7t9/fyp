@@ -21,6 +21,9 @@ sequelize
 
 // // // Define a new model
 const FacultyMember = require("./FacultyMember")(sequelize, DataTypes);
+const CommitteeReview = require("./CommitteeReview")(sequelize, DataTypes);
+const EvaluationLog = require("./EvaluationLog")(sequelize, DataTypes);
+
 const Role = require("./Role")(sequelize, DataTypes);
 const Faculty_Role = require("./Faculty_Role")(sequelize, DataTypes);
 const PMO = require("./PMO")(sequelize, DataTypes);
@@ -37,6 +40,7 @@ const Deliverable = require("./Deliverable")(sequelize, DataTypes);
 const Version = require("./Version")(sequelize, DataTypes);
 const EvaluationType = require("./EvaluationType")(sequelize, DataTypes);
 const Evaluation = require("./Evaluation")(sequelize, DataTypes);
+const Extension = require("./Extension")(sequelize, DataTypes);
 const EvaluationSchedule = require("./EvaluationSchedule")(
   sequelize,
   DataTypes
@@ -210,6 +214,31 @@ Deliverable.hasMany(EvaluationSchedule, {
 Semester.hasMany(Group, {
   foreignKey: "semesterId",
 });
+Group.hasMany(Extension, {
+  foreignKey: "groupId",
+});
+Deliverable.hasMany(Extension, {
+  foreignKey: "deliverableId",
+});
+FacultyMember.hasMany(Extension, {
+  foreignKey: "supervisorId",
+});
+Group.hasMany(CommitteeReview, {
+  foreignKey: "groupId",
+});
+Deliverable.hasMany(CommitteeReview, {
+  foreignKey: "deliverableId",
+});
+Group.hasMany(EvaluationLog, {
+  foreignKey: "groupId",
+});
+Deliverable.hasMany(EvaluationLog, {
+  foreignKey: "deliverableId",
+});
+Committee.hasMany(CommitteeReview, {
+  foreignKey: "committeeId",
+});
+
 // Committee.hs
 
 // Evaluation.hasMany(Version, {});
@@ -233,6 +262,7 @@ module.exports = {
   sequelize,
   Sequelize,
   FacultyMember,
+  CommitteeReview,
   Admin,
   Role,
   Faculty_Role,
@@ -251,6 +281,8 @@ module.exports = {
   Token,
   Evaluation,
   PMO,
+  Extension,
+  EvaluationLog,
   EvaluationType,
   EvaluationSchedule,
   Project,

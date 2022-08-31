@@ -3,17 +3,15 @@ import { Box } from "@mui/system";
 import Link from "./Link";
 
 const ItemCard = props => {
-  const { styles, item, index } = props;
+  const { styles, item, index, manual } = props;
   const roles = localStorage.getItem("USER_ROLE");
+  let route = item.link;
+  if (roles.includes("PMO")) route = "/deliverable/" + item.id;
+  else if (roles.includes("SUPERVISOR")) route = "/sup/deliverable/" + item.id;
+  else if (roles.includes("EVALUATOR")) route = "/deliverable/sched/" + item.id;
   return (
     <Link
-      to={
-        item.hasOwnProperty("deadline")
-          ? roles.includes("PMO") || roles.includes("EVALUATOR")
-            ? "/deliverable/" + item.id
-            : "/sup/deliverable/" + item.id
-          : item.link
-      }
+      to={manual ? item.link : route}
       style={{ textDecoration: "none", width: "calc(50% - 1.5rem)" }}
       variant="h5"
     >

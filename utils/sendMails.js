@@ -129,3 +129,47 @@ module.exports.sendMail = recipiants => {
   //   }
   // });
 };
+module.exports.sendMailWithAttachment = recipiants => {
+  Promise.all(
+    recipiants.map(recipiant => {
+      return new Promise((resolve, reject) => {
+        const mailOptions = {
+          from: process.env.SENDER_EMAIL,
+          to: recipiant.email,
+          subject: recipiant.subject,
+          text: recipiant.body,
+          html: recipiant.html,
+          // attachments: [
+          //   {
+          //     // file on disk as an attachment
+          //     // filename: recipiant.name,
+          //     path: recipiant.path, // stream this file
+          //   },
+          // ],
+        };
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            reject(err);
+          } else {
+            console.log("Email sent: " + info.response);
+            resolve(info);
+          }
+        });
+      });
+    })
+  )
+    .then(info => {
+      console.log(info);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
+  // transporter.sendMail(mailOptions, function (error, info) {
+  //   if (error) {
+  //     console.log(error);
+  //   } else {
+  //     console.log("Email sent: " + info.response);
+  //   }
+  // });
+};

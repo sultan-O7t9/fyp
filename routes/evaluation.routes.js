@@ -10,45 +10,43 @@ const verifyToken = require("../utils/verifyToken");
 const Router = require("express").Router();
 const Group = require("../controllers/group.controller");
 const multer = require("multer");
-const EvaluationController = require("../controllers/evaluation.controller");
+const Evaluation = require("../controllers/evaluation.controller");
+const CommitteeReview = require("../controllers/committeeReview.controller");
 const upload = multer();
 
-Router.post(
-  "/get-pmo-evaluation",
-  EvaluationController.getPMOEvaluationByGroup
-);
-Router.put(
-  "/update-pmo-evaluation",
-  EvaluationController.updatePMOEvaluationByGroup
-);
+Router.post("/get-pmo-evaluation", Evaluation.getPMOEvaluationByGroup);
+Router.put("/update-pmo-evaluation", Evaluation.updatePMOEvaluationByGroup);
 Router.post(
   "/get-supervisor-evaluation",
-  EvaluationController.getSupervisorEvaluationByGroup
+  Evaluation.getSupervisorEvaluationByGroup
 );
-Router.post("/schedule", EvaluationController.createSchedule);
+Router.post("/schedule", Evaluation.createSchedule);
 Router.post(
   "/get-schedule-deliverable",
-  EvaluationController.getAllSchedulesByDeliverable
+  Evaluation.getAllSchedulesByDeliverable
 );
-Router.delete("/del-schedule/:id", EvaluationController.deleteSchedule);
+Router.delete("/del-schedule/:id", Evaluation.deleteSchedule);
 Router.put(
   "/update-supervisor-evaluation",
-  EvaluationController.updateSupervisorEvaluationByGroup
+  Evaluation.updateSupervisorEvaluationByGroup
 );
-Router.post("/proposal-evaluation", EvaluationController.getProposalEvaluation);
+Router.post("/proposal-evaluation", Evaluation.getProposalEvaluation);
+Router.post("/add-proposal-evaluation", Evaluation.handleProposalEvaluation);
+Router.post("/sup-evaluation", Evaluation.getSupervisorEvaulation);
+Router.post("/add-sup-evaluation", Evaluation.handleSupervisorEvaluation);
+Router.post("/pmo-evaluation", Evaluation.getPmoEvaulation);
+Router.post("/add-pmo-evaluation", Evaluation.handlePmoEvaluation);
+Router.post("/d2-evaluation", Evaluation.getD2Evaulation);
+Router.post("/add-d2-evaluation", Evaluation.handleD2Evaluation);
+Router.post("/d3-evaluation", Evaluation.getD3Evaulation);
+Router.post("/add-d3-evaluation", Evaluation.handleD3Evaluation);
+
+Router.post("/update-review-status", CommitteeReview.changeEndorsementStatus);
 Router.post(
-  "/add-proposal-evaluation",
-  EvaluationController.handleProposalEvaluation
+  "/add-commented-doc",
+  upload.single("file"),
+  CommitteeReview.uploadCommentedDoc
 );
-Router.post("/sup-evaluation", EvaluationController.getSupervisorEvaulation);
-Router.post(
-  "/add-sup-evaluation",
-  EvaluationController.handleSupervisorEvaluation
-);
-Router.post("/pmo-evaluation", EvaluationController.getPmoEvaulation);
-Router.post("/add-pmo-evaluation", EvaluationController.handlePmoEvaluation);
-Router.post("/d2-evaluation", EvaluationController.getD2Evaulation);
-Router.post("/add-d2-evaluation", EvaluationController.handleD2Evaluation);
-Router.post("/d3-evaluation", EvaluationController.getD3Evaulation);
-Router.post("/add-d3-evaluation", EvaluationController.handleD3Evaluation);
+Router.post("/get-review-status", CommitteeReview.getEndorsementStatus);
+Router.post("/add-comment", CommitteeReview.addComment);
 module.exports = Router;

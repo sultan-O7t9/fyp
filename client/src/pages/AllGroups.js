@@ -107,28 +107,18 @@ const AllGroups = () => {
   }, [isPMO, showAddSemester, showManageGroup]);
 
   useEffect(() => {
-    const headers = isPMO
-      ? [
-          "Group ID",
-          "Members",
-          "",
-          "Project Title",
-          "Supervisor",
-          "Booklets Status",
-          "Booklets Comment",
-          "",
-          "",
-        ]
-      : [
-          "Group ID",
-          "Members",
-          "",
-          "Project Title",
-          "Booklets Status",
-          "Booklets Comment",
-          "",
-        ];
-    if (!isPMO) setHeads(headers);
+    const headers = [
+      "Group ID",
+      "Members",
+      "",
+      "Project Title",
+      "Supervisor",
+      "Booklets Status",
+      "Booklets Comment",
+      "",
+      "",
+    ];
+    setHeads(headers);
   }, [isPMO, showManageGroup, showAddSemester]);
 
   useEffect(() => {
@@ -205,7 +195,7 @@ const AllGroups = () => {
     );
   const importDataHandler = async importedData => {
     console.log(importedData);
-    return;
+    // return;
     setIsLoading(true);
 
     //ok
@@ -216,46 +206,76 @@ const AllGroups = () => {
     const indexOfName = importedData.heads.findIndex(item =>
       item.includes("ame")
     );
+    const indexOfDepartment = importedData.heads.findIndex(item =>
+      item.includes("epartment")
+    );
+    const indexOfGroup = importedData.heads.findIndex(item =>
+      item.includes("roup")
+    );
+
     // console.log(indexOfRoll, indexOfName);
     // //this will show us which column contains roll no and name
     // console.log(indexOfRoll, indexOfName);
     const dataHeads = [
       importedData.heads[indexOfRoll],
       importedData.heads[indexOfName],
-      "Group",
+      importedData.heads[indexOfDepartment],
+      importedData.heads[indexOfGroup],
     ];
-    const students = importedData.data
-      .map(item => {
-        if (item[indexOfRoll] && item[indexOfName])
-          return {
-            rollNo: item[indexOfRoll],
-            name: item[indexOfName],
-          };
-        else return null;
-      })
-      .filter(item => item != null);
-    const alreadyCreatedStudents = body.map(item => item.rollNo);
-    const studentsToCreate = students.filter(
-      item => !alreadyCreatedStudents.includes(item.rollNo)
-    );
-    console.log(studentsToCreate);
+    const uniqueGroups = [
+      ...new Set(importedData.data.map(d => d[indexOfGroup])),
+    ];
+    console.log(uniqueGroups);
+
+    const groups = uniqueGroups.map(item => {
+      return {
+        groupId: item,
+        members: importedData.data
+          .filter(d => d[indexOfGroup] === item)
+          .map(d => {
+            return d[indexOfRoll];
+          }),
+        leader: importedData.data.filter(d => d[indexOfGroup] === item)[0][
+          indexOfRoll
+        ],
+        department: importedData.data.filter(d => d[indexOfGroup] === item)[0][
+          indexOfDepartment
+        ],
+      };
+    });
+
+    // const students = importedData.data
+    //   .map(item => {
+    //     if (item[indexOfRoll] && item[indexOfName]&& item[indexOfDepartment]&& item[indexOfGroup]) {
+    //       return {
+    //         rollNo: item[indexOfRoll],
+    //         name: item[indexOfName],
+    //       };
+    //     else return null;
+    //   })
+    //   .filter(item => item != null);
+    // const alreadyCreatedStudents = body.map(item => item.rollNo);
+    // const studentsToCreate = students.filter(
+    //   item => !alreadyCreatedStudents.includes(item.rollNo)
+    // );
+    console.log(groups);
     // return;
     //Now send request to server and create studetns there, render the response array in table
-    // try {
-    //   const response = await axios.post(
-    //     "http://localhost:5000/api/student/create-all",
-    //     { students: studentsToCreate }
-    //   );
-
-    //   if (response.status === 200) {
-    //     setIsLoading(false);
-    //     setHeads(dataHeads);
-    //     // setBody(response.data.students);
-    //     setRefresh(refresh => !refresh);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/group/create-many",
+        { groups }
+      );
+      console.log(response.data);
+      if (response.status === 200) {
+        setIsLoading(false);
+        setHeads(dataHeads);
+        // setBody(response.data.students);
+        // setRefresh(refresh => !refresh);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const selectCurrentSemesterHandler = async sem => {
@@ -337,7 +357,8 @@ const AllGroups = () => {
                       " ",
                       "_"
                     )}
-                    head={heads.filter(head => head !== "Booklets Comment")}
+                    // head={heads.filter(head => head !== "Booklets Comment")}
+                    head={heads}
                     body={body.map(row => ({
                       id: row.id,
                       members: row.members.map(member => member.rollNo),

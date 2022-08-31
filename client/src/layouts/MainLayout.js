@@ -21,7 +21,12 @@ const MainLayout = props => {
     //   icon: "menubook",
     // },
     {
-      name: roles && roles.includes("SUPERVISOR") ? "My Groups" : "Groups",
+      name:
+        roles && roles.includes("SUPERVISOR")
+          ? "My Groups"
+          : roles && roles.includes("PMO")
+          ? "Groups"
+          : null,
       path: "/groups",
       icon: "group",
     },

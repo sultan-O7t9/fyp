@@ -13,6 +13,9 @@ const {
   D3Evaluation,
   SupervisorEvaluation,
   PmoEvaluation,
+  PMO,
+  CommitteeReview,
+  Version,
 } = require("../models");
 
 class EvaluationController {
@@ -138,9 +141,17 @@ class EvaluationController {
           id: userId,
         },
       });
+      const deptsOfPMO = await PMO.findAll({
+        where: {
+          pmoId: pmo.id,
+        },
+      });
+      const depts = deptsOfPMO.map(dept => dept.deptId);
       const groups = await Group.findAll({
         where: {
-          departmentId: pmo.departmentId,
+          departmentId: {
+            [sequelize.Op.or]: depts,
+          },
         },
       });
       if (groups.length > 0) {
@@ -152,6 +163,25 @@ class EvaluationController {
               deliverableId: deliverableId,
             },
           });
+
+          const committeeReview = await CommitteeReview.findOne({
+            where: {
+              groupId: groups[i].id,
+              deliverableId: deliverableId,
+              committeeId: groups[i].committeeId,
+            },
+          });
+
+          const versions = await Version.findAll({
+            where: {
+              groupId: groups[i].id,
+              deliverableId: deliverableId,
+            },
+          });
+          const latestVersion = versions
+            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+            .pop();
+
           // schedules.push(schedule);
           const committee = await Committee.findOne({
             where: {
@@ -199,6 +229,8 @@ class EvaluationController {
                 id: project ? project.id : null,
                 name: project ? project.title : null,
               },
+              submission: latestVersion,
+              committeeReview: committeeReview,
               group: {
                 id: groups[i].id,
                 name: groups[i].name,

@@ -18,10 +18,52 @@ const {
   Project,
   Student,
   Semester,
+  EvaluationLog,
+  CommitteeReview,
 } = require("../models");
 const { Op } = require("sequelize");
 
 class DeliverableController {
+  static setLogs = async (req, res) => {
+    const { deliverableId, groupId, text } = req.body;
+    try {
+      const log = await EvaluationLog.create({
+        text,
+        deliverableId,
+        groupId,
+      });
+      res.status(200).json({
+        message: "Log created successfully",
+        log,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting Logs",
+        error,
+        get: false,
+      });
+    }
+  };
+  static getLogs = async (req, res) => {
+    const { deliverableId, groupId } = req.body;
+    try {
+      const logs = await EvaluationLog.findAll({
+        where: {
+          deliverableId,
+          groupId,
+        },
+      });
+      res.status(200).json(logs);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting Logs",
+        error,
+        get: false,
+      });
+    }
+  };
   static getAllDeliverables = async (req, res) => {
     try {
       const deliverables = await Deliverable.findAll();
@@ -315,6 +357,7 @@ class DeliverableController {
   };
   static getGroupDeliverableSubmission = async (req, res) => {
     const { deliverableId, groupId } = req.body;
+    console.log("-----------------------------REQ");
     try {
       // console.log(deliverableId, groupId);
       // try{}
@@ -325,10 +368,19 @@ class DeliverableController {
         },
       });
       console.log(versions.dataValues);
+      const committeeReview = await CommitteeReview.findOne({
+        where: {
+          deliverableId,
+          groupId,
+        },
+      });
 
       res.json({
         message: "Versions fetched successfully",
-        versions,
+        versions: versions.map(version => ({
+          ...version,
+          committeeReview: version.status == "Approved" ? committeeReview : {},
+        })),
         get: true,
       });
     } catch (error) {
@@ -341,6 +393,7 @@ class DeliverableController {
     }
   };
   static getGroupDeliverableSubmission = async (req, res) => {
+    console.log("------------------REQ3");
     const { deliverableId, groupId } = req.body;
     try {
       // console.log(deliverableId, groupId);
@@ -351,11 +404,21 @@ class DeliverableController {
           groupId,
         },
       });
-      console.log(versions.dataValues);
+      // console.log(versions.dataValues);
+      const committeeReview = await CommitteeReview.findOne({
+        where: {
+          deliverableId,
+          groupId,
+        },
+      });
 
       res.json({
         message: "Versions fetched successfully",
-        versions,
+        versions: versions.map(version => ({
+          ...version.dataValues,
+          committeeReview: version.status == "Approved" ? committeeReview : {},
+        })),
+
         get: true,
       });
     } catch (error) {
@@ -369,6 +432,7 @@ class DeliverableController {
   };
   static getGroupsDeliverableSubmissionByDept = async (req, res) => {
     const { deliverableId, userId } = req.body;
+    console.log("-------------------REQ2");
     try {
       // console.log(deliverableId, groupId);
       // try{}
@@ -503,6 +567,7 @@ class DeliverableController {
     }
   };
   static getGroupsDeliverableSubmissionBySupervisor = async (req, res) => {
+    console.log("------------------REQ4");
     const { deliverableId, userId } = req.body;
     try {
       // console.log(deliverableId, groupId);

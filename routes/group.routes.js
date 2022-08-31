@@ -13,6 +13,7 @@ const multer = require("multer");
 const upload = multer();
 
 Router.post("/create", verifyToken, Group.createGroup);
+Router.post("/create-many", verifyToken, Group.createManyGroups);
 // Router.get("/get/dept", verifyToken, Group.getGroupsByDepartment);
 Router.get("/get/dept", Group.getGroupsByDepartment);
 Router.post("/change/password", Group.changePassword);

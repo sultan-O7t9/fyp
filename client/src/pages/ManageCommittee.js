@@ -125,15 +125,13 @@ const ManageCommittee = props => {
     }
     // return;
     axios
-      .get(
-        "http://localhost:5000/api/group/get-all/" +
-          localStorage.getItem("USER_ID")
-      )
+      .get("http://localhost:5000/api/group/get-groups/")
       .then(res => {
         console.log(res.data);
         console.log(evaluators.includes(1));
         console.log(res.data.groups);
         setGroups([]);
+        console.log(evaluators);
         setGroupItems(
           committee.hasOwnProperty("Groups")
             ? res.data.groups

@@ -10,7 +10,7 @@ const Router = require("express").Router();
 Router.get("/get-supervisors", Faculty.getAllSupervisors);
 Router.get("/get-supervisors-only", Faculty.getAllSupervisorsOnly);
 Router.get("/get-supervisor-all", Faculty.getAllSupervisorsList);
-
+Router.post("/get-sup-id", Faculty.getAllSupervisorById);
 Router.post("/register", Faculty.registerFaculty);
 Router.patch("/update", Faculty.updateFaculty);
 Router.patch("/pmo/assign", Faculty.assignPMO);

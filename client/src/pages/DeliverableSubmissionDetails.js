@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
+  Backdrop,
   Button,
+  Container,
   IconButton,
   List,
   ListItem,
@@ -11,6 +13,8 @@ import {
   TextareaAutosize,
   Typography,
 } from "@mui/material";
+import CancelIcon from "@mui/icons-material/Cancel";
+
 import { Box } from "@mui/system";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContainerFluid from "../components/ContainerFluid";
@@ -18,7 +22,7 @@ import DataTable from "../components/DataTable";
 import Link from "../components/Link";
 import Main from "../components/Main";
 import MenuButton from "../components/MenuButton";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 import UploadFile from "../components/UploadFile";
 import Toast from "../components/Toast";
@@ -26,18 +30,15 @@ import Toast from "../components/Toast";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
-import DeliverableSubmissionDetail from "./DeliverableSubmissionDetails";
 // import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 
 const DataHead = () => null;
 
-const DataBody = () => {
+const DataBody = ({ versionData }) => {
   const role = localStorage.getItem("USER_ROLE");
   const history = useHistory();
 
   const [deliverableData, setDeliverableData] = useState({});
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [detailedItem, setDetailedItem] = useState({});
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [file, setFile] = useState({ name: "" });
   const [submissionData, setSubmissionData] = useState({});
@@ -152,15 +153,7 @@ const DataBody = () => {
                     Delete
                   </Button>
                 ) : null}
-                <Button
-                  size="small"
-                  onClick={() => {
-                    console.log(item);
-                    setDetailedItem(item);
-                    setShowDetailsModal(true);
-                  }}
-                  variant="outlined"
-                >
+                <Button size="small" onClick={() => {}} variant="outlined">
                   Show Details
                 </Button>
               </div>
@@ -329,13 +322,6 @@ const DataBody = () => {
 
   return (
     <>
-      {showDetailsModal ? (
-        <DeliverableSubmissionDetail
-          deliverableId={1}
-          data={detailedItem}
-          setDisplay={setShowDetailsModal}
-        />
-      ) : null}
       {showDeleteModal ? (
         <DeleteConfirmationDialog
           itemType="Group"
@@ -360,7 +346,7 @@ const DataBody = () => {
 
       <TableRow>
         <TableCell colSpan={2}>
-          <Typography variant="h4">{deliverableData.title}</Typography>
+          {/* <Typography variant="h4">{deliverableData.title}</Typography> */}
         </TableCell>
       </TableRow>
       <TableRow>
@@ -380,84 +366,34 @@ const DataBody = () => {
           </Typography>
         </TableCell>
       </TableRow>
-      {deliverableData.template ? (
+
+      {deliverableData.template && deliverableData.deadline ? (
         <TableRow>
           <TableCell>
-            <Typography variant="h6">Template</Typography>
+            <Typography variant="h6">Submission File</Typography>
           </TableCell>
           <TableCell>
-            <form onSubmit={downloadTemplateFile} className="form">
+            <form
+              onSubmit={e => {
+                downloadVersionFile(e, versionData.name);
+              }}
+              className="form"
+            >
               <Button variant="text" type="submit">
-                {deliverableData.template}
+                {versionData.name}
               </Button>
             </form>
           </TableCell>
         </TableRow>
       ) : null}
-      {deliverableData.template && deliverableData.deadline ? (
-        <TableRow>
-          <TableCell>
-            <Typography variant="h6">Submission File</Typography>
-            {submissionData.length > 0 ? (
-              <form
-                onSubmit={e => {
-                  downloadVersionFile(e, submissionData[0].name);
-                }}
-                className="form"
-              >
-                <Button variant="text" type="submit">
-                  {submissionData[0].name}
-                </Button>
-              </form>
-            ) : (
-              <Typography variant="body">No submission</Typography>
-            )}
-          </TableCell>
-          <TableCell>
-            {!submissionData.length ? (
-              <Button
-                disabled={
-                  deliverableData.deadline &&
-                  new Date(
-                    new Date(deliverableData.deadline).getTime() +
-                      extensionData.days * 86400000
-                  ) < new Date()
-                }
-                color="primary"
-                variant="contained"
-                onClick={submitProposal}
-              >
-                Upload Deliverable
-              </Button>
-            ) : null}
-            {submissionData.length > 0 &&
-            submissionData[0].status != "Approved" ? (
-              <Button
-                disabled={
-                  deliverableData.deadline &&
-                  new Date(
-                    new Date(deliverableData.deadline).getTime() +
-                      extensionData.days * 86400000
-                  ) < new Date()
-                }
-                color="primary"
-                variant="contained"
-                onClick={submitProposal}
-              >
-                Upload Deliverable
-              </Button>
-            ) : null}
-          </TableCell>
-        </TableRow>
-      ) : null}
       <TableRow>
         <TableCell>
-          <Typography variant="h6">Evaluation Status</Typography>
+          <Typography variant="h6">Supervisor Endorsement</Typography>
         </TableCell>
 
         <TableCell>
-          {submissionData.length > 0 && submissionData[0].eval_status ? (
-            submissionData[0].eval_status == "Approved" ? (
+          {versionData.status ? (
+            versionData.status == "Approved" ? (
               <Typography
                 variant="body"
                 style={{
@@ -468,7 +404,7 @@ const DataBody = () => {
               >
                 Approved
               </Typography>
-            ) : submissionData[0].eval_status == "Revised" ? (
+            ) : versionData.status == "Revised" ? (
               <Typography
                 variant="body"
                 style={{
@@ -505,12 +441,118 @@ const DataBody = () => {
           )}
         </TableCell>
       </TableRow>
+      {deliverableData.template && deliverableData.deadline ? (
+        <TableRow>
+          <TableCell>
+            <Typography variant="h6">
+              Commented Document by Supervisor
+            </Typography>
+          </TableCell>
+          <TableCell>
+            {versionData.commented_doc ? (
+              <form
+                onSubmit={e => {
+                  downloadVersionFile(e, versionData.name);
+                }}
+                className="form"
+              >
+                <Button variant="text" type="submit">
+                  {versionData.commented_doc}
+                </Button>
+              </form>
+            ) : (
+              <Typography variant="body">None</Typography>
+            )}
+          </TableCell>
+        </TableRow>
+      ) : null}
+      <TableRow>
+        <TableCell>
+          <Typography variant="h6">Evaluation Status</Typography>
+        </TableCell>
+
+        <TableCell>
+          {versionData.eval_status ? (
+            versionData.eval_status == "Approved" ? (
+              <Typography
+                variant="body"
+                style={{
+                  color: "green",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                Approved
+              </Typography>
+            ) : versionData.eval_status == "Revised" ? (
+              <Typography
+                variant="body"
+                style={{
+                  color: "red",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                Revised
+              </Typography>
+            ) : (
+              <Typography
+                variant="body"
+                style={{
+                  color: "orange",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                Pending
+              </Typography>
+            )
+          ) : (
+            <Typography
+              variant="body"
+              style={{
+                color: "orange",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            >
+              Pending
+            </Typography>
+          )}
+        </TableCell>
+      </TableRow>
+      {deliverableData.template && deliverableData.deadline ? (
+        <TableRow>
+          <TableCell>
+            <Typography variant="h6">
+              Commented Document by Evaluator
+            </Typography>
+          </TableCell>
+          <TableCell>
+            {versionData.eval_commented_doc ? (
+              <form
+                onSubmit={e => {
+                  downloadVersionFile(e, versionData.name);
+                }}
+                className="form"
+              >
+                <Button variant="text" type="submit">
+                  {versionData.commented_doc}
+                </Button>
+              </form>
+            ) : (
+              <Typography variant="body">None</Typography>
+            )}
+          </TableCell>
+        </TableRow>
+      ) : null}
+
       {/* <TableRow>
         <TableCell>
           <Typography variant="h6">Commented Document by Committee</Typography>
         </TableCell>
         <TableCell>
-          {submissionData.length > 0 && submissionData[0].eval_commented_doc ? (
+          {submissionData.length > 0 && versionData.eval_commented_doc ? (
             <Button
               onClick={() => {
                 const win = window.open(
@@ -528,97 +570,68 @@ const DataBody = () => {
           )}
         </TableCell>
       </TableRow> */}
-      <TableRow>
-        <TableCell colSpan={2}>
-          <Typography variant="h6">Version History</Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell colSpan={2}>
-          <ReactDataGrid
-            idProperty="id"
-            columns={gridCols}
-            // selected={selectedGroups}
-            // checkboxColumn
-            // onSelectionChange={onSelectionChange}
-            dataSource={gridData}
-            rowHeight={100}
-            style={{
-              height: "calc(100vh - 230px)",
-            }}
-          />
-        </TableCell>
-        {/* <TableCell colSpan={2}>
-          {submissionData.length > 0 ? (
-            <ul>
-              {submissionData.map((submission, index) => (
-                <li key={index}>
-                  <form
-                    onSubmit={e => {
-                      downloadVersionFile(e, submission.name);
-                    }}
-                    className="form"
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Button variant="text" type="submit">
-                        {submission.name}
-                      </Button>
-                      <IconButton
-                        onClick={() => {
-                          console.log("deleting " + submission.name);
-                          deleteVersion(submission.name);
-                        }}
-                        color="error"
-                        variant="outlined"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </div>
-                  </form>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <Typography variant="body">No submissions</Typography>
-          )}
-          
-        </TableCell> */}
-      </TableRow>
     </>
   );
 };
 
-const ProposalSubmissionPage = () => {
+const DeliverableSubmissionDetail = props => {
+  const { deliverableId, data, setDisplay } = props;
+  console.log(data);
+
   const groupName = localStorage.getItem("GROUP_NAME");
   return (
-    <ContainerFluid title={groupName} maxWidth="lg">
-      <Main styles={{ padding: "1.5rem" }}>
-        <Box
-          sx={{ marginBottom: "3rem" }}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          {/* <Box>
+    <Backdrop
+      sx={{
+        color: "#000",
+        zIndex: theme => theme.zIndex.drawer + 1,
+      }}
+      open={true}
+    >
+      <Container
+        // title={groupName}
+        maxWidth="lg"
+        style={{ maxHeight: "95vh", overflowY: "auto" }}
+      >
+        <Main styles={{ padding: "1.5rem" }}>
+          <Box
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <IconButton
+              onClick={() => {
+                setDisplay(false);
+              }}
+            >
+              <CancelIcon style={{ color: "red" }} fontSize="large" />
+            </IconButton>
+          </Box>
+          <Box
+            sx={{ marginBottom: "3rem" }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            {/* <Box>
             <Typography variant="h3">SE_18_1 Proposal</Typography>
           </Box> */}
-          {/* <Box>
+            {/* <Box>
             <Button variant="contained" color="primary">
               Settings
             </Button>
           </Box> */}
-        </Box>
+          </Box>
 
-        <DataTable DataHead={DataHead} DataBody={DataBody} />
-      </Main>
-    </ContainerFluid>
+          <DataTable
+            DataHead={DataHead}
+            DataBody={() => <DataBody versionData={data} />}
+          />
+        </Main>
+      </Container>
+    </Backdrop>
   );
 };
 
-export default ProposalSubmissionPage;
+export default DeliverableSubmissionDetail;

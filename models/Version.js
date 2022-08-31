@@ -16,6 +16,17 @@ module.exports = (sequelize, DataTypes) => {
       comment: {
         type: DataTypes.STRING,
       },
+      eval_status: {
+        type: DataTypes.STRING,
+        defaultValue: "Pending",
+        //Approved, Revised, Pending
+      },
+      eval_comment: {
+        type: DataTypes.STRING,
+      },
+      eval_commented_doc: {
+        type: DataTypes.STRING,
+      },
     },
 
     {

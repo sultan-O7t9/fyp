@@ -15,10 +15,12 @@ import Select from "./Select";
 // import styles from "./auth.styles";
 
 const AddStudent = props => {
-  const { setDisplay } = props;
+  const { setDisplay, students } = props;
+  console.log(students);
   const [committee, setCommittee] = useState([]);
   const [evaluationDate, setEvaluationDate] = useState("");
   const [groupItems, setGroupItems] = useState([]);
+  const [error, setError] = useState(false);
   const [groups, setGroups] = useState([]);
   const [data, setData] = useState([]);
 
@@ -76,6 +78,11 @@ const AddStudent = props => {
   // }, []);
 
   const registerHandler = async () => {
+    if (students.find(student => student === rollNo)) {
+      alert("Student already exists");
+      setError(true);
+      return;
+    }
     try {
       const res = await axios.post("http://localhost:5000/api/student/create", {
         name,
@@ -136,8 +143,12 @@ const AddStudent = props => {
             style={styles.input}
             value={rollNo}
             placeholder="Roll #"
+            error={error}
             // disabled={faculty.hasOwnProperty("email")}
-            onChange={e => setRollNo(e.target.value)}
+            onChange={e => {
+              setError(false);
+              setRollNo(e.target.value);
+            }}
           />
 
           <Select
@@ -149,7 +160,7 @@ const AddStudent = props => {
           />
           <Button
             style={styles.input}
-            // disabled={!name || !department || !email}
+            disabled={!name || !rollNo || !dept}
             size="large"
             variant="contained"
             onClick={registerHandler}

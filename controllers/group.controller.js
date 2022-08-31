@@ -12,6 +12,7 @@ const {
   Project,
   Admin,
   Committee,
+  Semester,
 } = require("../models");
 const sequelize = require("sequelize");
 var crypto = require("crypto");
@@ -40,8 +41,8 @@ class GroupController {
         members.map(student => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",
-            subject: "Ignore - FYP Groups",
-            body: `Testing...
+            subject: "Updating FYP Group",
+            body: `
              Your group has been updated.
              Group members:
                 ${members.map(member => member.dataValues.rollNo).join(", ")} 
@@ -302,7 +303,23 @@ class GroupController {
         leader: true,
       });
 
-      if (currentSupervisor.dataValues.id != req.body.supervisor) {
+      if (!currentSupervisor) {
+        await group.update({
+          supervisorId: supervisor,
+        });
+        res.json({
+          message: "Group updated successfully",
+          group: {
+            id: group.dataValues.name,
+            members: newMembers.map(student => ({
+              rollNo: student.dataValues.rollNo,
+              name: student.dataValues.name,
+            })),
+            leader: leader,
+            supervisor: supervisor,
+          },
+        });
+      } else if (currentSupervisor.dataValues.id != req.body.supervisor) {
         await currentSupervisor.update({
           groupId: null,
         });
@@ -353,6 +370,110 @@ class GroupController {
     }
   };
 
+  static createManyGroups = async (req, res) => {
+    // const { id, role } = req.user;
+    const { groups } = req.body;
+    try {
+      const newGroups = await Promise.all(
+        groups.map(async group => {
+          const department = await Department.findOne({
+            where: {
+              name: group.department,
+            },
+          });
+
+          const newGroup = await Group.create({
+            departmentId: department.dataValues.id,
+            name: new Date().getTime().toString(),
+            password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+          });
+          await newGroup.update({
+            name: `${department.dataValues.name}_${
+              new Date().getFullYear() - 2004
+            }_${newGroup.dataValues.id}`,
+          });
+          const grpMems = [];
+          const members = await Promise.all(
+            group.members.map(async member => {
+              const student = await Student.findOne({
+                where: {
+                  rollNo: member,
+                  groupId: null,
+                },
+              });
+              if (student) {
+                await student.update({
+                  groupId: newGroup.dataValues.id,
+                });
+                grpMems.push(student.dataValues.rollNo);
+              }
+            })
+          );
+
+          const leader = await Student.findOne({
+            where: {
+              rollNo: group.leader,
+              groupId: newGroup.dataValues.id,
+            },
+          });
+          await leader.update({
+            leader: true,
+          });
+          console.log(leader.dataValues.rollNo);
+          console.log(grpMems);
+          sendMail(
+            [leader].map(student => {
+              return {
+                email: student.dataValues.rollNo + "@uog.edu.pk",
+                subject: "FYP Group Creation",
+                body: `
+             Your group has been created, successfully.
+             Group members:
+                ${grpMems.join(", ")}
+
+             Your credentials are:
+                Username: ${newGroup.dataValues.name}
+                Password:${newGroup.dataValues.password}
+             Login to submit your FYP Idea.
+             `,
+              };
+            })
+          );
+
+          return newGroup;
+        })
+      );
+      // const leaderStudent = members.find(
+      //   student => student.dataValues.leader == 1
+      // );
+      // console.log(leaderStudent);
+
+      // await members.map(async member => {
+      //   await member.update({
+      //     password: null,
+      //   });
+      // });
+
+      //TODO:
+      //Sign in as supervisor
+      //Display groups on dashbaord
+      //Allow accept and reject supervision.
+      //If supervisor accepts, send email to students
+      //If reject set supervisorId to null and send email to students for choosing supervisor again.
+
+      res.json({
+        register: true,
+        message: "Group created successfully",
+        groups: newGroups,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error creating group",
+        error,
+      });
+    }
+  };
   static createGroup = async (req, res) => {
     const { id, role } = req.user;
 
@@ -414,8 +535,8 @@ class GroupController {
           [leaderStudent].map(student => {
             return {
               email: student.dataValues.rollNo + "@uog.edu.pk",
-              subject: "Ignore - FYP Groups",
-              body: `Testing...
+              subject: "FYP Group Creating",
+              body: `
                Your group has been created, successfully.
                Group members:
                   ${members.map(member => member.dataValues.rollNo).join(", ")} 
@@ -643,12 +764,21 @@ class GroupController {
             };
           });
 
+          const semester = await Semester.findOne({
+            where: {
+              id: group.dataValues.semesterId,
+            },
+          });
+
           return {
             id: group.dataValues.name,
             committeeId: group.dataValues.committeeId,
             project: group.dataValues.project,
             members: group.dataValues.members,
-            supervisor: supervisor.dataValues.name,
+            semesterTitle: semester ? semester.dataValues.title : null,
+            supervisor: supervisor ? supervisor.dataValues.name : null,
+            supervisorId: group.dataValues.supervisorId,
+            // supervisor: supervisor.dataValues.name,
             bookletsStatus: group.dataValues.bookletsStatus,
             department: department ? department.dataValues.name : null,
             bookletsComment: group.dataValues.bookletsComment,
@@ -711,7 +841,7 @@ class GroupController {
               leader: member.dataValues.leader,
             };
           });
-
+          console.log(supervisor.dataValues);
           return {
             id: group.dataValues.name,
             committeeId: group.dataValues.committeeId,

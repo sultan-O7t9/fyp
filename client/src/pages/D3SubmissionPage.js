@@ -27,6 +27,7 @@ import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 // import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import DeliverableSubmissionDetail from "./DeliverableSubmissionDetails";
 
 const DataHead = () => null;
 
@@ -35,6 +36,8 @@ const DataBody = () => {
   const history = useHistory();
 
   const [deliverableData, setDeliverableData] = useState({});
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailedItem, setDetailedItem] = useState({});
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [file, setFile] = useState({ name: "" });
   const [submissionData, setSubmissionData] = useState({});
@@ -44,6 +47,7 @@ const DataBody = () => {
   const [gridCols, setGridCols] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [toDelete, setToDelete] = useState(null);
+  const [extensionData, setExtensionData] = useState({});
 
   useEffect(() => {
     const getData = async () => {
@@ -80,6 +84,28 @@ const DataBody = () => {
     getData();
   }, [showUploadModal]);
 
+  useEffect(() => {
+    const getExtensionInfo = async () => {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/deliverable/ex-get-grp",
+          {
+            deliverableId: 3,
+            groupId: localStorage.getItem("USER_ID"),
+          }
+        );
+        let ex = {};
+        console.log(res.data);
+        if (res.data.hasOwnProperty("extension")) ex = res.data.extension;
+        setExtensionData(ex);
+        console.log(ex);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getExtensionInfo();
+  }, []);
+
   const downloadTemplateFile = async e => {
     e.preventDefault();
     try {
@@ -109,19 +135,33 @@ const DataBody = () => {
                   width: "100%",
                   height: "100%",
                   display: "flex",
-                  justifyContent: "space-between",
+                  justifyContent: "center",
                 }}
               >
+                {item.status == "Pending" ? (
+                  <Button
+                    style={{ marginRight: "1rem" }}
+                    size="small"
+                    onClick={() => {
+                      setShowDeleteModal(true);
+                      setToDelete(item);
+                    }}
+                    variant="contained"
+                    color="error"
+                  >
+                    Delete
+                  </Button>
+                ) : null}
                 <Button
                   size="small"
                   onClick={() => {
-                    setShowDeleteModal(true);
-                    setToDelete(item);
+                    console.log(item);
+                    setDetailedItem(item);
+                    setShowDetailsModal(true);
                   }}
-                  variant="contained"
-                  color="error"
+                  variant="outlined"
                 >
-                  Delete
+                  Show Details
                 </Button>
               </div>
             ),
@@ -154,8 +194,8 @@ const DataBody = () => {
       },
       {
         name: "status",
-        header: "Endorsement",
-        defaultFlex: 1,
+        header: "Supervisor Review",
+        defaultFlex: 2,
         render: ({ value }) => {
           const color =
             value == "Approved"
@@ -177,34 +217,52 @@ const DataBody = () => {
         },
       },
       {
-        name: "comment",
-        header: "Comment",
-        defaultFlex: 2,
-        render: ({ value }) => (value ? value : "None"),
-      },
-      {
-        name: "commented_doc",
-        header: "Commented Document",
+        name: "eval_status",
+        header: "Evaluation Status",
         defaultFlex: 2,
         render: ({ value }) => {
-          return value ? (
-            <Button
-              onClick={() => {
-                let url = "http://localhost:5000/" + value;
-                let win = window.open(url, "_blank");
-                win.focus();
+          const color =
+            value == "Approved"
+              ? "green"
+              : value == "Pending"
+              ? "orange"
+              : "red";
+          return (
+            <div
+              style={{
+                color: color,
+                fontWeight: "bold",
+                textTransform: "uppercase",
               }}
             >
               {value}
-            </Button>
-          ) : (
-            "None"
+            </div>
           );
         },
       },
+      // {
+      //   name: "commented_doc",
+      //   header: "Commented Doc By Supervisor",
+      //   defaultFlex: 3,
+      //   render: ({ value }) => {
+      //     return value ? (
+      //       <Button
+      //         onClick={() => {
+      //           let url = "http://localhost:5000/" + value;
+      //           let win = window.open(url, "_blank");
+      //           win.focus();
+      //         }}
+      //       >
+      //         {value}
+      //       </Button>
+      //     ) : (
+      //       "None"
+      //     );
+      //   },
+      // },
       {
         name: "actions",
-        defaultFlex: 1,
+        defaultFlex: 2,
         header: "Actions",
       },
     ];
@@ -271,6 +329,13 @@ const DataBody = () => {
 
   return (
     <>
+      {showDetailsModal ? (
+        <DeliverableSubmissionDetail
+          deliverableId={3}
+          data={detailedItem}
+          setDisplay={setShowDetailsModal}
+        />
+      ) : null}
       {showDeleteModal ? (
         <DeleteConfirmationDialog
           itemType="Group"
@@ -305,7 +370,12 @@ const DataBody = () => {
         <TableCell>
           <Typography variant="body">
             {deliverableData.deadline
-              ? new Date(deliverableData.deadline).toUTCString()
+              ? extensionData.hasOwnProperty("days")
+                ? new Date(
+                    new Date(deliverableData.deadline).getTime() +
+                      extensionData.days * 86400000
+                  ).toUTCString()
+                : new Date(deliverableData.deadline).toDateString()
               : "None"}
           </Typography>
         </TableCell>
@@ -327,6 +397,7 @@ const DataBody = () => {
       {deliverableData.template && deliverableData.deadline ? (
         <TableRow>
           <TableCell>
+            <Typography variant="h6">Submission File</Typography>
             {submissionData.length > 0 ? (
               <form
                 onSubmit={e => {
@@ -343,20 +414,120 @@ const DataBody = () => {
             )}
           </TableCell>
           <TableCell>
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={submitProposal}
-              disabled={
-                deliverableData.deadline &&
-                new Date(deliverableData.deadline) < new Date()
-              }
-            >
-              Upload Deliverable
-            </Button>
+            {!submissionData.length ? (
+              <Button
+                disabled={
+                  deliverableData.deadline &&
+                  new Date(
+                    new Date(deliverableData.deadline).getTime() +
+                      extensionData.days * 86400000
+                  ) < new Date()
+                }
+                color="primary"
+                variant="contained"
+                onClick={submitProposal}
+              >
+                Upload Deliverable
+              </Button>
+            ) : null}
+            {submissionData.length > 0 &&
+            submissionData[0].status != "Approved" ? (
+              <Button
+                disabled={
+                  deliverableData.deadline &&
+                  new Date(
+                    new Date(deliverableData.deadline).getTime() +
+                      extensionData.days * 86400000
+                  ) < new Date()
+                }
+                color="primary"
+                variant="contained"
+                onClick={submitProposal}
+              >
+                Upload Deliverable
+              </Button>
+            ) : null}
           </TableCell>
         </TableRow>
       ) : null}
+      <TableRow>
+        <TableCell>
+          <Typography variant="h6">Evaluation Status</Typography>
+        </TableCell>
+
+        <TableCell>
+          {submissionData.length > 0 && submissionData[0].eval_status ? (
+            submissionData[0].eval_status == "Approved" ? (
+              <Typography
+                variant="body"
+                style={{
+                  color: "green",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                Approved
+              </Typography>
+            ) : submissionData[0].eval_status == "Revised" ? (
+              <Typography
+                variant="body"
+                style={{
+                  color: "red",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                Revised
+              </Typography>
+            ) : (
+              <Typography
+                variant="body"
+                style={{
+                  color: "orange",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                Pending
+              </Typography>
+            )
+          ) : (
+            <Typography
+              variant="body"
+              style={{
+                color: "orange",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            >
+              Pending
+            </Typography>
+          )}
+        </TableCell>
+      </TableRow>
+      {/* <TableRow>
+        <TableCell>
+          <Typography variant="h6">Commented Document by Committee</Typography>
+        </TableCell>
+        <TableCell>
+          {submissionData.length > 0 && submissionData[0].eval_commented_doc ? (
+            <Button
+              onClick={() => {
+                const win = window.open(
+                  "http://localhost:5000/" +
+                    submissionData[0].eval_commented_doc,
+                  "_blank"
+                );
+                win.focus();
+              }}
+            >
+              {submissionData[0].eval_commented_doc}
+            </Button>
+          ) : (
+            <Typography variant="body">No Commented Document</Typography>
+          )}
+        </TableCell>
+      </TableRow> */}
       <TableRow>
         <TableCell colSpan={2}>
           <Typography variant="h6">Version History</Typography>
@@ -423,7 +594,7 @@ const DataBody = () => {
   );
 };
 
-const ProposalSubmissionPage = () => {
+const D3SubmissionPage = () => {
   const groupName = localStorage.getItem("GROUP_NAME");
   return (
     <ContainerFluid title={groupName} maxWidth="lg">
@@ -450,4 +621,4 @@ const ProposalSubmissionPage = () => {
   );
 };
 
-export default ProposalSubmissionPage;
+export default D3SubmissionPage;

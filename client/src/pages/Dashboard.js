@@ -83,10 +83,14 @@ const Dashboard = () => {
                 />
               );
             })}
-            <ItemCard
-              index={""}
-              item={{ id: 1, title: "Communication", link: "/comm" }}
-            />
+
+            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+              <ItemCard
+                index={""}
+                manual={true}
+                item={{ id: 1, title: "Communication", link: "/comm" }}
+              />
+            ) : null}
           </Box>
         </Main>
       </ContainerFluid>

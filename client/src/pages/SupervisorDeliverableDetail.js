@@ -152,7 +152,11 @@ const DataBody = () => {
           return submission.supervisorId == userId;
         });
 
-        setSubmissionsData(newData);
+        setSubmissionsData(
+          newData.filter(s => {
+            return s.submission.hasOwnProperty("name");
+          })
+        );
       } catch (error) {
         console.log(error);
       }
@@ -557,6 +561,9 @@ const SupervisorDeliverableDetail = props => {
   const [toastMessage, setToastMessage] = useState("");
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [supGroups, setSupGroups] = useState([]);
+  const [exGroup, setExGroup] = useState(null);
+  const [days, setDays] = useState([]);
   // const history=useHistory();
   const params = useParams();
   const deliverableId = params.id;
@@ -625,6 +632,57 @@ const SupervisorDeliverableDetail = props => {
     setShowScheduleModal(true);
   };
 
+  useEffect(() => {
+    const getGroups = async () => {
+      const userId = localStorage.getItem("USER_ID");
+      try {
+        const res2 = await axios.post(
+          "http://localhost:5000/api/group/get-groups-sup/",
+          {
+            userId,
+          }
+        );
+        console.log(res2.data.groups);
+        setSupGroups(res2.data.groups);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getGroups();
+  }, []);
+
+  const selectGroupHandler = g => {
+    setExGroup(g);
+  };
+
+  const handleExtension = async () => {
+    const data = {
+      groupId: exGroup,
+      deliverableId: deliverableId,
+      days: days,
+      supervisorId: localStorage.getItem("USER_ID"),
+    };
+
+    console.log(data);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/deliverable/req-ex",
+        data
+      );
+      console.log(res.data);
+      setToastMessage("Extension request sent successfully");
+      setShowToast(true);
+      setExGroup("");
+      setDays("");
+    } catch (err) {
+      console.log(err);
+      setToastMessage("Extension request failed");
+      setShowToast(true);
+      setExGroup("");
+      setDays("");
+    }
+  };
+
   return (
     <>
       {showToast ? (
@@ -688,8 +746,51 @@ const SupervisorDeliverableDetail = props => {
                 </Typography> */}
               </Box>
             </Box>
-            <Box>
-              {roles.includes("PMO") ? (
+            {roles.includes("SUPERVISOR") ? (
+              <Box>
+                <Box>
+                  <Select
+                    style={{ marginBottom: "1rem" }}
+                    label="Group"
+                    value={exGroup}
+                    setValue={selectGroupHandler}
+                    items={
+                      supGroups.length
+                        ? supGroups.map(g => ({
+                            id: g.id.split("_").pop(),
+                            value: g.id.split("_").pop(),
+                            text: g.id,
+                          }))
+                        : []
+                    }
+                  />
+                  <Select
+                    style={{ marginBottom: "1rem" }}
+                    label="Days"
+                    items={[...Array(10 - 1 + 1).keys()]
+                      .map(x => x + 1)
+                      .map(a => ({
+                        id: a,
+                        value: a,
+                        text: a,
+                      }))}
+                    value={days}
+                    setValue={days => setDays(days)}
+                  />
+                  <Button
+                    variant="contained"
+                    size="large"
+                    disabled={!days || !exGroup}
+                    onClick={handleExtension}
+                  >
+                    Request Extension
+                  </Button>
+                </Box>
+              </Box>
+            ) : null}
+
+            {roles.includes("PMO") ? (
+              <Box>
                 <Button
                   variant="contained"
                   onClick={handleSettings}
@@ -697,8 +798,8 @@ const SupervisorDeliverableDetail = props => {
                 >
                   Settings
                 </Button>
-              ) : null}
-            </Box>
+              </Box>
+            ) : null}
           </Box>
           <Card
             variant="outlined"

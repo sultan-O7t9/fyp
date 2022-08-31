@@ -21,8 +21,10 @@ import D3EvaluationPage from "./pages/D3EvaluationPage";
 import D3SubmissionPage from "./pages/D3SubmissionPage";
 import Dashboard from "./pages/Dashboard";
 import DeliverableDetail from "./pages/DeliverableDetail";
+import DeliverableSubmissionDetail from "./pages/DeliverableSubmissionDetails";
 import DetailedReport from "./pages/DetailedReport";
 import DetailedReportPage from "./pages/DetailedReportPage";
+import EvaluationScheduleDetail from "./pages/EvaluationScheduleDetail";
 import GroupDashboard from "./pages/GroupDashboard";
 import GroupDetail from "./pages/GroupDetail";
 import GroupLogin from "./pages/GroupLogin";
@@ -31,6 +33,7 @@ import ProposalEvaluationPage from "./pages/ProposalEvaluationPage";
 import ProposalSubmissionPage from "./pages/ProposalSubmissionPage";
 import Register from "./pages/Register";
 import RegisterGroup from "./pages/RegisterGroup";
+import ScheduleReport from "./pages/ScheduleReport";
 import SubmitProjectTitle from "./pages/SubmitProjectTitle";
 import SupervisorDeliverableDetail from "./pages/SupervisorDeliverableDetail";
 import SupervisorDocumentation from "./pages/SupervisorDocumentation";
@@ -124,6 +127,8 @@ const App = () => {
             : data.role[0]
         );
         setRoles(data.role);
+      } else {
+        localStorage.setItem("USER_ROLE", "ADMIN");
       }
     }
   }, [token]);
@@ -134,6 +139,7 @@ const App = () => {
       {/* <Route exact path="/file" component={UploadFile} /> */}
 
       <Route exact path="/report" component={DetailedReport} />
+      <Route exact path="/schedule-report" component={ScheduleReport} />
       <Route exact path="/login" component={Login} />
       <Route exact path="/group" component={GroupLogin} />
       <Route exact path="/admin" component={AdminLogin} />
@@ -146,6 +152,12 @@ const App = () => {
       ) : roles === "group" ? (
         <GroupMainLayout>
           <Route exact path="/main/student" component={GroupDashboard} />
+          <Route
+            exact
+            path="/main/deliverable/detail/:id"
+            component={DeliverableSubmissionDetail}
+          />
+
           <Route
             exact
             path="/main/proposal"
@@ -177,6 +189,11 @@ const App = () => {
           />
           <Route exact path="/" component={Dashboard} />
           <Route exact path="/deliverable/:id" component={DeliverableDetail} />
+          <Route
+            exact
+            path="/deliverable/sched/:id"
+            component={EvaluationScheduleDetail}
+          />
           <Route
             exact
             path="/sup/deliverable/:id"

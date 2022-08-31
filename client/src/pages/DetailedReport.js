@@ -469,15 +469,15 @@ const DataBody = props => {
 
     const gradeObj = {};
     for (const key in totalObj) {
-      const r = totalObj[key] / 2;
-      if (r >= 84.5) gradeObj[key] = "A+";
-      else if (r >= 79.5) gradeObj[key] = "A";
-      else if (r >= 74.5) gradeObj[key] = "B+";
-      else if (r >= 69.5) gradeObj[key] = "B";
-      else if (r >= 64.5) gradeObj[key] = "B-";
-      else if (r >= 59.5) gradeObj[key] = "C+";
-      else if (r >= 54.5) gradeObj[key] = "C";
-      else if (r >= 49.5) gradeObj[key] = "D";
+      const r = totalObj[key];
+      if (r >= 170) gradeObj[key] = "A+";
+      else if (r >= 160) gradeObj[key] = "A";
+      else if (r >= 150) gradeObj[key] = "B+";
+      else if (r >= 140) gradeObj[key] = "B";
+      else if (r >= 130) gradeObj[key] = "B-";
+      else if (r >= 120) gradeObj[key] = "C+";
+      else if (r >= 110) gradeObj[key] = "C";
+      else if (r >= 100) gradeObj[key] = "D";
       else gradeObj[key] = "F";
     }
     console.log(gradeObj);

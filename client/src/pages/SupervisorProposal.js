@@ -23,6 +23,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import RadioButtonGroup from "../components/RadioButtonGroup";
 import UploadFile from "../components/UploadFile";
+import Toast from "../components/Toast";
 
 const DataHead = () => null;
 
@@ -34,6 +35,8 @@ const DataBody = props => {
 
   const [submissionData, setSubmissionData] = useState({});
 
+  const [toast, setToast] = useState(false);
+  const [tMsg, setTMsg] = useState("");
   const [gridData, setGridData] = useState([]);
   const [gridCols, setGridCols] = useState([]);
   const [latestSub, setLatestSub] = useState({});
@@ -56,7 +59,7 @@ const DataBody = props => {
 
         if (deliverableRes.data.get) {
           setSubmissionData(deliverableRes.data.versions.reverse());
-          const latest = deliverableRes.data.versions.reverse()[0];
+          const latest = deliverableRes.data.versions.reverse().pop();
           console.log(latest);
           setLatestSub(latest);
           // setStatus(latest.status);
@@ -229,7 +232,12 @@ const DataBody = props => {
         data
       );
       console.log(response.data);
-      if (response.data.version) setStatus(status);
+      if (response.data.version) {
+        setStatus(status);
+        setToast(true);
+        setTMsg("Status updated successfully");
+      }
+
       // setTMsg(
       //   "Booklet Status changed to " + response.data.group.bookletsStatus
       // );
@@ -241,6 +249,7 @@ const DataBody = props => {
 
   return (
     <>
+      {toast ? <Toast open={toast} setOpen={setToast} message={tMsg} /> : null}
       {showUploadModal ? (
         <UploadFile
           setFile={setFile}
@@ -281,7 +290,7 @@ const DataBody = props => {
         <TableCell>
           <RadioButtonGroup
             label=""
-            // defaultValue={}
+            defaultValue={latestSub.status}
             value={latestSub.status}
             // defaultValue={latestSub.status}
             onChange={e => {
