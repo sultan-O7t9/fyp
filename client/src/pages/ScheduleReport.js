@@ -43,7 +43,7 @@ export const ScheduleReportComponent = ({
     console.log("HTML", container.innerHTML);
     setPageDims({
       width: tbl1.getBoundingClientRect().width + 100,
-      height: container.getBoundingClientRect().height,
+      height: container.getBoundingClientRect().height + 100,
     });
     const options = {
       orientation: "l",
