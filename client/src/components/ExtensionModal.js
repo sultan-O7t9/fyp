@@ -17,7 +17,14 @@ import CancelIcon from "@mui/icons-material/Cancel";
 // import styles from "./auth.styles";
 
 const ExtensionModal = props => {
-  const { setDisplay, deliverableId, setToastMessage, setShowToast } = props;
+  const {
+    setDisplay,
+    deliverableId,
+    setToastMessage,
+    total,
+    setTotal,
+    setShowToast,
+  } = props;
 
   const [requestedExtensions, setRequestedExtensions] = useState([]);
 
@@ -30,6 +37,7 @@ const ExtensionModal = props => {
         );
         console.log(res.data);
         setRequestedExtensions(res.data.extensions);
+        setTotal(res.data.extensions.length);
       } catch (error) {
         console.log(error);
       }
@@ -97,13 +105,16 @@ const ExtensionModal = props => {
                     padding: "0.5rem 0",
                   }}
                 >
-                  <div style={{ width: "33%" }}>
+                  <div style={{ width: "25%" }}>
                     <Typography variant="h6">Group</Typography>
                   </div>
-                  <div style={{ width: "33%" }}>
+                  <div style={{ width: "25%" }}>
+                    <Typography variant="h6">Supervisor</Typography>
+                  </div>
+                  <div style={{ width: "25%" }}>
                     <Typography variant="h6">Days</Typography>
                   </div>
-                  <div style={{ width: "33%" }}>
+                  <div style={{ width: "25%" }}>
                     <Typography variant="h6">Actions</Typography>
                   </div>
                 </li>
@@ -120,19 +131,24 @@ const ExtensionModal = props => {
                         padding: "0.5rem 0",
                       }}
                     >
-                      <div style={{ width: "33%" }}>
+                      <div style={{ width: "25%" }}>
                         <Typography variant="body1">
                           {extension.group}
                         </Typography>
                       </div>
-                      <div style={{ width: "33%" }}>
+                      <div style={{ width: "25%" }}>
+                        <Typography variant="body1">
+                          {extension.supervisor}
+                        </Typography>
+                      </div>
+                      <div style={{ width: "25%" }}>
                         <Typography variant="body1">
                           {extension.days}
                         </Typography>
                       </div>
                       <div
                         style={{
-                          width: "33%",
+                          width: "25%",
                           //   display: "flex",
                           //   justifyContent: "center",
                         }}

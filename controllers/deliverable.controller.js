@@ -20,21 +20,29 @@ const {
   Semester,
   EvaluationLog,
   CommitteeReview,
+  PMO,
 } = require("../models");
 const { Op } = require("sequelize");
 
 class DeliverableController {
   static setLogs = async (req, res) => {
+    const { logs } = req.body;
     const { deliverableId, groupId, text } = req.body;
     try {
-      const log = await EvaluationLog.create({
-        text,
-        deliverableId,
-        groupId,
-      });
+      const LOGS = [];
+      for (let i = 0; i < logs.length; i++) {
+        const { deliverableId, groupId, text } = logs[i];
+
+        const log = await EvaluationLog.create({
+          text,
+          deliverableId,
+          groupId,
+        });
+        LOGS.push(log);
+      }
       res.status(200).json({
         message: "Log created successfully",
-        log,
+        logs: LOGS,
       });
     } catch (error) {
       console.log(error);
@@ -360,19 +368,16 @@ class DeliverableController {
         },
       });
       console.log(versions.dataValues);
-      const committeeReview = await CommitteeReview.findOne({
-        where: {
-          deliverableId,
-          groupId,
-        },
-      });
+      // const committeeReview = await CommitteeReview.findOne({
+      //   where: {
+      //     deliverableId,
+      //     groupId,
+      //   },
+      // });
 
       res.json({
         message: "Versions fetched successfully",
-        versions: versions.map(version => ({
-          ...version,
-          committeeReview: version.status == "Approved" ? committeeReview : {},
-        })),
+        versions: versions,
         get: true,
       });
     } catch (error) {
@@ -384,44 +389,44 @@ class DeliverableController {
       });
     }
   };
-  static getGroupDeliverableSubmission = async (req, res) => {
-    console.log("------------------REQ3");
-    const { deliverableId, groupId } = req.body;
-    try {
-      // console.log(deliverableId, groupId);
-      // try{}
-      const versions = await Version.findAll({
-        where: {
-          deliverableId,
-          groupId,
-        },
-      });
-      // console.log(versions.dataValues);
-      const committeeReview = await CommitteeReview.findOne({
-        where: {
-          deliverableId,
-          groupId,
-        },
-      });
+  // static getGroupDeliverableSubmission = async (req, res) => {
+  //   console.log("------------------REQ3");
+  //   const { deliverableId, groupId } = req.body;
+  //   try {
+  //     // console.log(deliverableId, groupId);
+  //     // try{}
+  //     const versions = await Version.findAll({
+  //       where: {
+  //         deliverableId,
+  //         groupId,
+  //       },
+  //     });
+  //     // console.log(versions.dataValues);
+  //     const committeeReview = await CommitteeReview.findOne({
+  //       where: {
+  //         deliverableId,
+  //         groupId,
+  //       },
+  //     });
 
-      res.json({
-        message: "Versions fetched successfully",
-        versions: versions.map(version => ({
-          ...version.dataValues,
-          committeeReview: version.status == "Approved" ? committeeReview : {},
-        })),
+  //     res.json({
+  //       message: "Versions fetched successfully",
+  //       versions: versions.map(version => ({
+  //         ...version.dataValues,
+  //         committeeReview: version.status == "Approved" ? committeeReview : {},
+  //       })),
 
-        get: true,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        message: "Error getting versions",
-        error,
-        get: false,
-      });
-    }
-  };
+  //       get: true,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.status(500).json({
+  //       message: "Error getting versions",
+  //       error,
+  //       get: false,
+  //     });
+  //   }
+  // };
   static getGroupsDeliverableSubmissionByDept = async (req, res) => {
     const { deliverableId, userId } = req.body;
     console.log("-------------------REQ2");

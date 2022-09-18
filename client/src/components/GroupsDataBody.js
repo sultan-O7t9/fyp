@@ -248,6 +248,7 @@ const GroupsDataBody = ({
       setData(data => data.filter(group => group.id !== id));
       setShowDeleteModal(false);
       setToastMessage("Group Deleted Successfully");
+      setOpen(true);
     }
   };
 
@@ -352,6 +353,9 @@ const GroupsDataBody = ({
         name: "supervisor",
         defaultFlex: 1,
         header: "Supervisor",
+        render: ({ value }) => {
+          return value ? value : "None";
+        },
       },
       {
         name: "bookletsStatus",

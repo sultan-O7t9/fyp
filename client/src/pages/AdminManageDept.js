@@ -28,6 +28,7 @@ import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import Toast from "../components/Toast";
+import { Redirect } from "react-router-dom";
 
 const DATA = {
   heads: ["Name", "Department", "Role"],
@@ -257,6 +258,9 @@ const DataBody = ({ data, editFaculty, setData, setRefresh }) => {
 };
 
 const AdminManageDept = () => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("HOD");
   const [heads, setHeads] = useState(["Department", "", "PMO", ""]);
   const [showAddCommittee, setShowAddCommittee] = useState(false);
   const [body, setBody] = useState([]);
@@ -308,6 +312,8 @@ const AdminManageDept = () => {
   //   console.log(committee);
   //   setShowAddCommittee(committee ? committee : true);
   // };
+
+  if (!isEligible) return <Redirect to="/404" />;
 
   if (isLoading)
     return (

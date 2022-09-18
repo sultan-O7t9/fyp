@@ -30,23 +30,31 @@ const Deliverables = [
 ];
 const Dashboard = () => {
   const [deliverables, setDeliverables] = useState([]);
-  const token = useSelector(state => state.auth.accessToken);
+
+  // const token = useSelector(state => state.auth.accessToken);
   const [role, setRole] = useState("");
   const history = useHistory();
+
   useEffect(() => {
-    console.log(token);
-    const userRole = jwt_decode(token).role;
-    if (userRole.includes("STUDENT")) {
-      console.log(userRole);
+    // console.log(token);
+    // const userRole = jwt_decode(token).role;
+    if (
+      localStorage.getItem("USER_ROLE") &&
+      localStorage.getItem("USER_ROLE").includes("STUDENT")
+    ) {
+      // console.log(userRole);
       history.replace("/register-group");
     }
-    if (userRole === "HOD") {
+    if (
+      localStorage.getItem("USER_ROLE") &&
+      localStorage.getItem("USER_ROLE").includes("STUDENT")
+    ) {
       history.replace("/admin/faculty");
     }
     // console.log(userRole);
-
     // setRole(userRole);
-  }, [history, token]);
+  }, [history]);
+  // }, [history, token]);
 
   useEffect(() => {
     const getDeliverables = async () => {
@@ -61,10 +69,10 @@ const Dashboard = () => {
 
   return (
     <div>
-      {/* {role.includes("STUDENT") ? (
-        <Redirect to="/register-group" />
+      {/* {!localStorage.getItem("accessToken") ? (
+        // <Redirect to="/login" />
       ) : ( */}
-      <ContainerFluid title="Dasboard">
+      <ContainerFluid title="Dasboard" maxWidth="lg">
         <Main>
           <Box
             sx={{
@@ -84,11 +92,29 @@ const Dashboard = () => {
               );
             })}
 
-            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+            {localStorage.getItem("USER_ROLE") &&
+            localStorage.getItem("USER_ROLE").includes("PMO") ? (
               <ItemCard
                 index={""}
                 manual={true}
                 item={{ id: 1, title: "Communication", link: "/comm" }}
+              />
+            ) : null}
+            {localStorage.getItem("USER_ROLE") &&
+            localStorage.getItem("USER_ROLE").includes("PMO") ? (
+              <ItemCard
+                index={""}
+                manual={true}
+                item={{ id: 2, title: "Reports", link: "/rep" }}
+              />
+            ) : null}
+            {localStorage.getItem("USER_ROLE") &&
+            localStorage.getItem("USER_ROLE").includes("PMO") ? (
+              <ItemCard
+                index={""}
+                styles={{ visibility: "hidden", cursor: "default" }}
+                manual={true}
+                item={{ id: 2, title: "", link: "/" }}
               />
             ) : null}
           </Box>

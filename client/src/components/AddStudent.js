@@ -11,6 +11,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import styles from "../pages/auth.styles";
 import Select from "./Select";
+import Toast from "./Toast";
 // import Select from "../components/Select";
 // import styles from "./auth.styles";
 
@@ -23,6 +24,8 @@ const AddStudent = props => {
   const [error, setError] = useState(false);
   const [groups, setGroups] = useState([]);
   const [data, setData] = useState([]);
+  const [toast, setToast] = useState(false);
+  const [msg, setMsg] = useState("");
 
   const [name, setName] = useState("");
   const [rollNo, setRollNo] = useState("");
@@ -79,7 +82,18 @@ const AddStudent = props => {
 
   const registerHandler = async () => {
     if (students.find(student => student === rollNo)) {
-      alert("Student already exists");
+      // alert("Student already exists");
+      setToast(true);
+      setMsg("ERROR: Student already exists");
+      setError(true);
+      return;
+    }
+    if (
+      rollNo.toString().split("-")[0].length != 8 ||
+      rollNo.toString().split("-")[1].length != 3
+    ) {
+      setToast(true);
+      setMsg("ERROR: Invalid Roll No");
       setError(true);
       return;
     }
@@ -121,68 +135,71 @@ const AddStudent = props => {
   //     : null;
 
   return (
-    <Backdrop
-      sx={{ color: "#000", zIndex: theme => theme.zIndex.drawer + 1 }}
-      open={true}
-    >
-      <Container
-        maxWidth="md"
-        style={{ maxHeight: "80vh", overflowY: "scroll" }}
+    <>
+      {toast ? <Toast open={toast} setOpen={setToast} message={msg} /> : null}
+      <Backdrop
+        sx={{ color: "#000", zIndex: theme => theme.zIndex.drawer + 1 }}
+        open={true}
       >
-        <Card style={styles.card}>
-          <Typography variant="h5" style={styles.heading}>
-            Register
-          </Typography>
-          <TextField
-            style={styles.input}
-            value={name}
-            placeholder="Name"
-            onChange={e => setName(e.target.value)}
-          />
-          <TextField
-            style={styles.input}
-            value={rollNo}
-            placeholder="Roll #"
-            error={error}
-            // disabled={faculty.hasOwnProperty("email")}
-            onChange={e => {
-              setError(false);
-              setRollNo(e.target.value);
-            }}
-          />
+        <Container
+          maxWidth="md"
+          style={{ maxHeight: "80vh", overflowY: "scroll" }}
+        >
+          <Card style={styles.card}>
+            <Typography variant="h5" style={styles.heading}>
+              Register
+            </Typography>
+            <TextField
+              style={styles.input}
+              value={name}
+              placeholder="Name"
+              onChange={e => setName(e.target.value)}
+            />
+            <TextField
+              style={styles.input}
+              value={rollNo}
+              placeholder="Roll #"
+              error={error}
+              // disabled={faculty.hasOwnProperty("email")}
+              onChange={e => {
+                setError(false);
+                setRollNo(e.target.value);
+              }}
+            />
 
-          <Select
-            label="Department"
-            style={styles.input}
-            value={dept}
-            setValue={selectDeptHandler}
-            items={depts}
-          />
-          <Button
-            style={styles.input}
-            disabled={!name || !rollNo || !dept}
-            size="large"
-            variant="contained"
-            onClick={registerHandler}
-          >
-            {/* {faculty.hasOwnProperty("name") ? "Update" : "Register"} */}
-            Add Student
-          </Button>
-          <Button
-            style={styles.input}
-            size="large"
-            variant="contained"
-            onClick={() => {
-              setDisplay(false);
-            }}
-            color="error"
-          >
-            Cancel
-          </Button>
-          {/* {error ? <Alert severity="error">{error}</Alert> : null} */}
-        </Card>
-      </Container>
-    </Backdrop>
+            <Select
+              label="Department"
+              style={styles.input}
+              value={dept}
+              setValue={selectDeptHandler}
+              items={depts}
+            />
+            <Button
+              style={styles.input}
+              disabled={!name || !rollNo || !dept}
+              size="large"
+              variant="contained"
+              onClick={registerHandler}
+            >
+              {/* {faculty.hasOwnProperty("name") ? "Update" : "Register"} */}
+              Add Student
+            </Button>
+            <Button
+              style={styles.input}
+              size="large"
+              variant="contained"
+              onClick={() => {
+                setDisplay(false);
+              }}
+              color="error"
+            >
+              Cancel
+            </Button>
+            {/* {error ? <Alert severity="error">{error}</Alert> : null} */}
+          </Card>
+        </Container>
+      </Backdrop>
+    </>
   );
 };
 

@@ -105,8 +105,9 @@ const EVALUATORS = [
   { id: "6", name: "ABC" },
 ];
 
-const ManageCommittee = props => {
+const EditCommittee = props => {
   const { setDisplay, committee } = props;
+  console.log(committee);
   // const [heads, setHeads] = useState([
   //   "Group ID",
   //   "Members",
@@ -114,15 +115,14 @@ const ManageCommittee = props => {
   //   "Supervisor",
   // ]);
   // const [body, setBody] = useState(DATA.data);
-  const [groupItems, setGroupItems] = useState([]);
+  const [groupItems, setGroupItems] = useState(GROUPS);
   const [evaluatorItems, setEvaluatorItems] = useState(EVALUATORS);
   const [groups, setGroups] = useState([]);
   const [evaluators, setEvaluators] = useState([]);
-
+  console.log(committee);
   useEffect(() => {
-    if (committee.hasOwnProperty("Groups")) {
-      setGroups(committee.Groups.map(group => group.name));
-    }
+    setGroups(committee.Groups.map(group => group.name));
+
     // return;
     axios
       .get("http://localhost:5000/api/group/get-groups/")
@@ -130,22 +130,29 @@ const ManageCommittee = props => {
         console.log(res.data);
         console.log(evaluators.includes(1));
         console.log(res.data.groups);
-        setGroups([]);
+        // setGroups([]);
         console.log(evaluators);
         setGroupItems(
-          committee.hasOwnProperty("Groups")
-            ? res.data.groups
-                .filter(
-                  group =>
-                    group.committeeId == null &&
-                    !evaluators.includes(group.supervisorId)
-                )
-                .concat(committee.Groups.map(group => ({ id: group.name })))
-            : res.data.groups.filter(
-                group =>
-                  group.committeeId == null &&
-                  !evaluators.includes(group.supervisorId)
-              )
+          res.data.groups
+            .filter(
+              group =>
+                group.committeeId == null &&
+                !evaluators.includes(group.supervisorId)
+            )
+            .map(group => {
+              return {
+                id: group.name,
+                text: group.name,
+                value: group.name,
+              };
+            })
+            .concat(
+              committee.Groups.map(group => ({
+                id: group.name,
+                text: group.name,
+                value: group.name,
+              }))
+            )
         );
       })
       .catch(err => {
@@ -153,26 +160,29 @@ const ManageCommittee = props => {
       });
   }, [committee, evaluators]);
   useEffect(() => {
-    if (committee.hasOwnProperty("FacultyMembers")) {
-      setEvaluators(committee.FacultyMembers.map(member => member.id));
-    }
+    setEvaluators(committee.members.map(member => member.id));
+
     axios
       .get("http://localhost:5000/api/faculty/get-supervisors")
       .then(res => {
         console.log(res.data);
         setEvaluatorItems(
-          committee.hasOwnProperty("FacultyMembers")
-            ? res.data.supervisors
-                .filter(faculty => faculty.committeeId == null)
-                .concat(
-                  committee.FacultyMembers.map(member => ({
-                    id: member.id,
-                    name: member.name,
-                  }))
-                )
-            : res.data.supervisors.filter(
-                faculty => faculty.committeeId == null
-              )
+          res.data.supervisors
+            .filter(faculty => faculty.committeeId == null)
+            .map(supervisor => {
+              return {
+                id: supervisor.id,
+                name: supervisor.name,
+                value: supervisor.id,
+              };
+            })
+            .concat(
+              committee.members.map(member => ({
+                id: member.id,
+                name: member.name,
+                value: member.id,
+              }))
+            )
         );
       })
       .catch(err => {
@@ -183,30 +193,21 @@ const ManageCommittee = props => {
   const manageCommitteeHandler = async () => {
     console.log("Manage Committee");
     console.log(groups, evaluators);
+    // return;
 
     try {
-      if (
-        committee.hasOwnProperty("Groups") &&
-        committee.hasOwnProperty("FacultyMembers")
-      ) {
-        const res = await axios.put(
-          "http://localhost:5000/api/committee/update",
-          {
-            committeeId: committee.id,
-            groups: groups,
-            members: evaluators,
-          }
-        );
-        console.log(res);
-
-        setDisplay(false);
-        return;
-      }
-      const result = await axios.post(
-        "http://localhost:5000/api/committee/create",
-        { members: [...evaluators], groups: [...groups] }
+      const res = await axios.put(
+        "http://localhost:5000/api/committee/update",
+        {
+          committeeId: committee.id,
+          groups: groups,
+          members: evaluators,
+        }
       );
-      console.log(result);
+      console.log(res);
+
+      setDisplay(false);
+      return;
     } catch (err) {
       console.log(err);
     } finally {
@@ -284,9 +285,9 @@ const ManageCommittee = props => {
           </Box>
           <Box style={{ margin: "2rem 0.5rem" }}>
             {/* <DataTable
-              DataHead={() => <GroupsDataHead heads={heads} />}
-              DataBody={() => <GroupsDataBody data={body} />}
-            /> */}
+                DataHead={() => <GroupsDataHead heads={heads} />}
+                DataBody={() => <GroupsDataBody data={body} />}
+              /> */}
           </Box>
           <Box
             style={{
@@ -319,4 +320,4 @@ const ManageCommittee = props => {
   );
 };
 
-export default ManageCommittee;
+export default EditCommittee;

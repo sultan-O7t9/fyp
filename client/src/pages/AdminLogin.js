@@ -7,6 +7,7 @@ import { loginUser } from "../store/actions/auth";
 import Styles from "./auth.styles";
 import axios from "axios";
 import Link from "../components/Link";
+import PasswordField from "../components/PasswordField";
 
 const AdminLogin = () => {
   const history = useHistory();
@@ -56,26 +57,45 @@ const AdminLogin = () => {
           placeholder="Email"
           onChange={e => setEmail(e.target.value)}
         />
-        <TextField
+        <PasswordField
           style={Styles.input}
-          type="password"
           placeholder="Password"
           onChange={e => setPassword(e.target.value)}
         />
         <Button
           size="large"
           style={Styles.input}
+          disabled={!email || password.length < 6}
           variant="contained"
           onClick={loginHandler}
         >
           Log in
         </Button>
-        <Typography variant="h6" style={{ textAlign: "center" }}>
-          <Link to="/login">Log in as Faculty Member</Link>
+        <Box
+        // style={{
+        //   display: "flex",
+        //   justifyContent: "space-between",
+        //   alignItems: "flex-end",
+        // }}
+        >
+          <Typography variant="body2" style={{ textDecoration: "underline" }}>
+            <Link to="/login">Log in as Faculty Member</Link>
+          </Typography>
+          <Typography
+            variant="body2"
+            style={{ textDecoration: "underline", marginTop: "0.5rem" }}
+          >
+            <Link to="/group">Log in as Student</Link>
+          </Typography>
+          {/* <Typography variant="body2" style={{ textDecoration: "underline" }}>
+            <Link to="/group">Forget Password</Link>
+          </Typography> */}
+        </Box>
+
+        {/* <Typography variant="h6" style={{ textAlign: "center" }}>
         </Typography>
         <Typography variant="h6" style={{ textAlign: "center" }}>
-          <Link to="/group">Log in as Student</Link>
-        </Typography>
+        </Typography> */}
         {error ? <Alert severity="error">{error}</Alert> : null}
       </Card>
     </Box>

@@ -18,52 +18,52 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "",
       },
       funcReqs: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       interfaces: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       usecaseDesc: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       usecaseDia: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       nonFuncReqs: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       projectType: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
         // if oose then 1 else 0
       },
       domainDia: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       classDia: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       sequenceDia: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       stateChartDia: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       collabDia: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       sysPrototype: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
     },

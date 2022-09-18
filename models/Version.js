@@ -21,6 +21,11 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "Pending",
         //Approved, Revised, Pending
       },
+      revision_date: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        //Approved, Revised, Pending
+      },
       eval_comment: {
         type: DataTypes.STRING,
       },

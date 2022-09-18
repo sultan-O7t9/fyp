@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
       },
+      designation: {
+        type: DataTypes.STRING,
+        defaultValue: "Lecturer",
+        //  Associate Professor, Professor, Lecturer
+      },
       email: {
         type: DataTypes.STRING,
         //Constriants

@@ -1,5 +1,5 @@
 const sequelize = require("sequelize");
-const { Extension, Group } = require("../models");
+const { Extension, Group, FacultyMember } = require("../models");
 
 class ExtensionController {
   static requestExtension = async (req, res) => {
@@ -84,9 +84,16 @@ class ExtensionController {
               id: extension.groupId,
             },
           });
+          const supervisor = await FacultyMember.findOne({
+            where: {
+              id: group.supervisorId,
+            },
+          });
+
           return {
             ...extension.dataValues,
             group: group.name,
+            supervisor: supervisor ? supervisor.name : "",
           };
         })
       );

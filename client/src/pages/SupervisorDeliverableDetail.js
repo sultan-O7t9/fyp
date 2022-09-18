@@ -23,7 +23,7 @@ import MenuButton from "../components/MenuButton";
 import Select from "../components/Select";
 import UploadFile from "../components/UploadFile";
 import axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
@@ -549,6 +549,10 @@ const DataBody2 = props => {
 };
 
 const SupervisorDeliverableDetail = props => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
+
   const roles = localStorage.getItem("USER_ROLE");
   const [file, setFile] = useState({});
   const [name, setName] = useState("");
@@ -682,6 +686,7 @@ const SupervisorDeliverableDetail = props => {
       setDays("");
     }
   };
+  if (!isEligible) return <Redirect to="/404" />;
 
   return (
     <>

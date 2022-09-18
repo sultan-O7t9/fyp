@@ -24,6 +24,10 @@ const ManageFaculty = props => {
   // const dispatch = useDispatch();
   const accessToken = useSelector(state => state.auth.accessToken);
   const [name, setName] = useState(faculty ? faculty.name : "");
+  const [designation, setDesignation] = useState(
+    faculty ? faculty.designation : ""
+  );
+
   const [email, setEmail] = useState(faculty ? faculty.email : "");
   const [password, setPassword] = useState(faculty ? faculty.password : "");
   const [allDepartments, setAllDepartments] = useState([]);
@@ -32,6 +36,15 @@ const ManageFaculty = props => {
   );
   const [error, setError] = useState(null);
 
+  const designationItems = [
+    { text: "Lecturer", value: "Lecturer", id: "Lecturer" },
+    {
+      text: "Associate Professor",
+      value: "Associate Professor",
+      id: "Associate Professor",
+    },
+    { text: "Professor", value: "Professor", id: "Professor" },
+  ];
   //   useEffect(() => {
   //     if (
   //       faculty.hasOwnProperty("name") &&
@@ -58,7 +71,8 @@ const ManageFaculty = props => {
   }, []);
 
   const registerHandler = async () => {
-    console.log(name, email, password, department);
+    console.log(name, email, password, department, designation);
+    // return;
     setError(null);
     if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
       return setError("Please enter a valid UOG email address");
@@ -79,6 +93,7 @@ const ManageFaculty = props => {
             name: name,
             departmentId: department,
             password: password,
+            designation: designation,
           }
         );
         console.log(res);
@@ -120,6 +135,8 @@ const ManageFaculty = props => {
           <Typography variant="h5" style={Styles.heading}>
             Register
           </Typography>
+          {error ? <Alert severity="error">{error}</Alert> : null}
+
           <TextField
             style={Styles.input}
             value={name}
@@ -143,6 +160,13 @@ const ManageFaculty = props => {
           />
 
           <Select
+            label="Designation"
+            style={Styles.input}
+            value={designation}
+            setValue={setDesignation}
+            items={designationItems}
+          />
+          <Select
             label="Department"
             style={Styles.input}
             value={department}
@@ -159,7 +183,7 @@ const ManageFaculty = props => {
           />
           <Button
             style={Styles.input}
-            disabled={!name || !department || !email}
+            disabled={!name || !department || !email || password.length < 6}
             size="large"
             variant="contained"
             onClick={registerHandler}
@@ -177,7 +201,6 @@ const ManageFaculty = props => {
           >
             Cancel
           </Button>
-          {error ? <Alert severity="error">{error}</Alert> : null}
         </Card>
       </Container>
     </Backdrop>

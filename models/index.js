@@ -24,6 +24,8 @@ const FacultyMember = require("./FacultyMember")(sequelize, DataTypes);
 const CommitteeReview = require("./CommitteeReview")(sequelize, DataTypes);
 const EvaluationLog = require("./EvaluationLog")(sequelize, DataTypes);
 
+const Mail = require("./Mail")(sequelize, DataTypes);
+const Recipiant = require("./Recipiant")(sequelize, DataTypes);
 const Role = require("./Role")(sequelize, DataTypes);
 const Faculty_Role = require("./Faculty_Role")(sequelize, DataTypes);
 const PMO = require("./PMO")(sequelize, DataTypes);
@@ -239,6 +241,9 @@ Committee.hasMany(CommitteeReview, {
   foreignKey: "committeeId",
 });
 
+Mail.hasMany(Recipiant, { foreignKey: "mailId" });
+FacultyMember.hasMany(Mail, { foreignKey: "facultyId" });
+
 // Committee.hs
 
 // Evaluation.hasMany(Version, {});
@@ -285,6 +290,8 @@ module.exports = {
   EvaluationLog,
   EvaluationType,
   EvaluationSchedule,
+  Mail,
+  Recipiant,
   Project,
   Committee,
 };

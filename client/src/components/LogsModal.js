@@ -98,7 +98,10 @@ const LogsModal = props => {
                         key={log.id}
                       >
                         <Typography variant="subtitle1">{log.text}</Typography>
-                        <Typography variant="body2">
+                        <Typography
+                          style={{ marginLeft: "1rem" }}
+                          variant="body2"
+                        >
                           {daysAgo < 1
                             ? hrsAgo + " Hrs ago"
                             : daysAgo + " Days ago"}

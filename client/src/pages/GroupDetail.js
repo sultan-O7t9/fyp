@@ -20,17 +20,24 @@ import { useEffect } from "react";
 import axios from "axios";
 import Toast from "../components/Toast";
 import RadioButtonGroup from "../components/RadioButtonGroup";
+import AddProject from "../components/AddProject";
+import EditProject from "../components/EditProject";
 
 const DataHead = () => null;
 
 const DataBody = props => {
-  const { groupInfo } = props;
+  // const { groupInfo, setRefresh } = props;
   const role = localStorage.getItem("USER_ROLE");
   const history = useHistory();
+  const [showAddProject, setShowAddProject] = useState(false);
+  const [showEditProject, setShowEditProject] = useState(false);
+
   const [projectDetails, setProjectDetails] = useState({});
   const [toast, setToast] = useState(false);
   const [tMsg, setTMsg] = useState("");
   const [bookletComment, setBookletComment] = useState("");
+  const [groupInfo, setGroupInfo] = useState({});
+
   // const [modal, setModal] = useState(false);
   const params = useParams();
   const groupId = params.id;
@@ -50,6 +57,21 @@ const DataBody = props => {
   const [supEvaluationData, setSupEvaluationData] = useState({});
   const [supMarks, setSupMarks] = useState("");
   const [supRemarks, setSupRemarks] = useState("");
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/group/get/" + groupId
+        );
+        console.log(res.data);
+        setGroupInfo(res.data.group);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getData();
+  }, [groupId, showAddProject, showEditProject]);
 
   useEffect(() => {
     if (supEvaluationData.remarks) setSupRemarks(supEvaluationData.remarks);
@@ -109,7 +131,8 @@ const DataBody = props => {
       }
     };
     getProjectDetails();
-  }, [groupId]);
+    // setRefresh(state => !state);
+  }, [groupId, showAddProject, showEditProject]);
 
   useEffect(() => {
     const getEvaluationData = async () => {
@@ -268,6 +291,16 @@ const DataBody = props => {
 
   return (
     <>
+      {showEditProject ? (
+        <EditProject
+          groupId={groupId}
+          projectInfo={projectDetails}
+          setDisplay={setShowEditProject}
+        />
+      ) : null}
+      {showAddProject ? (
+        <AddProject groupId={groupId} setDisplay={setShowAddProject} />
+      ) : null}
       {toast ? <Toast open={toast} setOpen={setToast} message={tMsg} /> : null}
 
       <TableRow>
@@ -392,6 +425,8 @@ const DataBody = props => {
                 to="#"
                 variant="body1"
                 style={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
                   color:
                     groupInfo.bookletsStatus === "Approved"
                       ? "green"
@@ -414,8 +449,31 @@ const DataBody = props => {
         <TableCell colSpan={3}>{""}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={3}>
+        <TableCell colSpan={2}>
           <Typography variant="h4">Project Details</Typography>
+        </TableCell>
+        <TableCell colSpan={1}>
+          {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+            groupInfo.hasOwnProperty("project") && groupInfo.project.title ? (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setShowEditProject(true);
+                }}
+              >
+                Edit Project Details
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setShowAddProject(true);
+                }}
+              >
+                Add Project
+              </Button>
+            )
+          ) : null}
         </TableCell>
       </TableRow>
       <TableRow>
@@ -774,6 +832,7 @@ const DataBody = props => {
 
 const GroupDetail = () => {
   const [groupInfo, setGroupInfo] = useState({});
+  const [refresh, setRefresh] = useState(false);
 
   const params = useParams();
   const groupId = params.id;
@@ -790,7 +849,7 @@ const GroupDetail = () => {
       }
     };
     getData();
-  }, [groupId]);
+  }, [groupId, refresh]);
   return (
     <>
       <ContainerFluid title="">
@@ -815,7 +874,13 @@ const GroupDetail = () => {
 
           <DataTable
             DataHead={DataHead}
-            DataBody={() => <DataBody groupInfo={groupInfo} />}
+            DataBody={() => (
+              <DataBody
+                groupInfo={groupInfo}
+                groupId={groupId}
+                setRefresh={setRefresh}
+              />
+            )}
           />
         </Main>
       </ContainerFluid>

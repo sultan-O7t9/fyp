@@ -63,6 +63,11 @@ class VersionController {
           message: "Version not found",
         });
       }
+      if (status == "Approved") {
+        await version.update({
+          commented_doc: null,
+        });
+      }
       await version.update({
         status: status,
       });
@@ -175,7 +180,7 @@ class VersionController {
               path: filePathHTML,
               // name: "Sched_Deliverable_" + deliverableId + ".pdf",
               body: `
-              The Evaluation Schedule for Deliverable ${deliverableId} is attached herewith.
+              The Evaluation Schedule for Deliverable ${deliverableId} is attached below.
                `,
             };
           })

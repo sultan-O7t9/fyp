@@ -7,6 +7,7 @@ import { loginUser } from "../store/actions/auth";
 import Styles from "./auth.styles";
 import axios from "axios";
 import Link from "../components/Link";
+import PasswordField from "../components/PasswordField";
 
 const GroupLogin = () => {
   const history = useHistory();
@@ -70,9 +71,8 @@ const GroupLogin = () => {
           type="email"
           onChange={e => setEmail(e.target.value)}
         />
-        <TextField
+        <PasswordField
           style={Styles.input}
-          type="password"
           placeholder="Password"
           onChange={e => setPassword(e.target.value)}
         />
@@ -80,13 +80,25 @@ const GroupLogin = () => {
           size="large"
           style={Styles.input}
           variant="contained"
+          disabled={!email || password.length < 6}
           onClick={loginHandler}
         >
           Log in
         </Button>
-        <Typography variant="h6" style={{ textAlign: "center" }}>
-          <Link to="/login">Log in as Faculty Member</Link>
-        </Typography>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+          }}
+        >
+          <Typography variant="body1" style={{ textDecoration: "underline" }}>
+            <Link to="/login">Log in as Faculty Member</Link>
+          </Typography>
+          <Typography variant="body2" style={{ textDecoration: "underline" }}>
+            <Link to="/forget">Forget Password?</Link>
+          </Typography>
+        </Box>
         {error ? <Alert severity="error">{error}</Alert> : null}
       </Card>
     </Box>

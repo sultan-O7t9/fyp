@@ -24,7 +24,7 @@ import MenuButton from "../components/MenuButton";
 import Select from "../components/Select";
 import UploadFile from "../components/UploadFile";
 import axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
@@ -238,7 +238,8 @@ const DataBody = props => {
 
   const changeMarks = (rollNo, marks, type) => {
     console.log(marks < 0, parseFloat(marks));
-    setBtnDisabled(false);
+
+    // setBtnDisabled(false);
     // setInputError({});
 
     switch (type) {
@@ -328,6 +329,18 @@ const DataBody = props => {
       default:
         break;
     }
+    // setTotalFieldMarks({
+    //   ...totalFieldMarks,
+    //   [rollNo]:
+    //     runProjectMarks[rollNo] +
+    //     codeModifyMarks[rollNo] +
+    //     testPlanMarks[rollNo] +
+    //     testCaseMarks[rollNo] +
+    //     projectPptMarks[rollNo] +
+    //     userManMarks[rollNo] +
+    //     stdTempMarks[rollNo] +
+    //     skillMarks[rollNo],
+    // });
   };
   const changeRemarks = (remarks, type) => {
     switch (type) {
@@ -346,6 +359,137 @@ const DataBody = props => {
   };
 
   const handleSubmit = async () => {
+    const facultyRes = await axios.post(
+      "http://localhost:5000/api/faculty/get-sup-id",
+      {
+        id: localStorage.getItem("USER_ID"),
+      }
+    );
+    console.log(facultyRes.data.faculty);
+    const LOGS = [];
+    const students = evalData.students;
+
+    students.forEach(student => {
+      if (student.runProject != runProjectMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Complete running project Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.runProject} to ${runProjectMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.codeModify != codeModifyMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Code Modification Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.codeModify} to ${codeModifyMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.testPlan != testPlanMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Test Plan Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.testPlan} to ${testPlanMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.testCase != testCaseMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Test Case Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.testCase} to ${testCaseMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+
+      if (student.projectPpt != projectPptMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Project Presentation Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.projectPpt} to ${projectPptMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+
+      if (student.userMan != userManMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `User Manual Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.userMan} to ${userManMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+
+      if (student.stdTemp != stdTempMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Standard Template Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.stdTemp} to ${stdTempMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+
+      if (student.skill != skillMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Overall Skillset Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.skill} to ${skillMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+    });
+    console.log(LOGS);
+    // return;
+
     const data = {
       groupId: groupId,
       remarks: {
@@ -391,28 +535,28 @@ const DataBody = props => {
       setTMsg("Marks has been updated successfully");
       setToast(true);
 
-      const facultyRes = await axios.post(
-        "http://localhost:5000/api/faculty/get-sup-id",
-        {
-          id: localStorage.getItem("USER_ID"),
-        }
-      );
-      console.log(facultyRes.data.faculty);
+      // const facultyRes = await axios.post(
+      //   "http://localhost:5000/api/faculty/get-sup-id",
+      //   {
+      //     id: localStorage.getItem("USER_ID"),
+      //   }
+      // );
+      // console.log(facultyRes.data.faculty);
 
-      const log = {
-        deliverableId: deliverableId,
-        groupId: groupId,
-        text: `Marks Changed By ${localStorage.getItem("USER_ROLE")}: ${
-          facultyRes.data.faculty.hasOwnProperty("name")
-            ? facultyRes.data.faculty.name
-            : null
-        }`,
-      };
-      console.log(log);
+      // const log = {
+      //   deliverableId: deliverableId,
+      //   groupId: groupId,
+      //   text: `Marks Changed By ${localStorage.getItem("USER_ROLE")}: ${
+      //     facultyRes.data.faculty.hasOwnProperty("name")
+      //       ? facultyRes.data.faculty.name
+      //       : null
+      //   }`,
+      // };
+      // console.log(log);
 
       const res2 = await axios.post(
         `http://localhost:5000/api/deliverable/set-logs`,
-        log
+        { logs: LOGS }
       );
       console.log(res2.data);
       setRefresh(refresh => !refresh);
@@ -533,6 +677,12 @@ const DataBody = props => {
           >
             {currVersion ? currVersion.eval_status : "Pending"}
           </Typography>
+          {currVersion.eval_status == "Revised" ? (
+            <Typography variant="body1">
+              Revision Date:{" "}
+              {new Date(currVersion.revision_date).toDateString()}
+            </Typography>
+          ) : null}
         </TableCell>
       </TableRow>
       <TableRow>
@@ -987,6 +1137,9 @@ const DataBody = props => {
 };
 
 const D3EvaluationPage = props => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    !localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
   // const roles = localStorage.getItem("USER_ROLE");
   // const [file, setFile] = useState({});
   // const [name, setName] = useState("");
@@ -1048,6 +1201,8 @@ const D3EvaluationPage = props => {
     win.focus();
   };
 
+  if (!isEligible) return <Redirect to="/404" />;
+
   return (
     <>
       {showToast ? (
@@ -1073,9 +1228,15 @@ const D3EvaluationPage = props => {
                 width: "100%",
               }}
             >
-              <Typography variant="h4">
-                D3 Evaluation: {data.group.name}
-              </Typography>
+              <Box>
+                <Typography variant="h4">
+                  D3 Evaluation: {data.group.name}
+                </Typography>
+
+                <Typography variant="h6">
+                  Evaluation Date: {new Date(evalDate).toDateString()}
+                </Typography>
+              </Box>
               <Box
                 style={{
                   display: "flex",

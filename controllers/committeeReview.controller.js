@@ -7,12 +7,15 @@ const {
   PMO,
   Version,
   CommitteeReview,
+  Student,
+  Group,
 } = require("../models");
 
 const fs = require("fs");
 const { promisify } = require("util");
 const pipeline = promisify(require("stream").pipeline);
 const path = require("path");
+const { sendMail } = require("../utils/sendMails");
 
 const dir = path.join(__dirname, "../uploads");
 
@@ -80,8 +83,46 @@ class CommitteeReviewController {
     }
   };
   static changeEndorsementStatus = async (req, res) => {
-    const { groupId, deliverableId, committeeId, status, versionId } = req.body;
+    const { groupId, deliverableId, committeeId, status, versionId, date } =
+      req.body;
     try {
+      const groupDetails = await Group.findOne({
+        where: {
+          id: groupId,
+        },
+      });
+      if (status == "Revised") {
+        const members = await Student.findAll({
+          where: {
+            groupId: groupId,
+          },
+        });
+        const supervisor = await FacultyMember.findOne({
+          where: {
+            id: groupDetails.dataValues.supervisorId,
+          },
+        });
+        const recipiants = members
+          .map(member => {
+            return member.dataValues.rollNo + "@uog.edu.pk";
+          })
+          .push(supervisor ? supervisor.dataValues.email : "");
+
+        sendMail(
+          // [recipiants].map(student => {
+          ["18094198-079@uog.edu.pk"].map(student => {
+            return {
+              email: student,
+              subject: "Evaluation Revision of Deliverable " + deliverableId,
+              body: `
+            The revision date for group ${
+              groupDetails.dataValues.name
+            } has been set to ${new Date(date).toDateString()}.
+         `,
+            };
+          })
+        );
+      }
       //Check if exists
       const review = await Version.findOne({
         where: {
@@ -103,7 +144,9 @@ class CommitteeReviewController {
       }
       await review.update({
         eval_status: status,
+        revision_date: date,
       });
+
       res.json({
         message: "Status changed successfully",
         review,

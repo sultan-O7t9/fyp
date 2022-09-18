@@ -13,6 +13,7 @@ const {
   Admin,
   Committee,
   Semester,
+  PMO,
 } = require("../models");
 const sequelize = require("sequelize");
 var crypto = require("crypto");
@@ -372,7 +373,9 @@ class GroupController {
 
   static createManyGroups = async (req, res) => {
     // const { id, role } = req.user;
+
     const { groups } = req.body;
+    console.log(groups);
     try {
       const newGroups = await Promise.all(
         groups.map(async group => {
@@ -392,6 +395,17 @@ class GroupController {
               new Date().getFullYear() - 2004
             }_${newGroup.dataValues.id}`,
           });
+          const supervisor = await FacultyMember.findOne({
+            where: {
+              name: group.supervisorName,
+            },
+          });
+          if (supervisor) {
+            console.log(supervisor.dataValues.name);
+            await newGroup.update({
+              supervisorId: supervisor.dataValues.id,
+            });
+          }
           const grpMems = [];
           const members = await Promise.all(
             group.members.map(async member => {
@@ -409,40 +423,51 @@ class GroupController {
               }
             })
           );
+          if (grpMems.length) {
+            const leader = await Student.findOne({
+              where: {
+                rollNo: group.leader,
+                groupId: newGroup.dataValues.id,
+              },
+            });
+            console.log(leader);
+            if (leader) {
+              console.log("LEADER");
+              await leader.update({
+                leader: true,
+              });
+              console.log(leader.dataValues.rollNo);
+            }
+            if (grpMems.length) {
+              sendMail(
+                [grpMems].map(student => {
+                  return {
+                    email: student.dataValues.rollNo + "@uog.edu.pk",
+                    subject: "FYP Group Creation",
+                    body: `
+                    Your group has been created, successfully.
+               Group members:
+                  ${grpMems.join(", ")}
+                  
+                  Your credentials are:
+                  Username: ${newGroup.dataValues.name}
+                  Password:${newGroup.dataValues.password}
+               Login to submit your FYP Idea.
+               `,
+                  };
+                })
+              );
+            }
 
-          const leader = await Student.findOne({
-            where: {
-              rollNo: group.leader,
-              groupId: newGroup.dataValues.id,
-            },
-          });
-          await leader.update({
-            leader: true,
-          });
-          console.log(leader.dataValues.rollNo);
-          console.log(grpMems);
-          sendMail(
-            [leader].map(student => {
-              return {
-                email: student.dataValues.rollNo + "@uog.edu.pk",
-                subject: "FYP Group Creation",
-                body: `
-             Your group has been created, successfully.
-             Group members:
-                ${grpMems.join(", ")}
-
-             Your credentials are:
-                Username: ${newGroup.dataValues.name}
-                Password:${newGroup.dataValues.password}
-             Login to submit your FYP Idea.
-             `,
-              };
-            })
-          );
-
-          return newGroup;
+            return newGroup;
+          } else {
+            console.log("IN ELSE");
+            await newGroup.destroy();
+            return null;
+          }
         })
       );
+      // console.log(newGroups);
       // const leaderStudent = members.find(
       //   student => student.dataValues.leader == 1
       // );
@@ -729,8 +754,31 @@ class GroupController {
   };
 
   static getAllGroups = async (req, res) => {
+    const { userId, userRole } = req.body;
     try {
+      // const pmoDepts = await PMO.findAll({
+      //   where: {
+      //     pmoId: userId,
+      //   },
+      // });
+      // const depts = pmoDepts.map(dept => dept.dataValues.deptId);
+      // console.log(depts);
       const groups = await Group.findAll();
+      // let groups = [];
+      // if (userRole == "PMO") {
+      //   const grps = await Group.findAll({
+      //     where: {
+      //       departmentId: {
+      //         [sequelize.Op.in]: depts,
+      //       },
+      //     },
+      //   });
+      //   groups = [...grps];
+      // } else {
+      //   const grps = await Group.findAll();
+      //   groups = [...grps];
+      // }
+      console.log(groups);
       const detailedGroups = await Promise.all(
         groups.map(async group => {
           const supervisor = await FacultyMember.findOne({

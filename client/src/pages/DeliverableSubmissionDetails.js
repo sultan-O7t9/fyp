@@ -519,6 +519,11 @@ const DataBody = ({ versionData }) => {
               Pending
             </Typography>
           )}
+          {versionData.eval_status == "Revised" ? (
+            <Typography variant="body1">
+              Revision Date: {versionData.revision_date}
+            </Typography>
+          ) : null}
         </TableCell>
       </TableRow>
       {deliverableData.template && deliverableData.deadline ? (

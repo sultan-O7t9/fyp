@@ -1,48 +1,151 @@
 const sequelize = require("sequelize");
 
-const { Semester, Group, FacultyMember, Student } = require("../models");
+const {
+  Semester,
+  Group,
+  FacultyMember,
+  Student,
+  Mail,
+  Recipiant,
+} = require("../models");
 const { sendMail } = require("../utils/sendMails");
 
 // Router.post("/current", Semester.setCurrentSemester);
 
 class SemesterController {
-  static sendMailToStudents = async (req, res) => {
-    const { message, subject, groups, userId } = req.body;
+  static getSentMails = async (req, res) => {
+    const { userId } = req.body;
     try {
-      const students = await Student.findAll({
+      const sentMails = await Mail.findAll({
         where: {
-          groupId: {
-            [sequelize.Op.in]: groups,
+          facultyId: userId,
+        },
+      });
+      for (let i = 0; i < sentMails.length; i++) {
+        const { id } = sentMails[i];
+        const recipiants = await Recipiant.findAll({
+          where: { mailId: id },
+        });
+        sentMails[i].dataValues.recipiants = recipiants
+          ? recipiants.map(recipiant => {
+              return recipiant.dataValues.recipiant;
+            })
+          : [];
+      }
+      res.status(200).json({ mails: sentMails, get: true });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+  static deleteSentMails = async (req, res) => {
+    const { userId } = req.body;
+    try {
+      const mails = await Mail.findAll({
+        where: {
+          facultyId: userId,
+        },
+      });
+
+      const recipiants = await Recipiant.findAll({
+        where: {
+          mailId: {
+            [sequelize.Op.in]: mails.map(mail => mail.id),
           },
         },
       });
+      await Promise.all(
+        mails.map(mail => {
+          return mail.destroy();
+        })
+      );
+      await Promise.all(
+        recipiants.map(recipiant => {
+          return recipiant.destroy();
+        })
+      );
+      res.status(200).json({ delete: true });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+  static sendMailToStudents = async (req, res) => {
+    const { message, subject, groups, userId, mails } = req.body;
+    try {
       const faculty = await FacultyMember.findOne({
         where: {
           id: userId,
         },
       });
+      if (mails && mails.length) {
+        sendMail(
+          mails.map(student => {
+            return {
+              email: student,
+              subject: subject,
+              body: `
+            ${message}
+  
+  
+            Regards,
+            ${faculty.dataValues.name}
+            `,
+            };
+          })
+        );
+        res.json({
+          message: "Mail sent successfully",
+          mail: true,
+        });
+      } else {
+        const students = await Student.findAll({
+          where: {
+            groupId: {
+              [sequelize.Op.in]: groups,
+            },
+          },
+        });
 
-      sendMail(
-        students.map(student => {
-          return {
-            email: student.dataValues.rollNo + "@uog.edu.pk",
-            subject: subject,
-            body: `
-          ${message}
+        sendMail(
+          students.map(student => {
+            return {
+              email: student.dataValues.rollNo + "@uog.edu.pk",
+              subject: subject,
+              body: `
+            ${message}
+  
+  
+            Regards,
+            ${faculty.dataValues.name}
+            `,
+            };
+          })
+        );
 
+        const mail = await Mail.create({
+          subject,
+          body: message,
+          facultyId: userId,
+        });
 
-          Regards,
-          ${faculty.dataValues.name}
-          `,
-          };
-        })
-      );
+        const recipiants = await Promise.all(
+          students.map(async student => {
+            const recipiant = await Recipiant.create({
+              mailId: mail.id,
+              recipiant: student.dataValues.rollNo + "@uog.edu.pk",
+            });
 
-      res.json({
-        message: "Mail sent successfully",
-        mail: true,
-        students,
-      });
+            return recipiant;
+          })
+        );
+
+        res.json({
+          message: "Mail sent successfully",
+          mail: true,
+          students,
+        });
+      }
     } catch (err) {
       res.json({
         message: "Error in sending mail",
@@ -103,10 +206,11 @@ class SemesterController {
     }
   };
   static createSemester = async (req, res) => {
-    const { title } = req.body;
+    const { title, session } = req.body;
     try {
       const semester = await Semester.create({
         title,
+        session,
       });
       res.json({
         message: "Semester created successfully",

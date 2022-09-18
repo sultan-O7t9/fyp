@@ -431,7 +431,7 @@ const DataBody = () => {
               </Button>
             ) : null}
             {submissionData.length > 0 &&
-            submissionData[0].status != "Approved" ? (
+            submissionData[0].eval_status != "Approved" ? (
               <Button
                 disabled={
                   deliverableData.deadline &&
@@ -457,6 +457,7 @@ const DataBody = () => {
 
         <TableCell>
           {submissionData.length > 0 && submissionData[0].eval_status ? (
+            submissionData.length > 0 &&
             submissionData[0].eval_status == "Approved" ? (
               <Typography
                 variant="body"
@@ -468,7 +469,8 @@ const DataBody = () => {
               >
                 Approved
               </Typography>
-            ) : submissionData[0].eval_status == "Revised" ? (
+            ) : submissionData.length > 0 &&
+              submissionData[0].eval_status == "Revised" ? (
               <Typography
                 variant="body"
                 style={{
@@ -503,6 +505,13 @@ const DataBody = () => {
               Pending
             </Typography>
           )}
+          {submissionData.length > 0 &&
+          submissionData[0].eval_status == "Revised" ? (
+            <Typography variant="body1">
+              Revision Date:{" "}
+              {new Date(submissionData[0].revision_date).toDateString()}
+            </Typography>
+          ) : null}
         </TableCell>
       </TableRow>
       {/* <TableRow>

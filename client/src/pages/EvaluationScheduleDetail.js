@@ -21,7 +21,7 @@ import MenuButton from "../components/MenuButton";
 import Select from "../components/Select";
 import UploadFile from "../components/UploadFile";
 import axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
@@ -442,7 +442,14 @@ const DataHead = () => {
 // };
 
 const DataBody2 = props => {
-  const { showScheduleModal } = props;
+  const {
+    showScheduleModal,
+    showEditScheduleModal,
+    setShowEditScheduleModal,
+    toEdit,
+    deliverableDeadline,
+    setToEdit,
+  } = props;
   const userId = localStorage.getItem("USER_ID");
   const [pageDims, setPageDims] = useState({});
 
@@ -458,7 +465,7 @@ const DataBody2 = props => {
   const deliverableId = params.id;
   const [schedulesData, setSchedulesData] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [showEditScheduleModal, setShowEditScheduleModal] = useState(false);
+
   const [exportSchedule, setExportSchedule] = useState(false);
 
   useEffect(() => {
@@ -528,6 +535,11 @@ const DataBody2 = props => {
     const dataSource = schedulesData.map(item => {
       return {
         ...item,
+        revisionDate:
+          item.submission && item.submission.eval_status == "Revised"
+            ? item.submission.revision_date
+            : null,
+
         committeeStatus:
           item.submission && item.submission.eval_status
             ? item.submission.eval_status
@@ -548,19 +560,51 @@ const DataBody2 = props => {
               width: "100%",
               height: "100%",
               display: "flex",
-              justifyContent: "space-evenly",
-              alignItems: "center",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "flex-end",
             }}
           >
             {localStorage.getItem("USER_ROLE").includes("PMO") ? (
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => {}}
-                color="error"
+              <Box
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
-                Delete
-              </Button>
+                {/* <Button
+                  style={{ marginBottom: "0.5rem" }}
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    setShowEditScheduleModal(true);
+                    setToEdit(item);
+                  }}
+                  disabled={
+                    item.submission && item.submission.eval_status != "Pending"
+                  }
+                >
+                  Edit
+                </Button> */}
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    setToDelete(item);
+                    setShowDeleteModal(true);
+                  }}
+                  color="error"
+                  disabled={
+                    item.submission && item.submission.eval_status != "Pending"
+                  }
+                  style={{ marginBottom: "0.5rem" }}
+                >
+                  Delete
+                </Button>
+              </Box>
             ) : null}
             <Button
               size="small"
@@ -570,9 +614,21 @@ const DataBody2 = props => {
               onClick={() => {
                 console.log(item);
 
-                if (deliverableId == 1) history.push("/proposal/eval/", item);
-                else if (deliverableId == 2) history.push("/d2/eval/", item);
-                else if (deliverableId == 3) history.push("/d3/eval/", item);
+                if (deliverableId == 1)
+                  history.push("/proposal/eval/", {
+                    ...item,
+                    deliverableDeadline: deliverableDeadline,
+                  });
+                else if (deliverableId == 2)
+                  history.push("/d2/eval/", {
+                    ...item,
+                    deliverableDeadline: deliverableDeadline,
+                  });
+                else if (deliverableId == 3)
+                  history.push("/d3/eval/", {
+                    ...item,
+                    deliverableDeadline: deliverableDeadline,
+                  });
               }}
               variant="contained"
             >
@@ -635,6 +691,14 @@ const DataBody2 = props => {
         },
       },
       {
+        name: "revisionDate",
+        header: "Evaluation Revision Date",
+        defaultFlex: 2,
+        render: ({ value }) => {
+          return <div>{value ? new Date(value).toDateString() : null}</div>;
+        },
+      },
+      {
         name: "supervisorStatus",
         header: "Supervisor Review",
         defaultFlex: 2,
@@ -676,7 +740,7 @@ const DataBody2 = props => {
       // },
       {
         name: "actions",
-        defaultFlex: 3,
+        defaultFlex: 2,
         header: "Actions",
       },
     ];
@@ -692,6 +756,8 @@ const DataBody2 = props => {
         "http://localhost:5000/api/evaluation/del-schedule/" + id
       );
       console.log(res.data);
+      setShowDeleteModal(false);
+
       setRefresh(refresh => !refresh);
     } catch (err) {
       console.log(err);
@@ -718,7 +784,11 @@ const DataBody2 = props => {
         data
       );
       console.log(res.data);
-    } catch (err) {}
+      setToastMessage("Schedule shared successfully");
+    } catch (err) {
+      setToastMessage("An error hass occured while sharing the schedule");
+      console.log(err);
+    }
   };
 
   useEffect(() => {
@@ -788,10 +858,10 @@ const DataBody2 = props => {
       />
       {showDeleteModal ? (
         <DeleteConfirmationDialog
-          itemType="Group"
-          item={toDelete.id}
+          itemType="Schedule"
+          item={"Schedule"}
           handleDelete={() => {
-            console.log(toDelete);
+            handleDeleteSchedule(toDelete.id);
           }}
           setOpen={setShowDeleteModal}
         />
@@ -900,6 +970,9 @@ const DataBody2 = props => {
 };
 
 const EvaluationScheduleDetail = props => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    !localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
   const roles = localStorage.getItem("USER_ROLE");
   const [file, setFile] = useState({});
   const [name, setName] = useState("");
@@ -913,6 +986,8 @@ const EvaluationScheduleDetail = props => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showExtensionModal, setShowExtensionModal] = useState(false);
+  const [toEdit, setToEdit] = useState(null);
+  const [showEditScheduleModal, setShowEditScheduleModal] = useState(false);
   // const history=useHistory();
   const params = useParams();
   const deliverableId = params.id;
@@ -981,8 +1056,19 @@ const EvaluationScheduleDetail = props => {
     setShowScheduleModal(true);
   };
 
+  if (!isEligible) return <Redirect to="/404" />;
+
   return (
     <>
+      {showEditScheduleModal ? (
+        <EditSchedule
+          deliverable={deliverableData}
+          setDisplay={setShowEditScheduleModal}
+          schedule={toEdit}
+          setToastMessage={setToastMessage}
+          setShowToast={setShowToast}
+        />
+      ) : null}
       {showExtensionModal ? (
         <ExtensionModal
           deliverableId={deliverableId}
@@ -1129,7 +1215,14 @@ const EvaluationScheduleDetail = props => {
             DataHead={DataHead}
             DataBody={() => <DataBody2 showScheduleModal={showScheduleModal} />}
           /> */}
-          <DataBody2 showScheduleModal={showScheduleModal} />
+          <DataBody2
+            showEditScheduleModal={showEditScheduleModal}
+            setShowEditScheduleModal={setShowEditScheduleModal}
+            toEdit={toEdit}
+            deliverableDeadline={deliverableData.deadline}
+            setToEdit={setToEdit}
+            showScheduleModal={showScheduleModal}
+          />
           {/* <DataBody /> */}
         </Main>
       </ContainerFluid>

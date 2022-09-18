@@ -41,6 +41,13 @@ Router.post("/add-d2-evaluation", Evaluation.handleD2Evaluation);
 Router.post("/d3-evaluation", Evaluation.getD3Evaulation);
 Router.post("/add-d3-evaluation", Evaluation.handleD3Evaluation);
 
+Router.post("/all-eval", Evaluation.getAllEvaluation);
+Router.post("/7th-eval", Evaluation.get7thEvaluation);
+Router.post("/8th-eval", Evaluation.get8thEvaluation);
+Router.post("/final-eval", Evaluation.getFinalEvaluationDetail);
+Router.post("/final-stu-eval", Evaluation.getFinalEvaluationDetailByStudent);
+Router.post("/cover", Evaluation.getCoverLetterReport);
+
 Router.post("/update-review-status", CommitteeReview.changeEndorsementStatus);
 Router.post(
   "/add-commented-doc",

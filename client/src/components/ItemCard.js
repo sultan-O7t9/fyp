@@ -12,13 +12,14 @@ const ItemCard = props => {
   return (
     <Link
       to={manual ? item.link : route}
-      style={{ textDecoration: "none", width: "calc(50% - 1.5rem)" }}
+      style={{ textDecoration: "none", width: "calc(33% - 1.5rem)" }}
       variant="h5"
     >
       <Paper
         style={{
           backgroundColor: "#fff",
           marginBottom: "2rem",
+          // marginRight: "1rem",
           minHeight: "156px",
           padding: "2rem 1.5rem",
           display: "flex",

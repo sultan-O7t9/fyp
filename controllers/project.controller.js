@@ -20,7 +20,51 @@ class ProjectController {
         project,
       });
     } catch (err) {
-      console.log(error);
+      console.log(err);
+      res.status(500).json({ message: err });
+    }
+  };
+  static updateProject = async (req, res) => {
+    const { title, description, type, dev_tech, platform, id } = req.body;
+    console.log(req.body);
+    try {
+      const proj = await Project.findOne({
+        id: id,
+      });
+      if (!proj) {
+        return res.status(404).json({
+          message: "Project not found",
+        });
+      }
+      // await proj.update({
+      //   title,
+      //   description,
+      //   type,
+      //   dev_tech,
+      //   platform,
+      // });
+      await Project.update(
+        {
+          title,
+          description,
+          type,
+          dev_tech,
+          platform,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+
+      console.log(proj);
+      res.status(200).json({
+        message: "Project update successfully",
+        project: proj,
+      });
+    } catch (err) {
+      console.log(err);
       res.status(500).json({ message: err });
     }
   };
@@ -33,7 +77,7 @@ class ProjectController {
       const project = await Project.findOne({
         where: { id: group.dataValues.projectId },
       });
-      console.log(project.dataValues);
+      // console.log(project.dataValues);
       res.status(200).json({
         get: true,
         message: "Project fetched successfully",

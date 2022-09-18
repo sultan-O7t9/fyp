@@ -15,6 +15,7 @@ import AllCommittees from "./pages/AllCommittees";
 import AllGroups from "./pages/AllGroups";
 import AllStudents from "./pages/AllStudents";
 import CommunicationPage from "./pages/CommunicationPage";
+import CoverLetterReport from "./pages/CoverLetterReport";
 import D2EvaluationPage from "./pages/D2EvaluationPage";
 import D2SubmissionPage from "./pages/D2SubmissionPage";
 import D3EvaluationPage from "./pages/D3EvaluationPage";
@@ -25,6 +26,9 @@ import DeliverableSubmissionDetail from "./pages/DeliverableSubmissionDetails";
 import DetailedReport from "./pages/DetailedReport";
 import DetailedReportPage from "./pages/DetailedReportPage";
 import EvaluationScheduleDetail from "./pages/EvaluationScheduleDetail";
+import FinalMarksReport from "./pages/FinalMarksReport";
+import FinalResultPerforma from "./pages/FinalResultPerforma";
+import ForgetPassword from "./pages/ForgetPassword";
 import GroupDashboard from "./pages/GroupDashboard";
 import GroupDetail from "./pages/GroupDetail";
 import GroupLogin from "./pages/GroupLogin";
@@ -33,7 +37,9 @@ import ProposalEvaluationPage from "./pages/ProposalEvaluationPage";
 import ProposalSubmissionPage from "./pages/ProposalSubmissionPage";
 import Register from "./pages/Register";
 import RegisterGroup from "./pages/RegisterGroup";
+import ReportsPage from "./pages/ReportsPage";
 import ScheduleReport from "./pages/ScheduleReport";
+import Semester7Report from "./pages/Semester7Report";
 import SubmitProjectTitle from "./pages/SubmitProjectTitle";
 import SupervisorDeliverableDetail from "./pages/SupervisorDeliverableDetail";
 import SupervisorDocumentation from "./pages/SupervisorDocumentation";
@@ -46,9 +52,13 @@ const AdminRoutes = () => {
   return (
     <>
       {/* Admin */}
-      <Route exact path="/admin/groups" component={AdminAllGroups} />
-      <Route exact path="/admin/faculty" component={AdminManageFaculty} />
-      <Route exact path="/admin/dept" component={AdminManageDept} />
+      <ProtectedRoute exact path="/admin/groups" component={AdminAllGroups} />
+      <ProtectedRoute
+        exact
+        path="/admin/faculty"
+        component={AdminManageFaculty}
+      />
+      <ProtectedRoute exact path="/admin/dept" component={AdminManageDept} />
       {/* ---- */}
     </>
   );
@@ -138,15 +148,56 @@ const App = () => {
       {/* <Route exact path="/committees" component={AllCommittees} /> */}
       {/* <Route exact path="/file" component={UploadFile} /> */}
 
-      <Route exact path="/report" component={DetailedReport} />
-      <Route exact path="/schedule-report" component={ScheduleReport} />
+      {/* <Route exact path="/7-rep" component={FinalResultPerforma} />
+      <Route exact path="/final-rep" component={FinalMarksReport} /> */}
+      <Route exact path="/fyp-rep" component={FinalResultPerforma} />
+      <ProtectedRoute exact path="/report" component={DetailedReport} />
+      {/* <Route exact path="/schedule-report" component={ScheduleReport} /> */}
+      <Route
+        path="/404"
+        component={() => (
+          <div
+            style={{
+              display: "flex",
+              minHeight: "300px",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <h1
+              style={{
+                fontFamily: "sans-serif",
+                color: "lightblue",
+                fontSize: "4rem",
+              }}
+            >
+              Error 404
+            </h1>
+            <h3
+              style={{
+                fontFamily: "sans-serif",
+                color: "lightblue",
+                fontSize: "2.5rem",
+              }}
+            >
+              Page not found
+            </h3>
+          </div>
+        )}
+      />
       <Route exact path="/login" component={Login} />
+      <Route exact path="/forget" component={ForgetPassword} />
       <Route exact path="/group" component={GroupLogin} />
       <Route exact path="/admin" component={AdminLogin} />
       <Route exact path="/register" component={Register} />
-      <Route exact path="/register-group" component={RegisterGroup} />
-      <Route exact path="/main/info" component={ViewGroup} />
-      <Route exact path="/register-project" component={SubmitProjectTitle} />
+      <ProtectedRoute exact path="/register-group" component={RegisterGroup} />
+      <ProtectedRoute exact path="/main/info" component={ViewGroup} />
+      <ProtectedRoute
+        exact
+        path="/register-project"
+        component={SubmitProjectTitle}
+      />
       {roles === "HOD" ? (
         <AdminRoutes />
       ) : roles === "group" ? (
@@ -170,103 +221,52 @@ const App = () => {
         </GroupMainLayout>
       ) : (
         <MainLayout>
-          <Route exact path="/groups" component={AllGroups} />
-          <Route exact path="/groups/:id" component={GroupDetail} />
-          <Route
+          <ProtectedRoute exact path="/groups" component={AllGroups} />
+          <ProtectedRoute exact path="/groups/:id" component={GroupDetail} />
+          <ProtectedRoute
             exact
             path="/sup/deliverable/detail/:id"
             component={SupervisorProposal}
           />
-          <Route
+          <ProtectedRoute
             exact
             path="/groups/d2/:id"
             component={SupervisorDocumentation}
           />
-          <Route
+          <ProtectedRoute
             exact
             path="/groups/d3/:id"
             component={SupervisorFinalDeliverable}
           />
-          <Route exact path="/" component={Dashboard} />
-          <Route exact path="/deliverable/:id" component={DeliverableDetail} />
-          <Route
+          <ProtectedRoute exact path="/" component={Dashboard} />
+          <ProtectedRoute
+            exact
+            path="/deliverable/:id"
+            component={DeliverableDetail}
+          />
+          <ProtectedRoute
             exact
             path="/deliverable/sched/:id"
             component={EvaluationScheduleDetail}
           />
-          <Route
+          <ProtectedRoute
             exact
             path="/sup/deliverable/:id"
             component={SupervisorDeliverableDetail}
           />
-          <Route
+          <ProtectedRoute
             exact
             path="/proposal/eval/"
             component={ProposalEvaluationPage}
           />
-          <Route exact path="/d2/eval/" component={D2EvaluationPage} />
-          <Route exact path="/d3/eval/" component={D3EvaluationPage} />
-          <Route exact path="/students" component={AllStudents} />
-          <Route exact path="/committees" component={AllCommittees} />
-          <Route exact path="/comm" component={CommunicationPage} />
+          <ProtectedRoute exact path="/d2/eval/" component={D2EvaluationPage} />
+          <ProtectedRoute exact path="/d3/eval/" component={D3EvaluationPage} />
+          <ProtectedRoute exact path="/students" component={AllStudents} />
+          <ProtectedRoute exact path="/committees" component={AllCommittees} />
+          <ProtectedRoute exact path="/comm" component={CommunicationPage} />
+          <ProtectedRoute exact path="/rep" component={ReportsPage} />
         </MainLayout>
       )}
-      {/* {roles && roles.includes("STUDENT") ? ( */}
-      {/* <> */}
-      {/* </>
-      ) : null} */}
-      {/* <MainLayout> */}
-      {/* <ProtectedRoute exact path="/" component={Dashboard} /> */}
-      {/* {
-          // (roles && roles.includes("PMO")) ||
-          // (roles && roles.includes("SUPERVISOR")) ||
-          // (roles && roles.includes("EVALUATOR")) ||
-          true ? (
-            <> */}
-
-      {/* <ProtectedRoute exact path="/committees" component={AllCommittees} /> */}
-      {/* <ProtectedRoute
-        exact
-        path="/deliverable/:id"
-        component={DeliverableDetail}
-      /> */}
-      {/* </>
-          ) : null
-        } */}
-      {/* </MainLayout> */}
-      <Route
-        path="/"
-        component={() => (
-          <div
-            style={{
-              display: "flex",
-              minHeight: "300px",
-              justifyContent: "center",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <h1
-              style={{
-                fontFamily: "sans-serif",
-                color: "purple",
-                fontSize: "4rem",
-              }}
-            >
-              Error 404
-            </h1>
-            <h3
-              style={{
-                fontFamily: "sans-serif",
-                color: "purple",
-                fontSize: "2.5rem",
-              }}
-            >
-              Page not found
-            </h3>
-          </div>
-        )}
-      />
     </Switch>
   );
 };

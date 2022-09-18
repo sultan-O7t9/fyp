@@ -16,9 +16,878 @@ const {
   PMO,
   CommitteeReview,
   Version,
+  Department,
+  Semester,
 } = require("../models");
 
 class EvaluationController {
+  static getCoverLetterReport = async (req, res) => {
+    const { groups } = req.body;
+    const data = [];
+    try {
+      for (let i = 0; i < groups.length; i++) {
+        const group = await Group.findOne({
+          where: {
+            id: groups[i],
+          },
+        });
+
+        const project = await Project.findOne({
+          where: {
+            id: group.projectId,
+          },
+        });
+        const members = await Student.findAll({
+          where: {
+            groupId: group.id,
+          },
+        });
+        data.push({
+          projectTitle: project ? project.dataValues.title : "",
+          members: members
+            ? members.map(member => ({
+                rollNo: member.dataValues.rollNo,
+                name: member.dataValues.name,
+              }))
+            : [],
+        });
+      }
+      console.log(data);
+      res.status(200).json({
+        status: "success",
+        students: data,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+  static get7thEvaluation = async (req, res) => {
+    const { groups } = req.body;
+    try {
+      const sts = [];
+      for (let i = 0; i < groups.length; i++) {
+        const grp = await Group.findOne({ where: { id: groups[i] } });
+        const prjct = await Project.findOne({ where: { id: grp.projectId } });
+        const students = await Student.findAll({
+          where: {
+            groupId: groups[i],
+          },
+        });
+        console.log(students);
+        const proposalEvals = {};
+        for (let i = 0; i < students.length; i++) {
+          const proposalEval = await ProposalEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          // proposalEvals.push(proposalEval?proposalEval.dataValues:{existingSystem:0,goals:0,architecture:0,pptSkills:0});
+          proposalEvals[students[i].rollNo] = proposalEval
+            ? { ...proposalEval.dataValues }
+            : { existingSystem: 0, goals: 0, architecture: 0, pptSkills: 0 };
+        }
+        console.log(proposalEvals);
+        const d2Evals = {};
+        for (let i = 0; i < students.length; i++) {
+          const d2Eval = await D2Evaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          d2Evals[students[i].rollNo] = d2Eval
+            ? { ...d2Eval.dataValues }
+            : {
+                funcReqs: 0,
+                interfaces: 0,
+                usecaseDesc: 0,
+                usecaseDia: 0,
+                nonFuncReqs: 0,
+                domainDia: 0,
+                classDia: 0,
+                sequenceDia: 0,
+                stateChartDia: 0,
+                collabDia: 0,
+                sysPrototype: 0,
+              };
+        }
+
+        const supEvals = {};
+        for (let i = 0; i < students.length; i++) {
+          const supEval = await SupervisorEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          supEvals[students[i].rollNo] = supEval
+            ? supEval.dataValues.marks / 2
+            : 0;
+        }
+        const pmoEvals = {};
+        for (let i = 0; i < students.length; i++) {
+          const pmoEval = await PmoEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          pmoEvals[students[i].rollNo] = pmoEval
+            ? pmoEval.dataValues.marks / 2
+            : 0;
+        }
+        const totals = {};
+        for (let i = 0; i < students.length; i++) {
+          totals[students[i].rollNo] =
+            proposalEvals[students[i].rollNo].existingSystem +
+            proposalEvals[students[i].rollNo].goals +
+            proposalEvals[students[i].rollNo].architecture +
+            proposalEvals[students[i].rollNo].pptSkills +
+            d2Evals[students[i].rollNo].funcReqs +
+            d2Evals[students[i].rollNo].interfaces +
+            d2Evals[students[i].rollNo].usecaseDesc +
+            d2Evals[students[i].rollNo].usecaseDia +
+            d2Evals[students[i].rollNo].nonFuncReqs +
+            d2Evals[students[i].rollNo].domainDia +
+            d2Evals[students[i].rollNo].classDia +
+            d2Evals[students[i].rollNo].sequenceDia +
+            d2Evals[students[i].rollNo].stateChartDia +
+            d2Evals[students[i].rollNo].collabDia +
+            d2Evals[students[i].rollNo].sysPrototype +
+            supEvals[students[i].rollNo] +
+            pmoEvals[students[i].rollNo];
+        }
+        console.log(totals);
+
+        const depts = {};
+        for (let i = 0; i < students.length; i++) {
+          const dept = await Department.findOne({
+            where: {
+              id: students[i].departmentId,
+            },
+          });
+          if (dept) {
+            depts[students[i].rollNo] = dept.dataValues.name;
+          } else {
+            depts[students[i].rollNo] = "";
+          }
+        }
+
+        const ssts = students.map(st => {
+          return {
+            name: st.dataValues.name,
+            projectTitle: prjct ? prjct.dataValues.title : "",
+            projectType: prjct ? prjct.dataValues.dev_tech : "structured",
+            rollNo: st.dataValues.rollNo,
+            degree: depts[st.dataValues.rollNo]
+              ? st.dataValues.degree + depts[st.dataValues.rollNo]
+              : st.dataValues.degree,
+            proposalEval: proposalEvals[st.dataValues.rollNo],
+            d2Eval: d2Evals[st.dataValues.rollNo],
+            supEval: supEvals[st.dataValues.rollNo],
+            pmoEval: pmoEvals[st.dataValues.rollNo],
+            total: totals[st.dataValues.rollNo],
+          };
+        });
+        for (let i = 0; i < ssts.length; i++) {
+          sts.push(ssts[i]);
+        }
+      }
+      console.log(sts);
+      res.status(200).json({
+        status: "success",
+        students: sts,
+      });
+      // const d3Evals=[];
+      // for(let i=0;i<students.length;i++){
+      //   const d3Eval=await D3Evaluation.findOne({
+      //     where:{
+      //       studentId:students[i].id
+      //     }
+      //   });
+      //   d3Evals.push(d3Eval?d3Eval.dataValues:{funcreqs:0,interfaces:0,usecaseDesc:0,usecaseDia:0,nonFuncReqs:0,domainDia:0,classDia:0,sequenceDia:0,stateChartDia:0,collabDia:0,sysPrototype:0});
+      // }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: err });
+    }
+  };
+  static get8thEvaluation = async (req, res) => {
+    const { groups } = req.body;
+    try {
+      const sts = [];
+      for (let i = 0; i < groups.length; i++) {
+        const grp = await Group.findOne({ where: { id: groups[i] } });
+        const prjct = await Project.findOne({ where: { id: grp.projectId } });
+        const students = await Student.findAll({
+          where: {
+            groupId: groups[i],
+          },
+        });
+        console.log(students);
+
+        const d3Evals = {};
+        for (let i = 0; i < students.length; i++) {
+          const d3Eval = await D3Evaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          d3Evals[students[i].rollNo] = d3Eval
+            ? { ...d3Eval.dataValues }
+            : {
+                runProject: 0,
+                codeModify: 0,
+                testPlan: 0,
+                testCase: 0,
+                projectPpt: 0,
+                userMan: 0,
+                stdTemp: 0,
+                skill: 0,
+              };
+        }
+
+        const supEvals = {};
+        for (let i = 0; i < students.length; i++) {
+          const supEval = await SupervisorEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          supEvals[students[i].rollNo] = supEval
+            ? supEval.dataValues.marks / 2
+            : 0;
+        }
+        const pmoEvals = {};
+        for (let i = 0; i < students.length; i++) {
+          const pmoEval = await PmoEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          pmoEvals[students[i].rollNo] = pmoEval
+            ? pmoEval.dataValues.marks / 2
+            : 0;
+        }
+        const totals = {};
+        for (let i = 0; i < students.length; i++) {
+          totals[students[i].rollNo] =
+            d3Evals[students[i].rollNo].runProject +
+            d3Evals[students[i].rollNo].codeModify +
+            d3Evals[students[i].rollNo].testPlan +
+            d3Evals[students[i].rollNo].testCase +
+            d3Evals[students[i].rollNo].projectPpt +
+            d3Evals[students[i].rollNo].userMan +
+            d3Evals[students[i].rollNo].stdTemp +
+            d3Evals[students[i].rollNo].skill +
+            supEvals[students[i].rollNo] +
+            pmoEvals[students[i].rollNo];
+        }
+        console.log(totals);
+
+        const depts = {};
+        for (let i = 0; i < students.length; i++) {
+          const dept = await Department.findOne({
+            where: {
+              id: students[i].departmentId,
+            },
+          });
+          if (dept) {
+            depts[students[i].rollNo] = dept.dataValues.name;
+          } else {
+            depts[students[i].rollNo] = "";
+          }
+        }
+
+        const ssts = students.map(st => {
+          return {
+            name: st.dataValues.name,
+            projectTitle: prjct ? prjct.dataValues.title : "",
+            projectType: prjct ? prjct.dataValues.dev_tech : "structured",
+            rollNo: st.dataValues.rollNo,
+            degree: depts[st.dataValues.rollNo]
+              ? st.dataValues.degree + depts[st.dataValues.rollNo]
+              : st.dataValues.degree,
+
+            d3Eval: d3Evals[st.dataValues.rollNo],
+            supEval: supEvals[st.dataValues.rollNo],
+            pmoEval: pmoEvals[st.dataValues.rollNo],
+            total: totals[st.dataValues.rollNo],
+          };
+        });
+        for (let i = 0; i < ssts.length; i++) {
+          sts.push(ssts[i]);
+        }
+      }
+      console.log(sts);
+      res.status(200).json({
+        status: "success",
+        students: sts,
+      });
+      // const d3Evals=[];
+      // for(let i=0;i<students.length;i++){
+      //   const d3Eval=await D3Evaluation.findOne({
+      //     where:{
+      //       studentId:students[i].id
+      //     }
+      //   });
+      //   d3Evals.push(d3Eval?d3Eval.dataValues:{funcreqs:0,interfaces:0,usecaseDesc:0,usecaseDia:0,nonFuncReqs:0,domainDia:0,classDia:0,sequenceDia:0,stateChartDia:0,collabDia:0,sysPrototype:0});
+      // }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: err });
+    }
+  };
+  static getFinalEvaluationDetailByStudent = async (req, res) => {
+    const { groups } = req.body;
+    //dept, name, roll, supervisor, class, session, projectTitle, evaluators: name, designation,  total, percentage
+    try {
+      const sts = [];
+      for (let i = 0; i < groups.length; i++) {
+        const grp = await Group.findOne({ where: { id: groups[i] } });
+        const supervisorId = grp.dataValues.supervisorId;
+        const supervisor = await FacultyMember.findOne({
+          where: { id: supervisorId },
+        });
+
+        const dept = await Department.findOne({
+          where: {
+            id: grp.dataValues.departmentId,
+          },
+        });
+
+        const comm = await Committee.findOne({
+          where: {
+            id: grp.dataValues.committeeId,
+          },
+        });
+        const evaluators = [];
+        if (comm) {
+          const members = await FacultyMember.findAll({
+            where: {
+              committeeId: comm.dataValues.id,
+            },
+          });
+          for (let j = 0; j < members.length; j++) {
+            evaluators.push({
+              name: members[j].dataValues.name,
+              designation: members[j].dataValues.designation,
+            });
+          }
+        }
+
+        const prjct = await Project.findOne({ where: { id: grp.projectId } });
+        const students = await Student.findAll({
+          where: {
+            groupId: groups[i],
+          },
+        });
+        console.log(students);
+
+        const evals = {};
+        for (let i = 0; i < students.length; i++) {
+          const d3Eval = await D3Evaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const proposalEval = await ProposalEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+
+          const d2Eval = await D2Evaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const pmoEval = await PmoEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const supEval = await SupervisorEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const d1 = proposalEval
+            ? proposalEval.dataValues.existingSystem +
+              proposalEval.dataValues.goals +
+              proposalEval.dataValues.architecture +
+              proposalEval.dataValues.pptSkills
+            : 0;
+          const d2 = d2Eval
+            ? d2Eval.dataValues.funcReqs +
+              d2Eval.dataValues.interfaces +
+              d2Eval.dataValues.usecaseDesc +
+              d2Eval.dataValues.usecaseDia +
+              d2Eval.dataValues.nonFuncReqs +
+              d2Eval.dataValues.domainDia +
+              d2Eval.dataValues.classDia +
+              d2Eval.dataValues.sequenceDia +
+              d2Eval.dataValues.stateChartDia +
+              d2Eval.dataValues.collabDia +
+              d2Eval.dataValues.sysPrototype
+            : 0;
+          const d3 = d3Eval
+            ? d3Eval.dataValues.runProject +
+              d3Eval.dataValues.codeModify +
+              d3Eval.dataValues.testPlan +
+              d3Eval.dataValues.testCase +
+              d3Eval.dataValues.projectPpt +
+              d3Eval.dataValues.userMan +
+              d3Eval.dataValues.stdTemp +
+              d3Eval.dataValues.skill
+            : 0;
+
+          const sup = supEval ? supEval.dataValues.marks : 0;
+          const pmo = pmoEval ? pmoEval.dataValues.marks : 0;
+          const total = d1 + d2 + d3 + sup + pmo;
+          evals[students[i].rollNo] = {
+            total: total,
+            percentage: (total / 200) * 100,
+          };
+        }
+
+        const depts = {};
+        for (let i = 0; i < students.length; i++) {
+          const dept = await Department.findOne({
+            where: {
+              id: students[i].departmentId,
+            },
+          });
+          if (dept) {
+            depts[students[i].rollNo] = {
+              name: dept.dataValues.name,
+              title: dept.dataValues.title,
+            };
+          } else {
+            depts[students[i].rollNo] = "";
+          }
+        }
+
+        const semester = await Semester.findOne({
+          where: {
+            id: grp.dataValues.semesterId,
+          },
+        });
+        let session = "";
+        if (semester) {
+          session = semester.dataValues.session;
+        }
+        console.log(session, semester);
+        const ssts = students.map(st => {
+          return {
+            name: st.dataValues.name,
+            supervisor: supervisor.dataValues.name,
+            evaluators: evaluators.length > 0 ? evaluators : [{}, {}],
+            projectTitle: prjct ? prjct.dataValues.title : "",
+            projectType: prjct ? prjct.dataValues.dev_tech : "structured",
+            rollNo: st.dataValues.rollNo,
+            department: depts[st.dataValues.rollNo]
+              ? depts[st.dataValues.rollNo].title
+              : "",
+            class: depts[st.dataValues.rollNo]
+              ? st.dataValues.degree + depts[st.dataValues.rollNo].name
+              : st.dataValues.degree,
+            session: session,
+            total: evals[st.dataValues.rollNo].total,
+            percentage: evals[st.dataValues.rollNo].percentage,
+          };
+        });
+        for (let i = 0; i < ssts.length; i++) {
+          sts.push(ssts[i]);
+        }
+      }
+      console.log(sts);
+      res.status(200).json({
+        status: "success",
+        students: sts,
+      });
+      // const d3Evals=[];
+      // for(let i=0;i<students.length;i++){
+      //   const d3Eval=await D3Evaluation.findOne({
+      //     where:{
+      //       studentId:students[i].id
+      //     }
+      //   });
+      //   d3Evals.push(d3Eval?d3Eval.dataValues:{funcreqs:0,interfaces:0,usecaseDesc:0,usecaseDia:0,nonFuncReqs:0,domainDia:0,classDia:0,sequenceDia:0,stateChartDia:0,collabDia:0,sysPrototype:0});
+      // }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: err });
+    }
+  };
+  static getFinalEvaluationDetail = async (req, res) => {
+    const { groups } = req.body;
+    try {
+      const sts = [];
+      for (let i = 0; i < groups.length; i++) {
+        const grp = await Group.findOne({ where: { id: groups[i] } });
+        const supervisorId = grp.dataValues.supervisorId;
+        const supervisor = await FacultyMember.findOne({
+          where: { id: supervisorId },
+        });
+
+        const dept = await Department.findOne({
+          where: {
+            id: grp.dataValues.departmentId,
+          },
+        });
+
+        const comm = await Committee.findOne({
+          where: {
+            id: grp.dataValues.committeeId,
+          },
+        });
+        const evaluators = [];
+        if (comm) {
+          const members = await FacultyMember.findAll({
+            where: {
+              committeeId: comm.dataValues.id,
+            },
+          });
+          for (let j = 0; j < members.length; j++) {
+            evaluators.push(members[j].dataValues.name);
+          }
+        }
+
+        const prjct = await Project.findOne({ where: { id: grp.projectId } });
+        const students = await Student.findAll({
+          where: {
+            groupId: groups[i],
+          },
+        });
+        console.log(students);
+
+        const evals = {};
+        for (let i = 0; i < students.length; i++) {
+          const d3Eval = await D3Evaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const proposalEval = await ProposalEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+
+          const d2Eval = await D2Evaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const pmoEval = await PmoEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const supEval = await SupervisorEvaluation.findOne({
+            where: {
+              studentId: students[i].rollNo,
+            },
+          });
+          const d1 = proposalEval
+            ? proposalEval.dataValues.existingSystem +
+              proposalEval.dataValues.goals +
+              proposalEval.dataValues.architecture +
+              proposalEval.dataValues.pptSkills
+            : 0;
+          const d2 = d2Eval
+            ? d2Eval.dataValues.funcReqs +
+              d2Eval.dataValues.interfaces +
+              d2Eval.dataValues.usecaseDesc +
+              d2Eval.dataValues.usecaseDia +
+              d2Eval.dataValues.nonFuncReqs +
+              d2Eval.dataValues.domainDia +
+              d2Eval.dataValues.classDia +
+              d2Eval.dataValues.sequenceDia +
+              d2Eval.dataValues.stateChartDia +
+              d2Eval.dataValues.collabDia +
+              d2Eval.dataValues.sysPrototype
+            : 0;
+          const d3 = d3Eval
+            ? d3Eval.dataValues.runProject +
+              d3Eval.dataValues.codeModify +
+              d3Eval.dataValues.testPlan +
+              d3Eval.dataValues.testCase +
+              d3Eval.dataValues.projectPpt +
+              d3Eval.dataValues.userMan +
+              d3Eval.dataValues.stdTemp +
+              d3Eval.dataValues.skill
+            : 0;
+
+          const sup = supEval ? supEval.dataValues.marks : 0;
+          const pmo = pmoEval ? pmoEval.dataValues.marks : 0;
+          const total = d1 + d2 + d3 + sup + pmo;
+          evals[students[i].rollNo] = {
+            total: total,
+            percentage: (total / 200) * 100,
+          };
+        }
+
+        const depts = {};
+        for (let i = 0; i < students.length; i++) {
+          const dept = await Department.findOne({
+            where: {
+              id: students[i].departmentId,
+            },
+          });
+          if (dept) {
+            depts[students[i].rollNo] = dept.dataValues.name;
+          } else {
+            depts[students[i].rollNo] = "";
+          }
+        }
+
+        const semester = await Semester.findOne({
+          where: {
+            id: grp.dataValues.semesterId,
+          },
+        });
+        let session = "";
+        if (semester) {
+          session = semester.dataValues.session;
+        }
+        const ssts = students.map(st => {
+          return {
+            name: st.dataValues.name,
+            supervisor: supervisor.dataValues.name,
+            evaluators: evaluators.length > 0 ? evaluators : ["", ""],
+            projectTitle: prjct ? prjct.dataValues.title : "",
+            projectType: prjct ? prjct.dataValues.dev_tech : "structured",
+            rollNo: st.dataValues.rollNo,
+
+            class: depts[st.dataValues.rollNo]
+              ? st.dataValues.degree + depts[st.dataValues.rollNo]
+              : st.dataValues.degree,
+            total: evals[st.dataValues.rollNo].total,
+            percentage: evals[st.dataValues.rollNo].percentage,
+          };
+        });
+        for (let i = 0; i < ssts.length; i++) {
+          sts.push(ssts[i]);
+        }
+      }
+      console.log(sts);
+      res.status(200).json({
+        status: "success",
+        students: sts,
+      });
+      // const d3Evals=[];
+      // for(let i=0;i<students.length;i++){
+      //   const d3Eval=await D3Evaluation.findOne({
+      //     where:{
+      //       studentId:students[i].id
+      //     }
+      //   });
+      //   d3Evals.push(d3Eval?d3Eval.dataValues:{funcreqs:0,interfaces:0,usecaseDesc:0,usecaseDia:0,nonFuncReqs:0,domainDia:0,classDia:0,sequenceDia:0,stateChartDia:0,collabDia:0,sysPrototype:0});
+      // }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: err });
+    }
+  };
+  static getAllEvaluation = async (req, res) => {
+    const { groups } = req.body;
+    try {
+      // const pmo = await PMO.findAll({ where: { pmoId: userId } });
+      // const depts = pmo.map(p => p.deptId);
+      const grps = await Group.findAll({
+        where: {
+          id: {
+            [sequelize.Op.in]: groups,
+          },
+        },
+      });
+      const studentsByGrps = [];
+      for (let i = 0; i < groups.length; i++) {
+        const supervisorId = grps[i].dataValues.supervisorId;
+        const supervisor = await FacultyMember.findOne({
+          where: { id: supervisorId },
+        });
+
+        const prjct = await Project.findOne({
+          where: {
+            id: grps[i].dataValues.projectId,
+          },
+        });
+
+        const dept = await Department.findOne({
+          where: {
+            id: grps[i].dataValues.departmentId,
+          },
+        });
+
+        const comm = await Committee.findOne({
+          where: {
+            id: grps[i].dataValues.committeeId,
+          },
+        });
+        const evaluators = [];
+        if (comm) {
+          const members = await FacultyMember.findAll({
+            where: {
+              committeeId: comm.dataValues.id,
+            },
+          });
+          for (let j = 0; j < members.length; j++) {
+            evaluators.push(members[j].dataValues.name);
+          }
+        }
+
+        const students = await Student.findAll({
+          where: { groupId: groups[i] },
+        });
+
+        const proposalEvals = {};
+        for (let j = 0; j < students.length; j++) {
+          const proposalEval = await ProposalEvaluation.findOne({
+            where: { studentId: students[j].dataValues.rollNo },
+          });
+          let marks;
+          if (proposalEval) {
+            marks =
+              proposalEval.dataValues.existingSystem +
+              proposalEval.dataValues.goals +
+              proposalEval.dataValues.architecture +
+              proposalEval.dataValues.pptSkills;
+          } else {
+            marks = 0;
+          }
+          proposalEvals[students[j].rollNo] = marks;
+        }
+        const d2Evals = {};
+        for (let j = 0; j < students.length; j++) {
+          const d2Eval = await D2Evaluation.findOne({
+            where: { studentId: students[j].dataValues.rollNo },
+          });
+          let marks;
+          if (d2Eval) {
+            marks =
+              d2Eval.dataValues.funcReqs +
+              d2Eval.dataValues.interfaces +
+              d2Eval.dataValues.usecaseDesc +
+              d2Eval.dataValues.usecaseDia +
+              d2Eval.dataValues.nonFuncReqs +
+              d2Eval.dataValues.domainDia +
+              d2Eval.dataValues.classDia +
+              d2Eval.dataValues.sequenceDia +
+              d2Eval.dataValues.stateChartDia +
+              d2Eval.dataValues.collabDia +
+              d2Eval.dataValues.sysPrototype;
+          } else {
+            marks = 0;
+          }
+          d2Evals[students[j].rollNo] = marks;
+        }
+
+        const d3Evals = {};
+        for (let j = 0; j < students.length; j++) {
+          const d3Eval = await D3Evaluation.findOne({
+            where: { studentId: students[j].dataValues.rollNo },
+          });
+          let marks;
+          if (d3Eval) {
+            marks =
+              d3Eval.dataValues.runProject +
+              d3Eval.dataValues.codeModify +
+              d3Eval.dataValues.testPlan +
+              d3Eval.dataValues.projectPpt +
+              d3Eval.dataValues.userMan +
+              d3Eval.dataValues.stdTemp +
+              d3Eval.dataValues.skill +
+              d3Eval.dataValues.testCase;
+          } else {
+            marks = 0;
+          }
+          d3Evals[students[j].rollNo] = marks;
+        }
+        const supEvals = {};
+        for (let j = 0; j < students.length; j++) {
+          const supEval = await SupervisorEvaluation.findOne({
+            where: { studentId: students[j].dataValues.rollNo },
+          });
+          let marks;
+          if (supEval) {
+            marks = supEval.dataValues.marks;
+          } else {
+            marks = 0;
+          }
+          supEvals[students[j].rollNo] = marks;
+        }
+        const pmoEvals = {};
+        for (let j = 0; j < students.length; j++) {
+          const pmoEval = await PmoEvaluation.findOne({
+            where: { studentId: students[j].dataValues.rollNo },
+          });
+          let marks;
+          if (pmoEval) {
+            marks = pmoEval.dataValues.marks;
+          } else {
+            marks = 0;
+          }
+          pmoEvals[students[j].rollNo] = marks;
+        }
+        const semester = await Semester.findOne({
+          where: {
+            id: grps[i].dataValues.semesterId,
+          },
+        });
+        let session = "";
+        if (semester) {
+          session = semester.dataValues.session;
+        }
+
+        const sts = students.map(st => {
+          return {
+            rollNo: st.dataValues.rollNo,
+            name: st.dataValues.name,
+            class: dept ? st.dataValues.degree + dept.dataValues.name : "",
+
+            supervisor: supervisor ? supervisor.dataValues.name : "",
+            projectTitle: prjct ? prjct.dataValues.title : "",
+            department: dept ? dept.dataValues.title : "",
+            evaluators: evaluators.length > 0 ? evaluators : ["", ""],
+            d1: proposalEvals[st.dataValues.rollNo],
+            d2: d2Evals[st.dataValues.rollNo],
+            d3: d3Evals[st.dataValues.rollNo],
+            supervisorEvaluation: supEvals[st.dataValues.rollNo],
+            pmoEvaluation: pmoEvals[st.dataValues.rollNo],
+            session: session,
+            total:
+              proposalEvals[st.dataValues.rollNo] +
+              d2Evals[st.dataValues.rollNo] +
+              d3Evals[st.dataValues.rollNo] +
+              supEvals[st.dataValues.rollNo] +
+              pmoEvals[st.dataValues.rollNo],
+            percentage:
+              ((proposalEvals[st.dataValues.rollNo] +
+                d2Evals[st.dataValues.rollNo] +
+                d3Evals[st.dataValues.rollNo] +
+                supEvals[st.dataValues.rollNo] +
+                pmoEvals[st.dataValues.rollNo]) /
+                200) *
+              100,
+          };
+        });
+        // console.log(sts);
+        sts.forEach(st => {
+          studentsByGrps.push(st);
+        });
+        // studentsByGrps.concat(sts);
+      }
+      console.log(studentsByGrps);
+      res.status(200).json({
+        status: "success",
+        studetns: studentsByGrps,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Internal Server Error", error: error });
+    }
+  };
   static getPMOEvaluationByGroup = async (req, res) => {
     const { groupId, projectId } = req.body;
     try {

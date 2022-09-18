@@ -25,7 +25,7 @@ import MenuButton from "../components/MenuButton";
 import Select from "../components/Select";
 import UploadFile from "../components/UploadFile";
 import axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
@@ -118,16 +118,6 @@ const DataBody = props => {
   const [totalFieldMarks, setTotalFieldMarks] = useState({});
 
   useEffect(() => {
-    const date = new Date(evalDate);
-    const month = date.getMonth() + 1;
-    const dd = `${date.getFullYear()}-${
-      month < 10 ? "0" + month : month
-    }-${date.getDate()}`;
-
-    setRevisionDate(dd);
-  }, [evalDate]);
-
-  useEffect(() => {
     const getDeliverableData = async () => {
       try {
         const response = await axios.post(
@@ -190,6 +180,16 @@ const DataBody = props => {
     };
     getReviewData();
   }, [deliverableId, groupId, committeeId, showUploadModal, refresh]);
+
+  useEffect(() => {
+    const date = new Date(evalDate);
+    const month = date.getMonth() + 1;
+    const dd = `${date.getFullYear()}-${
+      month < 10 ? "0" + month : month
+    }-${date.getDate()}`;
+
+    setRevisionDate(dd);
+  }, [evalDate]);
 
   useEffect(() => {
     if (!evalData.students) return;
@@ -392,6 +392,215 @@ const DataBody = props => {
   };
 
   const handleSubmit = async () => {
+    const facultyRes = await axios.post(
+      "http://localhost:5000/api/faculty/get-sup-id",
+      {
+        id: localStorage.getItem("USER_ID"),
+      }
+    );
+    console.log(facultyRes.data.faculty);
+
+    const LOGS = [];
+    const students = evalData.students;
+    students.forEach(student => {
+      if (student.funcReqs != funcReqsMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Functional Requirements Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.funcReqs} to ${funcReqsMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.interfaces != interfacesMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Interfaces Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.interfaces} to ${interfacesMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.usecaseDesc != usecaseDescMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Usecase Description Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.usecaseDesc} to ${usecaseDescMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.usecaseDia != usecaseDiaMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Usecase Diagram Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.usecaseDia} to ${usecaseDiaMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.nonFuncReqs != nonFuncReqsMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Non-Functional Requirements Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.nonFuncReqs} to ${nonFuncReqsMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.domainDia != domainDiaMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `${
+            projectInfo.hasOwnProperty("dev_tech") &&
+            projectInfo.dev_tech == "object oriented"
+              ? "Domain Model"
+              : "ERD"
+          } Marks of ${student.rollNo} was changed by ${localStorage.getItem(
+            "USER_ROLE"
+          )}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.domainDia} to ${domainDiaMarks[student.rollNo]}`,
+        };
+
+        LOGS.push(log);
+      }
+
+      if (student.classDia != classDiaMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `${
+            projectInfo.hasOwnProperty("dev_tech") &&
+            projectInfo.dev_tech == "object oriented"
+              ? "Class Diagram"
+              : "Data Flow Diagram"
+          } Marks of ${student.rollNo} was changed by ${localStorage.getItem(
+            "USER_ROLE"
+          )}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.classDia} to ${classDiaMarks[student.rollNo]}`,
+        };
+
+        LOGS.push(log);
+      }
+
+      if (student.sequenceDia != sequenceDiaMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `${
+            projectInfo.hasOwnProperty("dev_tech") &&
+            projectInfo.dev_tech == "object oriented"
+              ? "Sequence Diagram"
+              : "State Transition Diagram"
+          } Marks of ${student.rollNo} was changed by ${localStorage.getItem(
+            "USER_ROLE"
+          )}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.sequenceDia} to ${sequenceDiaMarks[student.rollNo]}`,
+        };
+
+        LOGS.push(log);
+      }
+
+      if (student.stateChartDia != stateChartDiaMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `${
+            projectInfo.hasOwnProperty("dev_tech") &&
+            projectInfo.dev_tech == "object oriented"
+              ? "State Chart Diagram"
+              : "Architectural Diagram"
+          } Marks of ${student.rollNo} was changed by ${localStorage.getItem(
+            "USER_ROLE"
+          )}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.stateChartDia} to ${
+            stateChartDiaMarks[student.rollNo]
+          }`,
+        };
+
+        LOGS.push(log);
+      }
+
+      if (student.collabDia != collabDiaMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `${
+            projectInfo.hasOwnProperty("dev_tech") &&
+            projectInfo.dev_tech == "object oriented"
+              ? "Collaboration Diagram"
+              : "Component Diagram"
+          } Marks of ${student.rollNo} was changed by ${localStorage.getItem(
+            "USER_ROLE"
+          )}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.collabDia} to ${collabDiaMarks[student.rollNo]}`,
+        };
+
+        LOGS.push(log);
+      }
+
+      if (student.sysPrototype != sysPrototypeMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Partially Working System Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.sysPrototype} to ${
+            sysPrototypeMarks[student.rollNo]
+          }`,
+        };
+
+        LOGS.push(log);
+      }
+    });
+    console.log(LOGS);
+    // return;
+
     const data = {
       groupId: evalData.groupId,
       remarks: {
@@ -451,28 +660,20 @@ const DataBody = props => {
       setTMsg("Marks has been updated successfully");
       setToast(true);
 
-      const facultyRes = await axios.post(
-        "http://localhost:5000/api/faculty/get-sup-id",
-        {
-          id: localStorage.getItem("USER_ID"),
-        }
-      );
-      console.log(facultyRes.data.faculty);
-
-      const log = {
-        deliverableId: deliverableId,
-        groupId: groupId,
-        text: `Marks Changed By ${localStorage.getItem("USER_ROLE")}: ${
-          facultyRes.data.faculty.hasOwnProperty("name")
-            ? facultyRes.data.faculty.name
-            : null
-        }`,
-      };
-      console.log(log);
+      // const log = {
+      //   deliverableId: deliverableId,
+      //   groupId: groupId,
+      //   text: `Marks Changed By ${localStorage.getItem("USER_ROLE")}: ${
+      //     facultyRes.data.faculty.hasOwnProperty("name")
+      //       ? facultyRes.data.faculty.name
+      //       : null
+      //   }`,
+      // };
+      // console.log(log);
 
       const res2 = await axios.post(
         `http://localhost:5000/api/deliverable/set-logs`,
-        log
+        { logs: LOGS }
       );
       console.log(res2.data);
       setRefresh(refresh => !refresh);
@@ -545,7 +746,7 @@ const DataBody = props => {
         <TableCell colSpan={2}>
           <RadioButtonGroup
             label=""
-            defaultValue={null}
+            value={committeeReview}
             onChange={e => {
               setCommitteeReview(e.target.value);
               console.log(e.target.value);
@@ -591,6 +792,12 @@ const DataBody = props => {
           >
             {currVersion ? currVersion.eval_status : "Pending"}
           </Typography>
+          {currVersion.eval_status == "Revised" ? (
+            <Typography variant="body1">
+              Revision Date:{" "}
+              {new Date(currVersion.revision_date).toDateString()}
+            </Typography>
+          ) : null}
         </TableCell>
       </TableRow>
       <TableRow>
@@ -1148,6 +1355,9 @@ const D2EvaluationPage = props => {
   // const roles = localStorage.getItem("USER_ROLE");
   // const [file, setFile] = useState({});
   // const [name, setName] = useState("");
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    !localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
   const [showLogsModal, setShowLogsModal] = useState(false);
   const [logsData, setLogsData] = useState([]);
   const [showToast, setShowToast] = useState(false);
@@ -1204,6 +1414,7 @@ const D2EvaluationPage = props => {
     win.focus();
   };
 
+  if (!isEligible) return <Redirect to="/404" />;
   return (
     <>
       {showToast ? (
@@ -1229,9 +1440,15 @@ const D2EvaluationPage = props => {
                 width: "100%",
               }}
             >
-              <Typography variant="h4">
-                D2 Evaluation: {data.group.name}
-              </Typography>
+              <Box>
+                <Typography variant="h4">
+                  D2 Evaluation: {data.group.name}
+                </Typography>
+
+                <Typography variant="h6">
+                  Evaluation Date: {new Date(evalDate).toDateString()}
+                </Typography>
+              </Box>
               <Box
                 style={{
                   display: "flex",

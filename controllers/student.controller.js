@@ -62,6 +62,7 @@ class StudentController {
       const student = await Student.create({
         name,
         rollNo,
+        degree: "BS",
         departmentId: dept,
         password: crypto.randomBytes(8).toString("hex").slice(0, 8),
       });
@@ -294,6 +295,7 @@ class StudentController {
             name: student.name,
             rollNo: student.rollNo,
             departmentId: dept ? dept.id : null,
+            degree: "BS",
             leader: false,
             password: crypto.randomBytes(8).toString("hex").slice(0, 8),
           });

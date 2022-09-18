@@ -20,6 +20,8 @@ const AddSemester = props => {
   const [newSemester, setNewSemester] = useState("");
   const [semester, setSemester] = useState([]);
   const [year, setYear] = useState([]);
+  const [startYear, setStartYear] = useState([]);
+  const [endYear, setEndYear] = useState([]);
 
   // const [students, setStudents] = useState([]);
   // const [supervisors, setSupervisors] = useState([]);
@@ -35,12 +37,26 @@ const AddSemester = props => {
     console.log("yr", yr);
     setYear(yr);
   };
+  const selectStartYearHandler = yr => {
+    console.log("yr", yr);
+    setStartYear(yr);
+  };
+  const selectEndYearHandler = yr => {
+    console.log("yr", yr);
+    setEndYear(yr);
+  };
 
   const handleAddSemester = async () => {
-    console.log("NEW SEMESTER", `${semester}-${year - 2000}`);
+    console.log(
+      "NEW SEMESTER",
+      `${semester}-${year - 2000}`,
+      startYear,
+      endYear
+    );
     try {
       const res = await axios.post("http://localhost:5000/api/sem/create", {
         title: `${semester}-${year - 2000}`,
+        session: `${startYear}-${endYear}`,
       });
       console.log("RES", res.data);
       setDisplay(false);
@@ -62,7 +78,35 @@ const AddSemester = props => {
         text: yr,
       };
     });
-  console.log(yearItems);
+  const startYearItems = [
+    ...Array(
+      new Date().getFullYear() + 20 - new Date().getFullYear() - 6 + 1
+    ).keys(),
+  ]
+    .map(x => x + new Date().getFullYear() - 6)
+    .map(yr => {
+      return {
+        id: yr,
+        value: yr,
+        text: yr,
+      };
+    });
+  console.log(startYearItems);
+  const endYearItems = [
+    ...Array(
+      new Date().getFullYear() + 20 - new Date().getFullYear() - 6 + 1
+    ).keys(),
+  ]
+    .map(x => x + new Date().getFullYear() - 6)
+    .map(yr => {
+      return {
+        id: yr,
+        value: yr,
+        text: yr,
+      };
+    })
+    .filter(yr => yr.id >= startYear + 4);
+  console.log(endYearItems);
 
   return (
     <Backdrop
@@ -107,6 +151,33 @@ const AddSemester = props => {
                   setValue={selectYearHandler}
                   //Array(end-start+1)
                   items={yearItems}
+                />
+              </Box>
+              <Typography variant="h6" style={{ marginTop: "1rem" }}>
+                Session
+              </Typography>
+              <Box style={{ marginTop: "1rem" }}>
+                <Select
+                  required
+                  // style={{ width: "100%" }}
+
+                  label="Starting Year"
+                  value={startYear}
+                  setValue={selectStartYearHandler}
+                  //Array(end-start+1)
+                  items={startYearItems}
+                />
+              </Box>
+              <Box style={{ marginTop: "1rem" }}>
+                <Select
+                  required
+                  // style={{ width: "100%" }}
+
+                  label="Ending Year"
+                  value={endYear}
+                  setValue={selectEndYearHandler}
+                  //Array(end-start+1)
+                  items={endYearItems}
                 />
               </Box>
             </Box>

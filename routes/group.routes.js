@@ -12,6 +12,7 @@ const Group = require("../controllers/group.controller");
 const multer = require("multer");
 const upload = multer();
 
+// Router.post("/assign-sup", verifyToken, Group.assignSupervisorToGroups);
 Router.post("/create", verifyToken, Group.createGroup);
 Router.post("/create-many", verifyToken, Group.createManyGroups);
 // Router.get("/get/dept", verifyToken, Group.getGroupsByDepartment);

@@ -24,7 +24,7 @@ import MenuButton from "../components/MenuButton";
 import Select from "../components/Select";
 import UploadFile from "../components/UploadFile";
 import axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
@@ -129,20 +129,31 @@ const DataBody = props => {
     getDeliverableData();
   }, [deliverableId, groupId, committeeId, showUploadModal, refresh]);
 
-  useEffect(() => {
-    const date = new Date(evalDate);
-    const month = date.getMonth() + 1;
-    const dd = `${date.getFullYear()}-${
-      month < 10 ? "0" + month : month
-    }-${date.getDate()}`;
+  // useEffect(() => {
 
-    setRevisionDate(dd);
-  }, [evalDate]);
+  // }, [evalDate]);
 
   useEffect(() => {
     if (!evalData.remarks) return;
     setRemarks(evalData.remarks);
   }, [evalData, refresh]);
+  useEffect(() => {
+    setCommitteeReview(currVersion.eval_status);
+    if (currVersion.revision_date) {
+      const date = new Date(currVersion.revision_date);
+
+      console.log(date);
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const dd = `${date.getFullYear()}-${month < 10 ? "0" + month : month}-${
+        day < 10 ? "0" + day : day
+      }`;
+      console.log(dd);
+
+      setRevisionDate(dd);
+    }
+    // console.log(currVersion);
+  }, [currVersion]);
 
   useEffect(() => {
     const getReviewData = async () => {
@@ -207,7 +218,7 @@ const DataBody = props => {
     getEvaluationData();
   }, [groupId]);
 
-  const changeMarks = (rollNo, marks, type) => {
+  const changeMarks = (rollNo, marks, type, prevMarks) => {
     console.log(marks < 0, parseFloat(marks));
     console.log(inputError);
     // setInputError({});
@@ -259,6 +270,79 @@ const DataBody = props => {
   };
 
   const handleSubmit = async () => {
+    const facultyRes = await axios.post(
+      "http://localhost:5000/api/faculty/get-sup-id",
+      {
+        id: localStorage.getItem("USER_ID"),
+      }
+    );
+    console.log(facultyRes.data.faculty);
+    const LOGS = [];
+    const students = evalData.students;
+    students.forEach(student => {
+      if (student.existingSystem != existingSystemMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Existing System Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.existingSystem} to ${
+            existingSystemMarks[student.rollNo]
+          }`,
+        };
+        LOGS.push(log);
+      }
+      if (student.architecture != architectureMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Architecture Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.architecture} to ${
+            architectureMarks[student.rollNo]
+          }`,
+        };
+        LOGS.push(log);
+      }
+      if (student.pptSkills != pptSkillsMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Presentation Skills Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.pptSkills} to ${pptSkillsMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+      if (student.goals != goalsMarks[student.rollNo]) {
+        const log = {
+          deliverableId: deliverableId,
+          groupId: groupId,
+          text: `Goals Marks of ${
+            student.rollNo
+          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+            facultyRes.data.faculty.hasOwnProperty("name")
+              ? facultyRes.data.faculty.name
+              : null
+          } from ${student.goals} to ${goalsMarks[student.rollNo]}`,
+        };
+        LOGS.push(log);
+      }
+    });
+    console.log(LOGS);
+    // return;
     const data = {
       groupId: evalData.groupId,
       remarks: remarks,
@@ -288,28 +372,20 @@ const DataBody = props => {
       setTMsg("Marks Updated Successfully");
       setToast(true);
 
-      const facultyRes = await axios.post(
-        "http://localhost:5000/api/faculty/get-sup-id",
-        {
-          id: localStorage.getItem("USER_ID"),
-        }
-      );
-      console.log(facultyRes.data.faculty);
-
-      const log = {
-        deliverableId: deliverableId,
-        groupId: groupId,
-        text: `Marks Changed By ${localStorage.getItem("USER_ROLE")}: ${
-          facultyRes.data.faculty.hasOwnProperty("name")
-            ? facultyRes.data.faculty.name
-            : null
-        }`,
-      };
-      console.log(log);
+      // const log = {
+      //   deliverableId: deliverableId,
+      //   groupId: groupId,
+      //   text: `Marks Changed By ${localStorage.getItem("USER_ROLE")}: ${
+      //     facultyRes.data.faculty.hasOwnProperty("name")
+      //       ? facultyRes.data.faculty.name
+      //       : null
+      //   }`,
+      // };
+      // console.log(log);
 
       const res2 = await axios.post(
         `http://localhost:5000/api/deliverable/set-logs`,
-        log
+        { logs: LOGS }
       );
       console.log(res2.data);
       setRefresh(refresh => !refresh);
@@ -386,7 +462,8 @@ const DataBody = props => {
         <TableCell colSpan={2}>
           <RadioButtonGroup
             label=""
-            defaultValue={null}
+            // defaultValue={null}
+            value={committeeReview}
             onChange={e => {
               setCommitteeReview(e.target.value);
               console.log(e.target.value);
@@ -400,7 +477,10 @@ const DataBody = props => {
             style={{ display: committeeReview == "Revised" ? "block" : "none" }}
             type="date"
             value={revisionDate}
-            onChange={e => setRevisionDate(e.target.value)}
+            onChange={e => {
+              console.log(e.target.value);
+              setRevisionDate(e.target.value);
+            }}
           />
         </TableCell>
         <TableCell colSpan={1}>
@@ -420,6 +500,12 @@ const DataBody = props => {
       <TableRow>
         <TableCell colSpan={1}>
           <Typography variant="h6">Current Review</Typography>
+          {currVersion.eval_status == "Revised" ? (
+            <Typography variant="body1">
+              Revision Date:{" "}
+              {new Date(currVersion.revision_date).toDateString()}
+            </Typography>
+          ) : null}
         </TableCell>
         <TableCell colSpan={3}>
           <Typography
@@ -535,7 +621,9 @@ const DataBody = props => {
                       changeMarks(
                         student.rollNo,
                         e.target.value,
-                        "existingSystem"
+                        "existingSystem",
+                        evalData.students.find(s => s.rollNo == student.rollNo)
+                          .existingSystem
                       )
                     }
                   />
@@ -706,8 +794,12 @@ const ProposalEvaluationPage = props => {
   //   title: "",
   //   template: "",
   // });
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    !localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
   const [showLogsModal, setShowLogsModal] = useState(false);
   const [logsData, setLogsData] = useState([]);
+  const [logs, setLogs] = useState([]);
   const [subFile, setSubFile] = useState();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -763,6 +855,8 @@ const ProposalEvaluationPage = props => {
     win.focus();
   };
 
+  if (!isEligible) return <Redirect to="/404" />;
+
   return (
     <>
       {showToast ? (
@@ -788,9 +882,15 @@ const ProposalEvaluationPage = props => {
                 width: "100%",
               }}
             >
-              <Typography variant="h4">
-                Proposal Evaluation: {data.group.name}
-              </Typography>
+              <Box>
+                <Typography variant="h4">
+                  Proposal Evaluation: {data.group.name}
+                </Typography>
+
+                <Typography variant="h6">
+                  Evaluation Date: {new Date(evalDate).toDateString()}
+                </Typography>
+              </Box>
               <Box
                 style={{
                   display: "flex",

@@ -18,7 +18,7 @@ import DataTable from "../components/DataTable";
 import Link from "../components/Link";
 import Main from "../components/Main";
 import MenuButton from "../components/MenuButton";
-import { useHistory, useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
 import RadioButtonGroup from "../components/RadioButtonGroup";
@@ -44,6 +44,7 @@ const DataBody = props => {
   const [file, setFile] = useState({});
   const [comment, setComment] = useState("");
   const [status, setStatus] = useState("");
+  const [endorsement, setEndorsement] = useState("Pending");
 
   useEffect(() => {
     const getData = async () => {
@@ -55,11 +56,11 @@ const DataBody = props => {
             groupId: groupId,
           }
         );
-        console.log(deliverableRes.data.versions);
+        console.log(deliverableRes.data);
 
         if (deliverableRes.data.get) {
           setSubmissionData(deliverableRes.data.versions.reverse());
-          const latest = deliverableRes.data.versions.reverse().pop();
+          const latest = deliverableRes.data.versions[0];
           console.log(latest);
           setLatestSub(latest);
           // setStatus(latest.status);
@@ -73,6 +74,8 @@ const DataBody = props => {
 
   useEffect(() => {
     setComment(latestSub.comment);
+    console.log(latestSub.status);
+    setEndorsement(latestSub.status);
   }, [latestSub]);
 
   useEffect(() => {
@@ -290,10 +293,11 @@ const DataBody = props => {
         <TableCell>
           <RadioButtonGroup
             label=""
-            defaultValue={latestSub.status}
-            value={latestSub.status}
+            // defaultValue={latestSub.status}
+            value={endorsement}
             // defaultValue={latestSub.status}
             onChange={e => {
+              setEndorsement(e.target.value);
               handleUpdateStatus(latestSub.id, e.target.value);
 
               console.log(e.target.value);
@@ -328,49 +332,51 @@ const DataBody = props => {
           </Box>
         </TableCell>
       </TableRow>
-      <TableRow>
-        <TableCell colSpan={2}>
-          <Typography variant="h6">Commented Document</Typography>
-          <Box
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "1rem",
-              padding: "0 2rem",
-              maxWidth: "600px",
-            }}
-          >
-            <Box>
-              {latestSub.commented_doc ? (
-                <Button
-                  onClick={() => {
-                    let url =
-                      "http://localhost:5000/" + latestSub.commented_doc;
-                    let win = window.open(url, "_blank");
-                    win.focus();
-                  }}
-                >
-                  {latestSub.commented_doc}
-                </Button>
-              ) : (
-                <Typography variant="body1">None</Typography>
-              )}
-            </Box>
-
-            <Button
-              variant="outlined"
-              size="small"
-              color="primary"
-              onClick={() => {
-                setShowUploadModal(true);
+      {latestSub.status == "Approved" ? null : (
+        <TableRow>
+          <TableCell colSpan={2}>
+            <Typography variant="h6">Commented Document</Typography>
+            <Box
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "1rem",
+                padding: "0 2rem",
+                maxWidth: "600px",
               }}
             >
-              Upload
-            </Button>
-          </Box>
-        </TableCell>
-      </TableRow>
+              <Box>
+                {latestSub.commented_doc ? (
+                  <Button
+                    onClick={() => {
+                      let url =
+                        "http://localhost:5000/" + latestSub.commented_doc;
+                      let win = window.open(url, "_blank");
+                      win.focus();
+                    }}
+                  >
+                    {latestSub.commented_doc}
+                  </Button>
+                ) : (
+                  <Typography variant="body1">None</Typography>
+                )}
+              </Box>
+
+              <Button
+                variant="outlined"
+                size="small"
+                color="primary"
+                onClick={() => {
+                  setShowUploadModal(true);
+                }}
+              >
+                Upload
+              </Button>
+            </Box>
+          </TableCell>
+        </TableRow>
+      )}
       {/* <TableRow>
         <TableCell>
           
@@ -456,11 +462,14 @@ const DataBody = props => {
 };
 
 const SupervisorProposal = () => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
   const params = useParams();
   const history = useHistory();
   const { deliverableId, groupId } = history.location.state;
   const [groupInfo, setGroupInfo] = useState({});
-
+  console.log("HELLO");
   useEffect(() => {
     const getGroupData = async () => {
       try {
@@ -474,6 +483,8 @@ const SupervisorProposal = () => {
     };
     getGroupData();
   }, [deliverableId, groupId]);
+
+  if (!isEligible) return <Redirect to="/404" />;
 
   return (
     <ContainerFluid title={"Deliverable " + deliverableId}>

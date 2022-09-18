@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       current: {
         type: DataTypes.BOOLEAN,
       },
+      session: {
+        type: DataTypes.STRING,
+      },
     },
     {
       tableName: "tbl_semester",

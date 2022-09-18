@@ -129,6 +129,7 @@ const AllGroups = () => {
         if (localStorage.getItem("USER_ROLE").includes("PMO")) {
           const res = await axios.get(
             "http://localhost:5000/api/group/get-groups/"
+            // { userId: localStorage.getItem("USER_ID"), userRole: "PMO" }
           );
           console.log(res.data.groups);
           filteredGroups = currentSemester
@@ -196,6 +197,7 @@ const AllGroups = () => {
   const importDataHandler = async importedData => {
     console.log(importedData);
     // return;
+
     setIsLoading(true);
 
     //ok
@@ -212,6 +214,10 @@ const AllGroups = () => {
     const indexOfGroup = importedData.heads.findIndex(item =>
       item.includes("roup")
     );
+    const indexOfSupervisor = importedData.heads.findIndex(item =>
+      item.includes("visor")
+    );
+    console.log(importedData.data[0][indexOfSupervisor]);
 
     // console.log(indexOfRoll, indexOfName);
     // //this will show us which column contains roll no and name
@@ -221,6 +227,7 @@ const AllGroups = () => {
       importedData.heads[indexOfName],
       importedData.heads[indexOfDepartment],
       importedData.heads[indexOfGroup],
+      importedData.heads[indexOfSupervisor],
     ];
     const uniqueGroups = [
       ...new Set(importedData.data.map(d => d[indexOfGroup])),
@@ -228,6 +235,7 @@ const AllGroups = () => {
     console.log(uniqueGroups);
 
     const groups = uniqueGroups.map(item => {
+      console.log(item);
       return {
         groupId: item,
         members: importedData.data
@@ -241,6 +249,9 @@ const AllGroups = () => {
         department: importedData.data.filter(d => d[indexOfGroup] === item)[0][
           indexOfDepartment
         ],
+        supervisorName: importedData.data.filter(
+          d => d[indexOfGroup] === item
+        )[0][indexOfSupervisor],
       };
     });
 
@@ -270,10 +281,16 @@ const AllGroups = () => {
       if (response.status === 200) {
         setIsLoading(false);
         setHeads(dataHeads);
+        setToastMessage("Groups imported successfully");
+        setOpen(true);
         // setBody(response.data.students);
         // setRefresh(refresh => !refresh);
       }
     } catch (error) {
+      setIsLoading(false);
+      setToastMessage("Groups imported successfully");
+      setOpen(true);
+      setHeads(dataHeads);
       console.log(error);
     }
   };

@@ -21,6 +21,8 @@ import Main from "../components/Main";
 import ManageCommittee from "./ManageCommittee";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { Redirect } from "react-router-dom";
+import EditCommittee from "./EditCommittee";
 const DATA = {
   heads: ["Committee ID", "Members", "Groups"],
   data: [
@@ -100,16 +102,34 @@ const DataBody = ({ data, editCommittee, setData }) => {
         </TableCell>
         <TableCell align="right">
           {/* <IconButton
-            onClick={() => {
-              editCommittee(row);
-            }}
+            
             color="primary"
             variant="outlined"
           >
             <EditIcon />
           </IconButton> */}
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => {
+              editCommittee(row);
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            style={{ marginLeft: "1rem" }}
+            variant="contained"
+            size="small"
+            onClick={() => {
+              deleteCommittee(row.id);
+            }}
+            color="error"
+          >
+            Delete
+          </Button>
 
-          <Tooltip title="Delete Committee">
+          {/* <Tooltip title="Delete Committee">
             <IconButton
               onClick={() => {
                 deleteCommittee(row.id);
@@ -119,7 +139,7 @@ const DataBody = ({ data, editCommittee, setData }) => {
             >
               <DeleteIcon />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
         </TableCell>
         {/* <TableCell>{row.supervisor ? row.supervisor : "None"}</TableCell> */}
       </TableRow>
@@ -128,8 +148,13 @@ const DataBody = ({ data, editCommittee, setData }) => {
 };
 
 const AllCommittees = () => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("PMO");
   const [heads, setHeads] = useState(["Committee ID", "Members", "Groups", ""]);
   const [showAddCommittee, setShowAddCommittee] = useState(false);
+  const [showEditCommittee, setShowEditCommittee] = useState(false);
+  const [toEdit, setToEdit] = useState({});
   const [body, setBody] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -153,9 +178,12 @@ const AllCommittees = () => {
   // return <ManageCommittee />;
 
   const addCommitteeHandler = committee => {
+    setToEdit(committee);
     console.log(committee);
-    setShowAddCommittee(committee ? committee : true);
+    setShowEditCommittee(true);
   };
+
+  if (!isEligible) return <Redirect to="/404" />;
 
   if (isLoading)
     return (
@@ -175,6 +203,9 @@ const AllCommittees = () => {
           setDisplay={setShowAddCommittee}
         />
       ) : null}
+      {showEditCommittee ? (
+        <EditCommittee committee={toEdit} setDisplay={setShowEditCommittee} />
+      ) : null}
       <Main styles={{ padding: "1.5rem" }}>
         <Box
           sx={{ marginBottom: "3rem" }}
@@ -189,7 +220,10 @@ const AllCommittees = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={addCommitteeHandler}
+              onClick={() => {
+                // setToEdit();
+                setShowAddCommittee(true);
+              }}
             >
               Add Committee
             </Button>

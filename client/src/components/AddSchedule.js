@@ -56,18 +56,32 @@ const AddSchedule = props => {
     if (!selectedCommitee) return;
     // console.log("SELECTED COMMITTEE", selectedCommitee);
     console.log("SELECTED COMMITTEE", selectedCommitee);
+    const approvedGroups = selectedCommitee.Groups
+      ? selectedCommitee.Groups.filter(group => {
+          return (
+            group.versions.filter(
+              version =>
+                version.status === "Approved" &&
+                version.deliverableId == deliverable.id
+            ).length > 0
+          );
+        })
+      : [];
+    console.log(approvedGroups, deliverable.id);
     const deliverableKey = "d" + deliverable.id;
-    const committeeGroups = selectedCommitee.Groups
-      ? selectedCommitee.Groups.map(group => ({
-          id: group.id,
-          text:
-            group.name +
-            " (" +
-            group.members.map(member => member.rollNo).join(", ") +
-            ")",
-          value: group.id,
-          schedules: group.schedules,
-        })).filter(group => !group.schedules[deliverableKey])
+    const committeeGroups = approvedGroups.length
+      ? approvedGroups
+          .map(group => ({
+            id: group.id,
+            text:
+              group.name +
+              " (" +
+              group.members.map(member => member.rollNo).join(", ") +
+              ")",
+            value: group.id,
+            schedules: group.schedules,
+          }))
+          .filter(group => !group.schedules[deliverableKey])
       : [];
     console.log("COMMITTEE GROUPS", committeeGroups);
 
@@ -153,8 +167,19 @@ const AddSchedule = props => {
         style={{ maxHeight: "80vh", overflowY: "scroll" }}
       >
         <Card style={styles.card}>
-          <Typography variant="h5" style={styles.heading}>
+          <Typography
+            variant="h5"
+            style={{ ...styles.heading, marginBottom: "1.5rem" }}
+          >
             Add Schedule
+          </Typography>
+
+          <Typography
+            variant="subtitle1"
+            style={{ fontWeight: "bold", marginBottom: "1rem" }}
+          >
+            Deliverable Submission Deadline:{" "}
+            {new Date(deliverable.deadline).toDateString()}
           </Typography>
           <Box>
             <Typography variant="h6">Evaluation Date</Typography>

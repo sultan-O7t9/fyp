@@ -15,6 +15,7 @@ require("dotenv").config();
 const jwt_decode = require("jwt-decode");
 const sequelize = require("sequelize");
 const res = require("express/lib/response");
+const { sendMail } = require("../utils/sendMails");
 
 const createAccessToken = user =>
   jwt.sign(user, process.env.JWT_SECRET, {
@@ -26,6 +27,87 @@ const createRefreshToken = user =>
 
 const refreshTokens = [];
 
+module.exports.forgetPassword = async (req, res) => {
+  const { email } = req.body;
+  let user = null;
+  try {
+    if (email.includes("@uog.edu.pk")) {
+      const faculty = await FacultyMember.findOne({
+        where: {
+          email: email,
+        },
+      });
+      if (faculty) {
+        // user = {
+        //   email: faculty.dataValues.email,
+        //   password: faculty.dataValues.password,
+        // };
+        user = {
+          email: "18094198-079@uog.edu.pk",
+          regEmail: faculty.dataValues.email,
+          password: faculty.dataValues.password,
+        };
+
+        res.status(200).json({
+          message: "Faculty member found",
+          email: true,
+          faculty,
+        });
+      } else {
+        throw new Error("Faculty member not found");
+      }
+    } else if (email.split("_").length - 1 == 2) {
+      const group = await Group.findOne({
+        where: {
+          name: email,
+        },
+      });
+      if (group) {
+        const student = await Student.findOne({
+          where: {
+            groupId: group.id,
+            leader: true,
+          },
+        });
+        if (student) {
+          user = {
+            email: student.dataValues.rollNo + "@uog.edu.pk",
+            regEmail: email,
+            password: group.dataValues.password,
+          };
+          res.status(200).json({
+            message: "Student found",
+            email: true,
+            student,
+          });
+        } else {
+          throw new Error("Student not found");
+        }
+      } else {
+        throw new Error("Group not found");
+      }
+    }
+    console.log(user);
+    sendMail(
+      [user].map(student => {
+        return {
+          email: student.email,
+          subject: "Password Recovery",
+          body: `
+        Your credentials are as follows:
+        Email: ${student.regEmail}
+        Password: ${student.password}
+        `,
+        };
+      })
+    );
+  } catch (error) {
+    res.status(500).json({
+      message: "Error finding",
+      error,
+    });
+  }
+};
 module.exports.initializeApp = async (req, res) => {
   try {
     const admin = await Admin.findAll();

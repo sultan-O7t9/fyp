@@ -26,7 +26,7 @@ import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import AddStudent from "../components/AddStudent";
 import EditStudent from "../components/EditStudent";
 
@@ -284,6 +284,9 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
 };
 
 const AllStudents = () => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("PMO");
   const [heads, setHeads] = useState(["Name", "Roll No", "Group"]);
   const [body, setBody] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -373,6 +376,8 @@ const AllStudents = () => {
     setShowAddStudent(true);
   };
 
+  if (!isEligible) return <Redirect to="/404" />;
+
   if (isLoading)
     return (
       <Backdrop
@@ -392,7 +397,11 @@ const AllStudents = () => {
         />
       ) : null}
       {showEditStudent ? (
-        <EditStudent student={toEdit} setDisplay={setShowEditStudent} />
+        <EditStudent
+          student={toEdit}
+          students={body ? body.map(b => b.rollNo) : []}
+          setDisplay={setShowEditStudent}
+        />
       ) : null}
       <ContainerFluid>
         <Main styles={{ padding: "1.5rem" }}>

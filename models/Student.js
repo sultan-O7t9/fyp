@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      degree: {
+        type: DataTypes.STRING,
+        defaultValue: "BS",
+      },
     },
     {
       tableName: "tbl_student",

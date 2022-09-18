@@ -318,8 +318,17 @@ class FacultyController {
     }
   };
   static registerFaculty = async (req, res) => {
-    const { email, password, name, department, roles, role, id, departmentId } =
-      req.body;
+    const {
+      email,
+      password,
+      name,
+      department,
+      roles,
+      role,
+      id,
+      departmentId,
+      designation,
+    } = req.body;
 
     console.log(req.body);
     try {
@@ -353,6 +362,7 @@ class FacultyController {
           email,
           password,
           name,
+          designation,
           departmentId: dept.id,
         });
         await Faculty_Role.create({
@@ -426,6 +436,7 @@ class FacultyController {
           "committeeId",
           "departmentId",
           "password",
+          "designation",
         ],
       });
       await Promise.all(
@@ -523,7 +534,15 @@ class FacultyController {
   };
 
   static updateFaculty = async (req, res) => {
-    const { id, name, email, password, departmentId, committeeId } = req.body;
+    const {
+      id,
+      name,
+      email,
+      password,
+      departmentId,
+      committeeId,
+      designation,
+    } = req.body;
     try {
       const faculty = await FacultyMember.findOne({
         where: {
@@ -534,6 +553,9 @@ class FacultyController {
         await faculty.update({
           name: name ? name : faculty.dataValues.name,
           password: password ? password : faculty.dataValues.password,
+          designation: designation
+            ? designation
+            : faculty.dataValues.designation,
           departmentId: departmentId
             ? departmentId
             : faculty.dataValues.departmentId,

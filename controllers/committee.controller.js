@@ -7,6 +7,7 @@ const {
   Role,
   Faculty_Role,
   EvaluationSchedule,
+  Version,
 } = require("../models");
 const sequelize = require("sequelize");
 
@@ -49,6 +50,12 @@ class CommitteeClass {
                   groupId: group.dataValues.id,
                 },
               });
+              const versions = await Version.findAll({
+                where: {
+                  groupId: group.dataValues.id,
+                },
+              });
+
               const members = await Student.findAll({
                 where: {
                   groupId: group.dataValues.id,
@@ -61,6 +68,16 @@ class CommitteeClass {
                   rollNo: member.dataValues.rollNo,
                   name: member.dataValues.name,
                 })),
+                versions: versions.length
+                  ? versions.map(version => ({
+                      id: version.dataValues.id,
+                      deliverableId: version.dataValues.deliverableId,
+
+                      eval_status: version.dataValues.eval_status,
+                      status: version.dataValues.status,
+                    }))
+                  : [],
+
                 schedules: {
                   d1: schedules.find(
                     schedule => schedule.dataValues.deliverableId == 1

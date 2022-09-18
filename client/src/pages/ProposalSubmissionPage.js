@@ -431,7 +431,7 @@ const DataBody = () => {
               </Button>
             ) : null}
             {submissionData.length > 0 &&
-            submissionData[0].status != "Approved" ? (
+            submissionData[0].eval_status != "Approved" ? (
               <Button
                 disabled={
                   deliverableData.deadline &&

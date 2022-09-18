@@ -4,6 +4,7 @@ const Project = require("../controllers/project.controller");
 const Router = require("express").Router();
 
 Router.post("/create", Project.createProject);
+Router.post("/update-proj", Project.updateProject);
 Router.get("/get-grp/:id", Project.getProjectByGroup);
 // Router.post("grp", Project.getProjectByGroup);
 // Router.post("/")

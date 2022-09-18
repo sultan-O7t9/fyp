@@ -22,7 +22,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ManageFaculty from "./ManageFaculty";
 import AdminMainLayout from "../layouts/AdminMainLayout";
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
@@ -228,6 +228,9 @@ const DataBody = ({ data, editCommittee, setData }) => {
 };
 
 const AdminManageFaculty = () => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("HOD");
   const [heads, setHeads] = useState(["Name", "Department", "Email"]);
   const [showAddCommittee, setShowAddCommittee] = useState(false);
   const [body, setBody] = useState([]);
@@ -256,6 +259,8 @@ const AdminManageFaculty = () => {
     console.log(committee);
     setShowAddCommittee(committee ? committee : true);
   };
+
+  if (!isEligible) return <Redirect to="/404" />;
 
   if (isLoading)
     return (

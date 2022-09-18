@@ -11,7 +11,7 @@ import AppBarMenu from "./AppBarMenu";
 export default function MainAppbar(props) {
   const { toggleSidebar, menu } = props;
   const [currentRole, setCurrentRole] = React.useState(
-    localStorage.getItem("USER_ROLE")
+    localStorage.getItem("USER_ROLE") ? localStorage.getItem("USER_ROLE") : []
   );
 
   return (

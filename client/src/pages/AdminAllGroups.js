@@ -30,7 +30,7 @@ import { IconButton } from "@mui/material";
 import React from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import Select from "../components/Select";
 import styles from "./auth.styles";
 import AdminMainLayout from "../layouts/AdminMainLayout";
@@ -184,6 +184,7 @@ const DataBody = ({ data, depts }) => {
     setGridCols(columns);
 
     setGridData(data);
+    console.log(gridData);
   }, [data, depts]);
 
   return (
@@ -298,6 +299,9 @@ const DataBody = ({ data, depts }) => {
 };
 
 const AdminAllGroups = () => {
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("HOD");
   const [heads, setHeads] = useState([
     "Group ID",
     "Project Title",
@@ -348,6 +352,8 @@ const AdminAllGroups = () => {
   const editGroupHandler = group => {
     setShowManageGroup(group ? group : true);
   };
+
+  if (!isEligible) return <Redirect to="/404" />;
 
   if (isLoading)
     return (

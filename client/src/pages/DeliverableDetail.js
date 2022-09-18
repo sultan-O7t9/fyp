@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Badge,
   Button,
   Card,
   IconButton,
@@ -19,7 +20,7 @@ import MenuButton from "../components/MenuButton";
 import Select from "../components/Select";
 import UploadFile from "../components/UploadFile";
 import axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 
@@ -596,6 +597,9 @@ const DataBody2 = props => {
 
 const DeliverableDetail = props => {
   const roles = localStorage.getItem("USER_ROLE");
+  const isEligible =
+    localStorage.getItem("USER_ROLE") &&
+    localStorage.getItem("USER_ROLE").includes("PMO");
   const [file, setFile] = useState({});
   const [name, setName] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -608,6 +612,7 @@ const DeliverableDetail = props => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showExtensionModal, setShowExtensionModal] = useState(false);
+  const [totalExtensionreqs, setTotalExtensionreqs] = useState(0);
   const history = useHistory();
   // const history=useHistory();
   const params = useParams();
@@ -677,10 +682,14 @@ const DeliverableDetail = props => {
     setShowScheduleModal(true);
   };
 
+  if (!isEligible) return <Redirect to="/404" />;
+
   return (
     <>
       {showExtensionModal ? (
         <ExtensionModal
+          total={totalExtensionreqs}
+          setTotal={setTotalExtensionreqs}
           deliverableId={deliverableId}
           setDisplay={setShowExtensionModal}
           setToastMessage={setToastMessage}
@@ -761,14 +770,16 @@ const DeliverableDetail = props => {
                   >
                     Settings
                   </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      setShowExtensionModal(true);
-                    }}
-                  >
-                    Deadline Extension Requests
-                  </Button>
+                  <Badge badgeContent={totalExtensionreqs} color="secondary">
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        setShowExtensionModal(true);
+                      }}
+                    >
+                      Deadline Extension Requests
+                    </Button>
+                  </Badge>
                   <Button
                     style={{ marginTop: "0.5rem" }}
                     variant="contained"

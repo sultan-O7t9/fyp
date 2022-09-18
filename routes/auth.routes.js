@@ -6,12 +6,14 @@ const {
   refreshAccessToken,
   adminLogin,
   initializeApp,
+  forgetPassword,
 } = require("../controllers/auth.controller");
 const verifyToken = require("../utils/verifyToken");
 
 const Router = require("express").Router();
 
 Router.post("/login", loginUser);
+Router.post("/forget", forgetPassword);
 Router.post("/admin", adminLogin);
 Router.post("/logout", verifyToken, logoutUser);
 Router.post("/refresh", refreshAccessToken);

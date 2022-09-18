@@ -10,19 +10,19 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "",
       },
       existingSystem: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       goals: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       architecture: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       pptSkills: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
     },
