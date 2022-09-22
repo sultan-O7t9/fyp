@@ -99,7 +99,17 @@ class VersionController {
       //   const version_id = submittedVersion.id;
       const title = fileTitle.split(".")[0];
       const extension = fileTitle.split(".").pop();
-      const fileName = title + "_commented" + "." + extension;
+      const fileName =
+        title +
+        "_comm" +
+        (new Date().getHours() +
+          new Date().getMinutes() +
+          new Date().getMonth() +
+          new Date().getYear() +
+          new Date().getDay() +
+          new Date().getSeconds()) +
+        "." +
+        extension;
       const filePath = path.join(dir, fileName);
       fs.writeFileSync(filePath, file.buffer, err => {
         if (err) throw err;

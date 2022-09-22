@@ -123,34 +123,48 @@ const ManageCommittee = props => {
     if (committee.hasOwnProperty("Groups")) {
       setGroups(committee.Groups.map(group => group.name));
     }
-    // return;
-    axios
-      .get("http://localhost:5000/api/group/get-groups/")
-      .then(res => {
+    const getData = async () => {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/group/get-groups/",
+          {
+            userId: localStorage.getItem("USER_ID"),
+          }
+        );
+        const res2 = await axios.get(
+          "http://localhost:5000/api/sem/get-current"
+        );
+        console.log(res2.data);
+        const currSem = res2.data.semester ? res2.data.semester.id : null;
         console.log(res.data);
         console.log(evaluators.includes(1));
         console.log(res.data.groups);
+        console.log(currSem);
         setGroups([]);
         console.log(evaluators);
-        setGroupItems(
-          committee.hasOwnProperty("Groups")
-            ? res.data.groups
-                .filter(
-                  group =>
-                    group.committeeId == null &&
-                    !evaluators.includes(group.supervisorId)
-                )
-                .concat(committee.Groups.map(group => ({ id: group.name })))
-            : res.data.groups.filter(
+        const grps = committee.hasOwnProperty("Groups")
+          ? res.data.groups
+              .filter(
                 group =>
                   group.committeeId == null &&
                   !evaluators.includes(group.supervisorId)
               )
+              .concat(committee.Groups.map(group => ({ id: group.name })))
+          : res.data.groups.filter(
+              group =>
+                group.committeeId == null &&
+                !evaluators.includes(group.supervisorId)
+            );
+        setGroupItems(
+          currSem != null
+            ? grps.filter(grp => currSem != null && grp.semesterId == currSem)
+            : grps
         );
-      })
-      .catch(err => {
-        console.log(err);
-      });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getData();
   }, [committee, evaluators]);
   useEffect(() => {
     if (committee.hasOwnProperty("FacultyMembers")) {

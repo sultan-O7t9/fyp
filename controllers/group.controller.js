@@ -753,7 +753,7 @@ class GroupController {
     }
   };
 
-  static getAllGroups = async (req, res) => {
+  static getAllGroupsAdmin = async (req, res) => {
     const { userId, userRole } = req.body;
     try {
       // const pmoDepts = await PMO.findAll({
@@ -791,6 +791,97 @@ class GroupController {
               id: group.dataValues.departmentId,
             },
           });
+
+          if (group.dataValues.projectId) {
+            const project = await Project.findOne({
+              where: {
+                id: group.dataValues.projectId,
+              },
+            });
+            group.dataValues.project = project.dataValues.title;
+          } else {
+            group.dataValues.project = null;
+          }
+          //Get members
+          const members = await group.getStudents();
+          group.dataValues.members = members.map(member => {
+            return {
+              rollNo: member.dataValues.rollNo,
+              name: member.dataValues.name,
+              email: member.dataValues.email,
+              leader: member.dataValues.leader,
+            };
+          });
+
+          const semester = await Semester.findOne({
+            where: {
+              id: group.dataValues.semesterId,
+            },
+          });
+
+          return {
+            id: group.dataValues.name,
+            committeeId: group.dataValues.committeeId,
+            project: group.dataValues.project,
+            members: group.dataValues.members,
+            semesterTitle: semester ? semester.dataValues.title : null,
+            supervisor: supervisor ? supervisor.dataValues.name : null,
+            supervisorId: group.dataValues.supervisorId,
+            // supervisor: supervisor.dataValues.name,
+            bookletsStatus: group.dataValues.bookletsStatus,
+            department: department ? department.dataValues.name : null,
+            bookletsComment: group.dataValues.bookletsComment,
+            semesterId: group.dataValues.semesterId,
+          };
+        })
+      );
+
+      res.json({
+        message: "Groups fetched successfully",
+        groups: detailedGroups,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error getting groups",
+        error,
+      });
+    }
+  };
+  static getAllGroups = async (req, res) => {
+    const { userId } = req.body;
+    console.log(userId);
+    try {
+      const pmoDepts = await PMO.findAll({
+        where: {
+          pmoId: userId,
+        },
+      });
+      const depts = pmoDepts.map(dept => dept.dataValues.deptId);
+      console.log(depts);
+      // const groups = await Group.findAll();
+      const groups = await Group.findAll({
+        where: {
+          departmentId: {
+            [sequelize.Op.in]: depts,
+          },
+        },
+      });
+
+      console.log(groups);
+      const detailedGroups = await Promise.all(
+        groups.map(async group => {
+          const supervisor = await FacultyMember.findOne({
+            where: {
+              id: group.dataValues.supervisorId,
+            },
+          });
+          const department = await Department.findOne({
+            where: {
+              id: group.dataValues.departmentId,
+            },
+          });
+
           if (group.dataValues.projectId) {
             const project = await Project.findOne({
               where: {

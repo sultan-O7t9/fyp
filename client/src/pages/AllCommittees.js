@@ -173,7 +173,7 @@ const AllCommittees = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [showAddCommittee]);
+  }, [showAddCommittee, showEditCommittee]);
 
   // return <ManageCommittee />;
 

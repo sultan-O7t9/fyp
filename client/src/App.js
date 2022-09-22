@@ -32,6 +32,7 @@ import ForgetPassword from "./pages/ForgetPassword";
 import GroupDashboard from "./pages/GroupDashboard";
 import GroupDetail from "./pages/GroupDetail";
 import GroupLogin from "./pages/GroupLogin";
+import HODLogin from "./pages/HODLogin";
 import Login from "./pages/Login";
 import ProposalEvaluationPage from "./pages/ProposalEvaluationPage";
 import ProposalSubmissionPage from "./pages/ProposalSubmissionPage";
@@ -53,11 +54,13 @@ const AdminRoutes = () => {
     <>
       {/* Admin */}
       <ProtectedRoute exact path="/admin/groups" component={AdminAllGroups} />
+      <ProtectedRoute exact path="/hod/groups" component={AdminAllGroups} />
       <ProtectedRoute
         exact
         path="/admin/faculty"
         component={AdminManageFaculty}
       />
+
       <ProtectedRoute exact path="/admin/dept" component={AdminManageDept} />
       {/* ---- */}
     </>
@@ -190,6 +193,7 @@ const App = () => {
       <Route exact path="/forget" component={ForgetPassword} />
       <Route exact path="/group" component={GroupLogin} />
       <Route exact path="/admin" component={AdminLogin} />
+      <Route exact path="/hod" component={HODLogin} />
       <Route exact path="/register" component={Register} />
       <ProtectedRoute exact path="/register-group" component={RegisterGroup} />
       <ProtectedRoute exact path="/main/info" component={ViewGroup} />

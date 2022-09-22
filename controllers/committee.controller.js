@@ -261,13 +261,19 @@ class CommitteeClass {
           committeeId: req.body.committeeId,
         },
       });
-      await Promise.all(
-        groups.map(async group => {
-          await group.update({
-            committeeId: null,
-          });
-        })
-      );
+      for (let i = 0; i < groups.length; i++) {
+        await groups[i].update({
+          committeeId: null,
+        });
+      }
+
+      // await Promise.all(
+      //   groups.map(async group => {
+      //     await group.update({
+      //       committeeId: null,
+      //     });
+      //   })
+      // );
       // groups.forEach(async group => {
       //   await group.update({
       //     committeeId: null,
@@ -385,6 +391,7 @@ class CommitteeClass {
           });
         })
       );
+      console.log(newGroups);
       // newGroups.forEach(async group => {
       //   await group.update({
       //     committeeId: req.body.committeeId,

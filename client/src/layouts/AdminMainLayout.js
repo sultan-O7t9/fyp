@@ -5,9 +5,21 @@ import MainAppbar from "../components/MainAppbar";
 import { BG } from "../utils/Theme";
 
 const navLinks = [
-  { name: "Faculty", path: "/admin/faculty", icon: "dashboard" },
-  { name: "Groups", path: "/admin/groups", icon: "group" },
-  { name: "Departments", path: "/admin/dept", icon: "person" },
+  {
+    name: localStorage.getItem("HOD_ID") ? "" : "Faculty",
+    path: "/admin/faculty",
+    icon: "dashboard",
+  },
+  {
+    name: "Groups",
+    path: localStorage.getItem("HOD_ID") ? "/hod/groups" : "/admin/groups",
+    icon: "group",
+  },
+  {
+    name: localStorage.getItem("HOD_ID") ? "" : "Departments",
+    path: "/admin/dept",
+    icon: "person",
+  },
 ];
 
 const AdminMainLayout = props => {
@@ -23,7 +35,7 @@ const AdminMainLayout = props => {
       <Sidebar
         showSidebar={showSidebar}
         toggleSidebar={toggleSidebar}
-        links={navLinks}
+        links={navLinks.filter(link => link.name)}
       />
       {children}
     </Box>

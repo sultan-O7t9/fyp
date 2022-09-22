@@ -131,30 +131,6 @@ export const FinalMarksReportComponent = props => {
                   );
                 })
               : null}
-
-            <tr>
-              <td style={{ ...tDataStyles }}>1</td>
-              <td style={{ ...tDataStyles }}>PMO System</td>
-              <td style={{ ...tDataStyles }}>Ejaz</td>
-              <td style={{ ...tDataStyles }}>Sultan</td>
-              <td style={{ ...tDataStyles }}>18094198-079</td>
-              <td style={{ ...tDataStyles }}>Gulsher</td>
-              <td style={{ ...tDataStyles }}>Adeel</td>
-              <td style={{ ...tDataStyles }}>D1</td>
-              <td style={{ ...tDataStyles }}>D2</td>
-              <td style={{ ...tDataStyles }}>Sup</td>
-              <td style={{ ...tDataStyles }}>D3</td>
-              <td style={{ ...tDataStyles }}>PMO</td>
-              <td style={{ ...tDataStyles }}>Total</td>
-              <td style={{ ...tDataStyles }}>Percent</td>
-              <td style={{ ...tDataStyles }}>Department</td>
-              <td style={{ ...tDataStyles }}>Class</td>
-              <td style={{ ...tDataStyles }}>Session</td>
-              <td style={{ ...tDataStyles }}>PROJECT</td>
-              <td style={{ ...tDataStyles }}>6</td>
-              <td style={{ ...tDataStyles }}>200</td>
-              <td style={{ ...tDataStyles }}>{new Date().toDateString()}</td>
-            </tr>
           </tbody>
         </table>
       </div>

@@ -69,7 +69,7 @@ const ExtensionModal = props => {
       sx={{ color: "#000", zIndex: theme => theme.zIndex.drawer + 1 }}
       open={true}
     >
-      <Container maxWidth="md" style={{ maxHeight: "80vh", overflowY: "auto" }}>
+      <Container maxWidth="lg" style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <Card style={styles.card}>
           <Box
             style={{
@@ -154,7 +154,7 @@ const ExtensionModal = props => {
                         }}
                       >
                         <Button
-                          style={{ marginRight: "1rem" }}
+                          style={{ marginRight: "0.5rem" }}
                           variant="contained"
                           onClick={() => {
                             handleExtensionStatus(extension.id, "Approved");

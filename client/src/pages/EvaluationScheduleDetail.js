@@ -785,8 +785,10 @@ const DataBody2 = props => {
       );
       console.log(res.data);
       setToastMessage("Schedule shared successfully");
+      setOpen(true);
     } catch (err) {
       setToastMessage("An error hass occured while sharing the schedule");
+      setOpen(true);
       console.log(err);
     }
   };

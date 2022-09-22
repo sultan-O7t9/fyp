@@ -121,43 +121,54 @@ const EditCommittee = props => {
   const [evaluators, setEvaluators] = useState([]);
   console.log(committee);
   useEffect(() => {
-    setGroups(committee.Groups.map(group => group.name));
-
-    // return;
-    axios
-      .get("http://localhost:5000/api/group/get-groups/")
-      .then(res => {
+    const getData = async () => {
+      setGroups(committee.Groups.map(group => group.name));
+      try {
+        const res = axios.post("http://localhost:5000/api/group/get-groups/", {
+          userId: localStorage.getItem("USER_ID"),
+        });
         console.log(res.data);
         console.log(evaluators.includes(1));
         console.log(res.data.groups);
         // setGroups([]);
         console.log(evaluators);
-        setGroupItems(
-          res.data.groups
-            .filter(
-              group =>
-                group.committeeId == null &&
-                !evaluators.includes(group.supervisorId)
-            )
-            .map(group => {
-              return {
-                id: group.name,
-                text: group.name,
-                value: group.name,
-              };
-            })
-            .concat(
-              committee.Groups.map(group => ({
-                id: group.name,
-                text: group.name,
-                value: group.name,
-              }))
-            )
+
+        const res2 = await axios.get(
+          "http://localhost:5000/api/sem/get-current"
         );
-      })
-      .catch(err => {
-        console.log(err);
-      });
+        console.log(res2.data);
+        const currSem = res2.data.semester ? res2.data.semester.id : null;
+
+        const grps = res.data.groups
+          .filter(
+            group =>
+              group.committeeId == null &&
+              !evaluators.includes(group.supervisorId)
+          )
+          .map(group => {
+            return {
+              id: group.id,
+              text: group.id,
+              value: group.id,
+            };
+          })
+          .concat(
+            committee.Groups.map(group => ({
+              id: group.name,
+              text: group.name,
+              value: group.name,
+            }))
+          );
+        setGroupItems(
+          currSem != null
+            ? grps.filter(grp => currSem != null && grp.semesterId == currSem)
+            : grps
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getData();
   }, [committee, evaluators]);
   useEffect(() => {
     setEvaluators(committee.members.map(member => member.id));

@@ -19,6 +19,7 @@ const {
   Department,
   Semester,
 } = require("../models");
+const { generateFypFinalPerforma } = require("../utils/generateDocx");
 
 class EvaluationController {
   static getCoverLetterReport = async (req, res) => {
@@ -359,20 +360,6 @@ class EvaluationController {
             id: grp.dataValues.committeeId,
           },
         });
-        const evaluators = [];
-        if (comm) {
-          const members = await FacultyMember.findAll({
-            where: {
-              committeeId: comm.dataValues.id,
-            },
-          });
-          for (let j = 0; j < members.length; j++) {
-            evaluators.push({
-              name: members[j].dataValues.name,
-              designation: members[j].dataValues.designation,
-            });
-          }
-        }
 
         const prjct = await Project.findOne({ where: { id: grp.projectId } });
         const students = await Student.findAll({
@@ -448,7 +435,33 @@ class EvaluationController {
             percentage: (total / 200) * 100,
           };
         }
+        const evaluators = {};
+        if (comm) {
+          const members = await FacultyMember.findAll({
+            where: {
+              committeeId: comm.dataValues.id,
+            },
+          });
+          for (let j = 0; j < students.length; j++) {
+            // evaluators.push({
+            //   name: members[j].dataValues.name,
 
+            //   designation: members[j].dataValues.designation,
+            // });
+            console.log(students[j].dataValues.rollNo);
+            for (let i = 0; i < members.length; i++) {
+              console.log(members[i].name);
+              const nameKey = `evaluator${i + 1}name`;
+              const desigKey = `evaluator${i + 1}desig`;
+              evaluators[students[j].rollNo] = {
+                ...evaluators[students[j].rollNo],
+                [nameKey]: members[i].dataValues.name,
+                [desigKey]: members[i].dataValues.designation,
+              };
+            }
+          }
+        }
+        // console.log(evaluators);
         const depts = {};
         for (let i = 0; i < students.length; i++) {
           const dept = await Department.findOne({
@@ -475,12 +488,43 @@ class EvaluationController {
         if (semester) {
           session = semester.dataValues.session;
         }
-        console.log(session, semester);
+        // console.log(session, semester);
+        console.log(evaluators);
         const ssts = students.map(st => {
           return {
             name: st.dataValues.name,
             supervisor: supervisor.dataValues.name,
-            evaluators: evaluators.length > 0 ? evaluators : [{}, {}],
+            // evaluators: evaluators.length > 0 ? evaluators : [{}, {}],
+            evaluator1name:
+              comm && evaluators.hasOwnProperty([st.dataValues.rollNo])
+                ? evaluators[st.dataValues.rollNo].evaluator1name
+                : "",
+            evaluator2name:
+              comm && evaluators.hasOwnProperty([st.dataValues.rollNo])
+                ? evaluators[st.dataValues.rollNo].evaluator2name
+                : "",
+            evaluator1desig:
+              comm && evaluators.hasOwnProperty([st.dataValues.rollNo])
+                ? evaluators[st.dataValues.rollNo].evaluator1desig
+                : "",
+            evaluator2desig:
+              comm && evaluators.hasOwnProperty([st.dataValues.rollNo])
+                ? evaluators[st.dataValues.rollNo].evaluator2desig
+                : "",
+
+            // evaluator1desig:
+            //   evaluators.length >= 2 && evaluators[0]
+            //     ? evaluators[0].designation
+            //     : "",
+
+            // evaluator2name:
+            //   evaluators.length >= 2 && evaluators[1] ? evaluators[1].name : "",
+
+            // evaluator2desig:
+            //   evaluators.length >= 2 && evaluators[1]
+            //     ? evaluators[1].designation
+            //     : "",
+
             projectTitle: prjct ? prjct.dataValues.title : "",
             projectType: prjct ? prjct.dataValues.dev_tech : "structured",
             rollNo: st.dataValues.rollNo,
@@ -493,17 +537,23 @@ class EvaluationController {
             session: session,
             total: evals[st.dataValues.rollNo].total,
             percentage: evals[st.dataValues.rollNo].percentage,
+            date: new Date().toDateString().split(" ").slice(1).join(" "),
           };
         });
         for (let i = 0; i < ssts.length; i++) {
           sts.push(ssts[i]);
         }
+        console.log(evaluators);
       }
-      console.log(sts);
-      res.status(200).json({
-        status: "success",
-        students: sts,
-      });
+
+      const file = await generateFypFinalPerforma({ students: [...sts] });
+      // console.log(file);
+      // res.download(file);
+      res.json({ file: file });
+      // res.status(200).json({
+      //   status: "success",
+      //   students: sts,
+      // });
       // const d3Evals=[];
       // for(let i=0;i<students.length;i++){
       //   const d3Eval=await D3Evaluation.findOne({
@@ -551,6 +601,7 @@ class EvaluationController {
             evaluators.push(members[j].dataValues.name);
           }
         }
+        console.log(evaluators);
 
         const prjct = await Project.findOne({ where: { id: grp.projectId } });
         const students = await Student.findAll({
@@ -558,7 +609,6 @@ class EvaluationController {
             groupId: groups[i],
           },
         });
-        console.log(students);
 
         const evals = {};
         for (let i = 0; i < students.length; i++) {
@@ -670,7 +720,6 @@ class EvaluationController {
           sts.push(ssts[i]);
         }
       }
-      console.log(sts);
       res.status(200).json({
         status: "success",
         students: sts,

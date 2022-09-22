@@ -65,6 +65,8 @@ const ReportsPage = () => {
   const [selectedReportType, setSelectedReportType] = useState(
     reportItems[0].value
   );
+  const btnRef = React.useRef(null);
+  const [fileUrl, setFileUrl] = useState("");
 
   const isEligible =
     localStorage.getItem("USER_ROLE") &&
@@ -176,8 +178,14 @@ const ReportsPage = () => {
           { groups: grps }
         );
         console.log(res.data);
-        setRptData(res.data.students);
-        setFinalPerforma(true);
+        // var output = res.data;
+        // const blob = new Blob([output]);
+        // const fileDownloadUrl = URL.createObjectURL(blob);
+
+        // setRptData(res.data.students);
+        // setFinalPerforma(true);
+        setFileUrl(res.data.file);
+        btnRef.current.click();
       } catch (err) {
         console.log(err);
       }
@@ -228,6 +236,16 @@ const ReportsPage = () => {
 
   return (
     <div>
+      <Button
+        ref={btnRef}
+        onClick={() => {
+          let url = "http://localhost:5000/" + fileUrl;
+          let win = window.open(url, "_blank");
+          win.focus();
+        }}
+      >
+        Download
+      </Button>
       {coverReport ? (
         <CoverLetterReport
           setDisabled={setDisabled}

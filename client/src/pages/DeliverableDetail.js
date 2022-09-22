@@ -770,16 +770,14 @@ const DeliverableDetail = props => {
                   >
                     Settings
                   </Button>
-                  <Badge badgeContent={totalExtensionreqs} color="secondary">
-                    <Button
-                      variant="contained"
-                      onClick={() => {
-                        setShowExtensionModal(true);
-                      }}
-                    >
-                      Deadline Extension Requests
-                    </Button>
-                  </Badge>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      setShowExtensionModal(true);
+                    }}
+                  >
+                    Deadline Extension Requests
+                  </Button>
                   <Button
                     style={{ marginTop: "0.5rem" }}
                     variant="contained"

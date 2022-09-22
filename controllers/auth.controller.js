@@ -10,6 +10,7 @@ const {
   Batch,
   Deliverable,
   EvaluationType,
+  HOD,
 } = require("../models");
 require("dotenv").config();
 const jwt_decode = require("jwt-decode");
@@ -116,6 +117,10 @@ module.exports.initializeApp = async (req, res) => {
         email: process.env.ADMIN_EMAIL,
         password: process.env.ADMIN_PASSWORD,
         name: "Admin",
+      });
+      await HOD.create({
+        email: process.env.HOD_EMAIL,
+        password: process.env.HOD_PASSWORD,
       });
       await Role.create({
         title: "PMO",
@@ -303,6 +308,45 @@ module.exports.assignRole = async (req, res) => {
   }
 };
 
+module.exports.hodLogin = async (req, res) => {
+  const { email, password } = req.body;
+  console.log("BODY", req.body);
+
+  try {
+    const admin = await HOD.findOne({
+      where: {
+        email: email,
+        password: password,
+      },
+    });
+    console.log(admin);
+    if (admin) {
+      const user = { id: admin.id, role: "HOD" };
+      const accessToken = createAccessToken(user);
+      const refreshToken = createRefreshToken(user);
+      const token = await Token.create({
+        refreshToken,
+      });
+      console.log(refreshToken, accessToken);
+      refreshTokens.push(refreshToken);
+
+      res.status(200).json({
+        login: true,
+        accessToken,
+        id: admin.id,
+        refreshToken,
+      });
+    } else {
+      throw new Error("Invalid Email or Password");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error logging in",
+      error,
+    });
+  }
+};
 module.exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
   console.log("BODY", req.body);

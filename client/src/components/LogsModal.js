@@ -24,7 +24,7 @@ const LogsModal = props => {
       sx={{ color: "#000", zIndex: theme => theme.zIndex.drawer + 1 }}
       open={true}
     >
-      <Container maxWidth="md" style={{ maxHeight: "80vh", overflowY: "auto" }}>
+      <Container maxWidth="lg" style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <Card style={styles.card}>
           <Box
             style={{

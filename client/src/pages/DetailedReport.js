@@ -1620,8 +1620,8 @@ const DataBody = props => {
         <TableCell></TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ fontWeight: "bold" }}>Grades</TableCell>
-        <TableCell style={{ fontWeight: "bold" }}>{""}</TableCell>
+        <TableCell style={{ fontWeight: "bold" }}>Percentage</TableCell>
+        <TableCell style={{ fontWeight: "bold" }}>100%</TableCell>
         <TableCell>
           {d3EvalData.students && d3EvalData.students.length
             ? d3EvalData.students.map(student => {
@@ -1636,7 +1636,7 @@ const DataBody = props => {
                       display: "inline-block",
                     }}
                   >
-                    {grades[student.rollNo]}
+                    {(totalMarks[student.rollNo] / 200) * 100} %
                   </Typography>
                 );
               })

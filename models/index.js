@@ -38,6 +38,7 @@ const Token = require("./Token")(sequelize, DataTypes);
 const Project = require("./Project")(sequelize, DataTypes);
 const Committee = require("./Committee")(sequelize, DataTypes);
 const Admin = require("./Admin")(sequelize, DataTypes);
+const HOD = require("./HOD")(sequelize, DataTypes);
 const Deliverable = require("./Deliverable")(sequelize, DataTypes);
 const Version = require("./Version")(sequelize, DataTypes);
 const EvaluationType = require("./EvaluationType")(sequelize, DataTypes);
@@ -291,6 +292,7 @@ module.exports = {
   EvaluationType,
   EvaluationSchedule,
   Mail,
+  HOD,
   Recipiant,
   Project,
   Committee,

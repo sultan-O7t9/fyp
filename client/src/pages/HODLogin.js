@@ -9,7 +9,7 @@ import axios from "axios";
 import Link from "../components/Link";
 import PasswordField from "../components/PasswordField";
 
-const AdminLogin = () => {
+const HODLogin = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const accessToken = useSelector(state => state.auth.accessToken);
@@ -26,17 +26,14 @@ const AdminLogin = () => {
     if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
       return setError("Please enter a valid UOG email address");
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/admin",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post("http://localhost:5000/api/auth/hod", {
+        email,
+        password,
+      });
       // console.log(response.data);
-      localStorage.setItem("ADMIN_ID", response.data.id);
+      localStorage.setItem("HOD_ID", response.data.id);
       localStorage.setItem("USER_ROLE", ["HOD"]);
-      history.replace("/admin/faculty", response.data);
+      history.replace("/hod/groups", response.data);
       dispatch(loginUser(response.data));
     } catch (error) {
       //  Generate an alert here.
@@ -49,7 +46,7 @@ const AdminLogin = () => {
     <Box style={Styles.container}>
       <Card style={Styles.card}>
         <Typography variant="h5" style={Styles.heading}>
-          Log In as Admin
+          HOD Office Log In
         </Typography>
         <TextField
           style={Styles.input}
@@ -81,12 +78,7 @@ const AdminLogin = () => {
           <Typography variant="body2" style={{ textDecoration: "underline" }}>
             <Link to="/login">Log in as Faculty Member</Link>
           </Typography>
-          <Typography
-            variant="body2"
-            style={{ textDecoration: "underline", marginTop: "0.5rem" }}
-          >
-            <Link to="/hod">Log in as HOD Office</Link>
-          </Typography>
+
           <Typography
             variant="body2"
             style={{ textDecoration: "underline", marginTop: "0.5rem" }}
@@ -108,4 +100,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default HODLogin;

@@ -127,9 +127,9 @@ const AllGroups = () => {
       try {
         let filteredGroups = [];
         if (localStorage.getItem("USER_ROLE").includes("PMO")) {
-          const res = await axios.get(
-            "http://localhost:5000/api/group/get-groups/"
-            // { userId: localStorage.getItem("USER_ID"), userRole: "PMO" }
+          const res = await axios.post(
+            "http://localhost:5000/api/group/get-groups/",
+            { userId: localStorage.getItem("USER_ID") }
           );
           console.log(res.data.groups);
           filteredGroups = currentSemester
@@ -368,7 +368,7 @@ const AllGroups = () => {
               ) : null}
               {body.length > 0 ? (
                 <>
-                  <GroupExportTable
+                  {/* <GroupExportTable
                     label="Export Groups"
                     filename={("groups_" + new Date().toLocaleString()).replace(
                       " ",
@@ -388,7 +388,7 @@ const AllGroups = () => {
                         ? row.bookletsComment
                         : "",
                     }))}
-                  />
+                  /> */}
                 </>
               ) : null}
               {localStorage.getItem("USER_ROLE").includes("PMO") ? (

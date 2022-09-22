@@ -60,6 +60,7 @@ const DATA = {
 };
 
 const DataBody = ({ data, depts }) => {
+  console.log(data);
   // const [filter, setFilter] = useState("All");
   const [gridData, setGridData] = useState(data);
   const [gridCols, setGridCols] = useState([]);
@@ -83,11 +84,23 @@ const DataBody = ({ data, depts }) => {
     { name: "department", operator: "startsWith", type: "string", value: "" },
     { name: "supervisor", operator: "startsWith", type: "string", value: "" },
     {
+      name: "semesterTitle",
+      operator: "startsWith",
+      type: "string",
+      value: "",
+    },
+    {
       name: "bookletsStatus",
       operator: "eq",
       type: "select",
       value: "Approved",
     },
+    // {
+    //   name: "semesterTitle",
+    //   operator: "eq",
+    //   type: "select",
+    //   // value: "All",
+    // },
     // { name: 'age', operator: 'gte', type: 'number', value: 21 },
     // { name: 'city', operator: 'startsWith', type: 'string', value: '' },
     // {
@@ -98,6 +111,10 @@ const DataBody = ({ data, depts }) => {
     // },
     // { name: 'country', operator: 'eq', type: 'select', value: 'ca' }
   ];
+
+  const semesterItems = [...new Set(data.map(item => item.semesterTitle))].map(
+    item => ({ label: item, value: item })
+  );
 
   useEffect(() => {
     const columns = [
@@ -120,9 +137,14 @@ const DataBody = ({ data, depts }) => {
       //   },
       // },
       {
-        name: "semester",
+        name: "semesterTitle",
         header: "Semester",
         defaultFlex: 1,
+        // filterEditor: SelectFilter,
+        // filterEditorProps: {
+        //   placeholder: "All",
+        //   dataSource: semesterItems,
+        // },
       },
       // {
       //   name: "department",
@@ -320,7 +342,7 @@ const AdminAllGroups = () => {
       setIsLoading(false);
       try {
         const resGroup = await axios.get(
-          "http://localhost:5000/api/group/get-groups"
+          "http://localhost:5000/api/group/get-groups-admin"
         );
         const resDept = await axios.get(
           "http://localhost:5000/api/dept/get-all"
