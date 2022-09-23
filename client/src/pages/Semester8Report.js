@@ -416,7 +416,7 @@ const Semester8ReportComponent = props => {
                         <b>Evaluator 1 (Name, Signature & Date): </b>
                         {student.evaluators[0]}
                       </span>
-                      <span>{new Date().toLocaleDateString()}</span>
+                      {/* <span>{new Date().toLocaleDateString()}</span> */}
                     </div>
                     <div
                       style={{
@@ -432,7 +432,7 @@ const Semester8ReportComponent = props => {
                         <b>Evaluator 2 (Name, Signature & Date): </b>
                         {student.evaluators[1]}
                       </span>
-                      <span>{new Date().toLocaleDateString()}</span>
+                      {/* <span>{new Date().toLocaleDateString()}</span> */}
                     </div>
                   </div>
                   <div
