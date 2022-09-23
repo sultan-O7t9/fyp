@@ -374,9 +374,15 @@ class GroupController {
   static createManyGroups = async (req, res) => {
     // const { id, role } = req.user;
 
-    const { groups } = req.body;
+    const { groups, userId } = req.body;
     console.log(groups);
     try {
+      const pmo = await PMO.findAll({
+        where: {
+          pmoId: userId,
+        },
+      });
+      const pmoDepts = pmo.map(p => p.deptId);
       const newGroups = await Promise.all(
         groups.map(async group => {
           const department = await Department.findOne({
@@ -384,9 +390,10 @@ class GroupController {
               name: group.department,
             },
           });
-
+          if (!department || !pmoDepts.includes(department.dataValues.id))
+            return;
           const newGroup = await Group.create({
-            departmentId: department.dataValues.id,
+            departmentId: department ? department.dataValues.id : null,
             name: new Date().getTime().toString(),
             password: crypto.randomBytes(8).toString("hex").slice(0, 8),
           });

@@ -8,7 +8,7 @@ import { Backdrop, Button } from "@mui/material";
 import { useHistory } from "react-router-dom";
 
 const Semester7ReportComponent = props => {
-  const { data, setDisplay, withMarks, setDisabled } = props;
+  const { data, setDisplay, withMarks, setDisabled, pmoDept } = props;
   const rptRef = useRef(null);
 
   const generatePDF = async () => {
@@ -214,18 +214,26 @@ const Semester7ReportComponent = props => {
                         <td style={tdStyles}>
                           Understanding of existing system
                         </td>
-                        <td style={tdStyles}>5</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>5</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.proposalEval.existingSystem : ""}
                         </td>
-                        <td style={tdStyles} rowSpan={4}>
-                          {/* remarks */}
+                        <td
+                          style={{ ...tdStyles, textAlign: "center" }}
+                          rowSpan={4}
+                        >
+                          {withMarks
+                            ? student.proposalEval.existingSystem +
+                              student.proposalEval.architecture +
+                              student.proposalEval.goals +
+                              student.proposalEval.pptSkills
+                            : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>Well defined goal & objective</td>
-                        <td style={tdStyles}>5</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>5</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.proposalEval.goals : ""}
                         </td>
                       </tr>
@@ -233,41 +241,53 @@ const Semester7ReportComponent = props => {
                         <td style={tdStyles}>
                           Conceptual Application Architecture{" "}
                         </td>
-                        <td style={tdStyles}>5</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>5</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.proposalEval.architecture : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>Presentation Skills</td>
-                        <td style={tdStyles}>5</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>5</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.proposalEval.pptSkills : ""}
                         </td>
                       </tr>
                     </tbody>
                   </table>
                   <div style={{ margin: "4px" }}>
-                    <p
+                    <div
                       style={{
                         ...infoStyles,
-                        fontWeight: "bold",
+                        // fontWeight: "bold",
                         fontSize: "13px",
+                        // borderBottom: "1px solid black",
+                        display: "flex",
+                        justifyContent: "space-between",
                       }}
                     >
-                      Evaluator 1 (Name, Signature &
-                      Date):_________________________________
-                    </p>
-                    <p
+                      <span>
+                        <b>Evaluator 1 (Name, Signature & Date): </b>
+                        {student.evaluators[0]}
+                      </span>
+                      <span>{new Date().toLocaleDateString()}</span>
+                    </div>
+                    <div
                       style={{
                         ...infoStyles,
-                        fontWeight: "bold",
+                        // fontWeight: "bold",
                         fontSize: "13px",
+                        // borderBottom: "1px solid black",
+                        display: "flex",
+                        justifyContent: "space-between",
                       }}
                     >
-                      Evaluator 2 (Name, Signature &
-                      Date):_________________________________
-                    </p>
+                      <span>
+                        <b>Evaluator 2 (Name, Signature & Date): </b>
+                        {student.evaluators[1]}
+                      </span>
+                      <span>{new Date().toLocaleDateString()}</span>
+                    </div>
                   </div>
                   <table
                     style={{
@@ -289,41 +309,68 @@ const Semester7ReportComponent = props => {
                         <td style={{ ...tdStyles, width: "50%" }}>
                           Functional Requirements
                         </td>
-                        <td style={{ ...tdStyles, width: "12%" }}>2</td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
+                          2
+                        </td>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
                           {withMarks ? student.d2Eval.funcReqs : ""}
                         </td>
-                        <td style={{ ...tdStyles, width: "26%" }} rowSpan={5}>
-                          {/* remarks */}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "26%",
+                            textAlign: "center",
+                          }}
+                          rowSpan={5}
+                        >
+                          {withMarks
+                            ? student.d2Eval.funcReqs +
+                              student.d2Eval.interfaces +
+                              student.d2Eval.usecaseDesc +
+                              student.d2Eval.usecaseDia +
+                              student.d2Eval.nonFuncReqs
+                            : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>
                           Interfaces (UI, External, H/W interface requirements)
                         </td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.interfaces : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>Usecase Descriptions</td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.usecaseDesc : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>Usecase Diagrams</td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.usecaseDia : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>Non-Fucntional Attributes</td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.nonFuncReqs : ""}
                         </td>
                       </tr>
@@ -352,12 +399,39 @@ const Semester7ReportComponent = props => {
                             ? "ERD"
                             : "Domain Model"}
                         </td>
-                        <td style={{ ...tdStyles, width: "12%" }}>2</td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
+                          2
+                        </td>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
                           {withMarks ? student.d2Eval.domainDia : ""}
                         </td>
-                        <td style={{ ...tdStyles, width: "26%" }} rowSpan={5}>
-                          {/* remarks */}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "26%",
+                            textAlign: "center",
+                          }}
+                          rowSpan={5}
+                        >
+                          {withMarks
+                            ? student.d2Eval.domainDia +
+                              student.d2Eval.classDia +
+                              student.d2Eval.sequenceDia +
+                              student.d2Eval.stateChartDia +
+                              student.d2Eval.collabDia
+                            : ""}
                         </td>
                       </tr>
                       <tr>
@@ -366,8 +440,8 @@ const Semester7ReportComponent = props => {
                             ? "Data Flow Diagram"
                             : "Class Diagram"}
                         </td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.classDia : ""}
                         </td>
                       </tr>
@@ -377,8 +451,8 @@ const Semester7ReportComponent = props => {
                             ? "State Transition Diagram"
                             : "Sequence Diagram"}
                         </td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.sequenceDia : ""}
                         </td>
                       </tr>
@@ -388,8 +462,8 @@ const Semester7ReportComponent = props => {
                             ? "Architectural Diagram"
                             : "State Chart Diagram"}
                         </td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.stateChartDia : ""}
                         </td>
                       </tr>
@@ -399,8 +473,8 @@ const Semester7ReportComponent = props => {
                             ? "Collaboration Diagram"
                             : "Component Diagram"}
                         </td>
-                        <td style={tdStyles}>2</td>
-                        <td style={tdStyles}>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>2</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
                           {withMarks ? student.d2Eval.collabDia : ""}
                         </td>
                       </tr>
@@ -424,12 +498,31 @@ const Semester7ReportComponent = props => {
                         <td style={{ ...tdStyles, width: "50%" }}>
                           Partially Working System (30% implementation)
                         </td>
-                        <td style={{ ...tdStyles, width: "12%" }}></td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        ></td>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
                           {withMarks ? student.d2Eval.sysPrototype : ""}
                         </td>
-                        <td style={{ ...tdStyles, width: "26%" }} rowSpan={1}>
-                          {/* remarks */}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "26%",
+                            textAlign: "center",
+                          }}
+                          rowSpan={1}
+                        >
+                          {withMarks ? student.d2Eval.sysPrototype : ""}
                         </td>
                       </tr>
                     </tbody>
@@ -455,12 +548,31 @@ const Semester7ReportComponent = props => {
                           {" "}
                           (Meetings, Project progress)
                         </td>
-                        <td style={{ ...tdStyles, width: "12%" }}></td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        ></td>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
                           {withMarks ? student.supEval : ""}
                         </td>
-                        <td style={{ ...tdStyles, width: "26%" }} rowSpan={1}>
-                          {/* remarks */}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "26%",
+                            textAlign: "center",
+                          }}
+                          rowSpan={1}
+                        >
+                          {withMarks ? student.supEval : ""}
                         </td>
                       </tr>
                     </tbody>
@@ -485,12 +597,31 @@ const Semester7ReportComponent = props => {
                         <td style={{ ...tdStyles, width: "50%" }}>
                           (Meeting Deadlines, Attending Workshops)
                         </td>
-                        <td style={{ ...tdStyles, width: "12%" }}></td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        ></td>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
                           {withMarks ? student.pmoEval : ""}
                         </td>
-                        <td style={{ ...tdStyles, width: "26%" }} rowSpan={2}>
-                          {/* remarks */}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "26%",
+                            textAlign: "center",
+                          }}
+                          rowSpan={2}
+                        >
+                          {withMarks ? student.pmoEval : ""}
                         </td>
                       </tr>
 
@@ -500,34 +631,62 @@ const Semester7ReportComponent = props => {
                             Internal Marks
                           </span>
                         </td>
-                        <td style={{ ...tdStyles, width: "12%" }}>80</td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
-                          {student.total}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
+                          80
+                        </td>
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
+                          {withMarks
+                            ? +(Math.round(student.total + "e+2") + "e-2")
+                            : ""}
                         </td>
                       </tr>
                     </tbody>
                   </table>
                   <div style={{ margin: "4px" }}>
-                    <p
+                    <div
                       style={{
                         ...infoStyles,
-                        fontWeight: "bold",
+                        // fontWeight: "bold",
                         fontSize: "13px",
+                        // borderBottom: "1px solid black",
+                        display: "flex",
+                        justifyContent: "space-between",
                       }}
                     >
-                      Evaluator 1 (Name, Signature &
-                      Date):_________________________________
-                    </p>
-                    <p
+                      <span>
+                        <b>Evaluator 1 (Name, Signature & Date): </b>
+                        {student.evaluators[0]}
+                      </span>
+                      <span>{new Date().toLocaleDateString()}</span>
+                    </div>
+                    <div
                       style={{
                         ...infoStyles,
-                        fontWeight: "bold",
+                        // fontWeight: "bold",
                         fontSize: "13px",
+                        // borderBottom: "1px solid black",
+                        display: "flex",
+                        justifyContent: "space-between",
                       }}
                     >
-                      Evaluator 2 (Name, Signature &
-                      Date):_________________________________
-                    </p>
+                      <span>
+                        <b>Evaluator 2 (Name, Signature & Date): </b>
+                        {student.evaluators[1]}
+                      </span>
+                      <span>{new Date().toLocaleDateString()}</span>
+                    </div>
                   </div>
                   <div
                     style={{
@@ -538,8 +697,8 @@ const Semester7ReportComponent = props => {
                       textAlign: "center",
                     }}
                   >
-                    Project Management Office (PMO-SE), C & IT Evening Program
-                    Marghzar Campus, University of Gujrat.
+                    Project Management Office (PMO-{pmoDept}), C & IT Evening
+                    Program Marghzar Campus, University of Gujrat.
                   </div>
                 </div>
               );
@@ -554,7 +713,7 @@ const Semester7ReportComponent = props => {
 };
 
 const Semester7Report = props => {
-  const { data, setDisplay, withMarks, setDisabled } = props;
+  const { data, setDisplay, withMarks, setDisabled, pmoDept } = props;
   console.log("data", data);
   return (
     <Backdrop
@@ -566,6 +725,7 @@ const Semester7Report = props => {
     >
       <Semester7ReportComponent
         data={data}
+        pmoDept={pmoDept}
         setDisabled={setDisabled}
         withMarks={withMarks}
         // setPageDims={setPageDims}

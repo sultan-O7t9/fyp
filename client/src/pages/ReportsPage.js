@@ -62,6 +62,7 @@ const ReportsPage = () => {
   const [report8, setReport8] = useState(false);
   const [finalPerforma, setFinalPerforma] = useState(false);
   const [rptData, setRptData] = useState([]);
+  const [pmoDept, setPmoDept] = useState("");
   const [selectedReportType, setSelectedReportType] = useState(
     reportItems[0].value
   );
@@ -137,42 +138,58 @@ const ReportsPage = () => {
 
     if (selectedReportType == 1) {
       try {
+        setDisabled(true);
+
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/7th-eval",
-          { groups: grps }
+          { groups: grps, userId: localStorage.getItem("USER_ID") }
         );
         console.log(res.data);
+        setPmoDept(res.data.pmoDept);
         setRptData(res.data.students);
         setReport7(true);
       } catch (err) {
+        setDisabled(false);
+
         console.log(err);
       }
     } else if (selectedReportType == 2) {
       try {
+        setDisabled(true);
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/8th-eval",
-          { groups: grps }
+          { groups: grps, userId: localStorage.getItem("USER_ID") }
         );
         console.log(res.data);
         setRptData(res.data.students);
+        setPmoDept(res.data.pmoDept);
+
         setReport8(true);
       } catch (err) {
+        setDisabled(false);
+
         console.log(err);
       }
     } else if (selectedReportType == 3) {
       try {
+        setDisabled(true);
+
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/all-eval",
-          { groups: grps }
+          { groups: grps, userId: localStorage.getItem("USER_ID") }
         );
         console.log(res.data);
         setRptData(res.data.studetns);
         setFinalReport(true);
       } catch (err) {
+        setDisabled(false);
+
         console.log(err);
       }
     } else if (selectedReportType == 4) {
       try {
+        setDisabled(true);
+
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/final-stu-eval",
           { groups: grps }
@@ -186,20 +203,30 @@ const ReportsPage = () => {
         // setFinalPerforma(true);
         setFileUrl(res.data.file);
         btnRef.current.click();
+        setDisabled(false);
       } catch (err) {
+        setDisabled(false);
+
         console.log(err);
       }
     } else if (selectedReportType == 5) {
       try {
+        setDisabled(true);
+
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/cover",
-          { groups: grps }
+          { groups: grps, userId: localStorage.getItem("USER_ID") }
         );
         console.log(res.data);
-        setRptData(res.data.students);
+        // setRptData(res.data.students);
         // setFinalReport(true);
-        setCoverReport(true);
+        setFileUrl(res.data.file);
+        btnRef.current.click();
+        // setCoverReport(true);
+        setDisabled(false);
       } catch (err) {
+        setDisabled(false);
+
         console.log(err);
       }
     }
@@ -238,6 +265,7 @@ const ReportsPage = () => {
     <div>
       <Button
         ref={btnRef}
+        style={{ display: "none" }}
         onClick={() => {
           let url = "http://localhost:5000/" + fileUrl;
           let win = window.open(url, "_blank");
@@ -262,6 +290,7 @@ const ReportsPage = () => {
       ) : null}
       {report7 ? (
         <Semester7Report
+          pmoDept={pmoDept}
           setDisabled={setDisabled}
           withMarks={withMarks}
           data={rptData}
@@ -270,6 +299,7 @@ const ReportsPage = () => {
       ) : null}
       {report8 ? (
         <Semester8Report
+          pmoDept={pmoDept}
           setDisabled={setDisabled}
           withMarks={withMarks}
           data={rptData}

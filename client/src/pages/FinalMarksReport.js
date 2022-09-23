@@ -102,7 +102,9 @@ export const FinalMarksReportComponent = props => {
               ? data.map((item, index) => {
                   return (
                     <tr key={item.rollNo}>
-                      <td style={{ ...tDataStyles }}>{index + 1}</td>
+                      <td style={{ ...tDataStyles, textAlign: "center" }}>
+                        {item.grpId}
+                      </td>
                       <td style={{ ...tDataStyles }}>{item.projectTitle}</td>
                       <td style={{ ...tDataStyles }}>{item.supervisor}</td>
                       <td style={{ ...tDataStyles }}>{item.name}</td>

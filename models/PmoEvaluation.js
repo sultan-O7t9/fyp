@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         defaultValue: "",
       },
-      marks: {
+      marks_seven: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      marks_eight: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },

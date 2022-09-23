@@ -19,13 +19,31 @@ const {
   Department,
   Semester,
 } = require("../models");
-const { generateFypFinalPerforma } = require("../utils/generateDocx");
+const {
+  generateFypFinalPerforma,
+  generateCoverLetter,
+} = require("../utils/generateDocx");
+
+function roundToTwo(num) {
+  return +(Math.round(num + "e+2") + "e-2");
+}
 
 class EvaluationController {
   static getCoverLetterReport = async (req, res) => {
-    const { groups } = req.body;
+    const { groups, userId } = req.body;
     const data = [];
     try {
+      const pmo = await PMO.findOne({
+        where: {
+          pmoId: userId,
+        },
+      });
+      const dept = await Department.findOne({
+        where: {
+          id: pmo.deptId,
+        },
+      });
+
       for (let i = 0; i < groups.length; i++) {
         const group = await Group.findOne({
           where: {
@@ -43,20 +61,37 @@ class EvaluationController {
             groupId: group.id,
           },
         });
-        data.push({
-          projectTitle: project ? project.dataValues.title : "",
-          members: members
-            ? members.map(member => ({
-                rollNo: member.dataValues.rollNo,
-                name: member.dataValues.name,
-              }))
-            : [],
-        });
+        for (let j = 0; j < members.length; j++) {
+          const member = members[j];
+          const memberData = {
+            name: member.name,
+            rollNo: member.rollNo,
+            group: group.name,
+            projectTitle: project.title,
+            srNo: i + 1,
+          };
+          data.push(memberData);
+        }
+        // data.push({
+        //   projectTitle: project ? project.dataValues.title : "",
+        //   members: members
+        //     ? members.map(member => ({
+        //         rollNo: member.dataValues.rollNo,
+        //         name: member.dataValues.name,
+        //       }))
+        //     : [],
+        // });
       }
       console.log(data);
+      const file = await generateCoverLetter({
+        students: data,
+        department: dept ? dept.title : "",
+        date: new Date().toDateString().split(" ").slice(1).join(" "),
+      });
+
       res.status(200).json({
         status: "success",
-        students: data,
+        file: file,
       });
     } catch (err) {
       console.log(err);
@@ -64,8 +99,29 @@ class EvaluationController {
     }
   };
   static get7thEvaluation = async (req, res) => {
-    const { groups } = req.body;
+    const { groups, userId } = req.body;
     try {
+      const pmo = await PMO.findAll({
+        where: {
+          pmoId: userId,
+        },
+      });
+      const dept = await Department.findAll({
+        where: {
+          id: {
+            [sequelize.Op.in]: pmo.map(p => p.deptId),
+          },
+        },
+      });
+      const deptsOfPmo = dept
+        .reduce((acc, curr) => {
+          acc.push(curr.name);
+
+          return acc;
+        }, [])
+        .join(", ");
+      console.log(deptsOfPmo);
+
       const sts = [];
       for (let i = 0; i < groups.length; i++) {
         const grp = await Group.findOne({ where: { id: groups[i] } });
@@ -121,7 +177,7 @@ class EvaluationController {
             },
           });
           supEvals[students[i].rollNo] = supEval
-            ? supEval.dataValues.marks / 2
+            ? supEval.dataValues.marks_seven
             : 0;
         }
         const pmoEvals = {};
@@ -132,7 +188,7 @@ class EvaluationController {
             },
           });
           pmoEvals[students[i].rollNo] = pmoEval
-            ? pmoEval.dataValues.marks / 2
+            ? pmoEval.dataValues.marks_seven
             : 0;
         }
         const totals = {};
@@ -158,8 +214,23 @@ class EvaluationController {
         }
         console.log(totals);
 
+        let evs = ["", ""];
+        if (grp.dataValues.committeeId) {
+          const commMmbrs = await FacultyMember.findAll({
+            where: {
+              committeeId: grp.dataValues.committeeId,
+            },
+          });
+          if (commMmbrs.length == 2) {
+            evs = [commMmbrs[0].dataValues.name, commMmbrs[1].dataValues.name];
+          }
+        }
+
         const depts = {};
+        const evaluators = {};
         for (let i = 0; i < students.length; i++) {
+          evaluators[students[i].rollNo] = evs;
+
           const dept = await Department.findOne({
             where: {
               id: students[i].departmentId,
@@ -186,6 +257,7 @@ class EvaluationController {
             supEval: supEvals[st.dataValues.rollNo],
             pmoEval: pmoEvals[st.dataValues.rollNo],
             total: totals[st.dataValues.rollNo],
+            evaluators: evaluators[st.dataValues.rollNo],
           };
         });
         for (let i = 0; i < ssts.length; i++) {
@@ -196,6 +268,7 @@ class EvaluationController {
       res.status(200).json({
         status: "success",
         students: sts,
+        pmoDept: deptsOfPmo,
       });
       // const d3Evals=[];
       // for(let i=0;i<students.length;i++){
@@ -212,11 +285,32 @@ class EvaluationController {
     }
   };
   static get8thEvaluation = async (req, res) => {
-    const { groups } = req.body;
+    const { groups, userId } = req.body;
     try {
+      const pmo = await PMO.findAll({
+        where: {
+          pmoId: userId,
+        },
+      });
+      const dept = await Department.findAll({
+        where: {
+          id: {
+            [sequelize.Op.in]: pmo.map(p => p.deptId),
+          },
+        },
+      });
+      const deptsOfPmo = dept
+        .reduce((acc, curr) => {
+          acc.push(curr.name);
+
+          return acc;
+        }, [])
+        .join(", ");
+      console.log(deptsOfPmo);
       const sts = [];
       for (let i = 0; i < groups.length; i++) {
         const grp = await Group.findOne({ where: { id: groups[i] } });
+
         const prjct = await Project.findOne({ where: { id: grp.projectId } });
         const students = await Student.findAll({
           where: {
@@ -254,7 +348,7 @@ class EvaluationController {
             },
           });
           supEvals[students[i].rollNo] = supEval
-            ? supEval.dataValues.marks / 2
+            ? supEval.dataValues.marks_eight
             : 0;
         }
         const pmoEvals = {};
@@ -265,7 +359,7 @@ class EvaluationController {
             },
           });
           pmoEvals[students[i].rollNo] = pmoEval
-            ? pmoEval.dataValues.marks / 2
+            ? pmoEval.dataValues.marks_eight
             : 0;
         }
         const totals = {};
@@ -284,8 +378,21 @@ class EvaluationController {
         }
         console.log(totals);
 
+        let evs = ["", ""];
+        if (grp.dataValues.committeeId) {
+          const commMmbrs = await FacultyMember.findAll({
+            where: {
+              committeeId: grp.dataValues.committeeId,
+            },
+          });
+          if (commMmbrs.length == 2) {
+            evs = [commMmbrs[0].dataValues.name, commMmbrs[1].dataValues.name];
+          }
+        }
         const depts = {};
+        const evaluators = {};
         for (let i = 0; i < students.length; i++) {
+          evaluators[students[i].rollNo] = evs;
           const dept = await Department.findOne({
             where: {
               id: students[i].departmentId,
@@ -312,6 +419,7 @@ class EvaluationController {
             supEval: supEvals[st.dataValues.rollNo],
             pmoEval: pmoEvals[st.dataValues.rollNo],
             total: totals[st.dataValues.rollNo],
+            evaluators: evaluators[st.dataValues.rollNo],
           };
         });
         for (let i = 0; i < ssts.length; i++) {
@@ -322,6 +430,7 @@ class EvaluationController {
       res.status(200).json({
         status: "success",
         students: sts,
+        pmoDept: deptsOfPmo,
       });
       // const d3Evals=[];
       // for(let i=0;i<students.length;i++){
@@ -427,8 +536,12 @@ class EvaluationController {
               d3Eval.dataValues.skill
             : 0;
 
-          const sup = supEval ? supEval.dataValues.marks : 0;
-          const pmo = pmoEval ? pmoEval.dataValues.marks : 0;
+          const sup = supEval
+            ? supEval.dataValues.marks_seven + supEval.dataValues.marks_eight
+            : 0;
+          const pmo = pmoEval
+            ? pmoEval.dataValues.marks_seven + pmoEval.dataValues.marks_eight
+            : 0;
           const total = d1 + d2 + d3 + sup + pmo;
           evals[students[i].rollNo] = {
             total: total,
@@ -668,8 +781,12 @@ class EvaluationController {
               d3Eval.dataValues.skill
             : 0;
 
-          const sup = supEval ? supEval.dataValues.marks : 0;
-          const pmo = pmoEval ? pmoEval.dataValues.marks : 0;
+          const sup = supEval
+            ? supEval.dataValues.marks_seven + supEval.dataValues.marks_eight
+            : 0;
+          const pmo = pmoEval
+            ? pmoEval.dataValues.marks_seven + pmoEval.dataValues.marks_eight
+            : 0;
           const total = d1 + d2 + d3 + sup + pmo;
           evals[students[i].rollNo] = {
             total: total,
@@ -860,7 +977,8 @@ class EvaluationController {
           });
           let marks;
           if (supEval) {
-            marks = supEval.dataValues.marks;
+            marks =
+              supEval.dataValues.marks_seven + supEval.dataValues.marks_eight;
           } else {
             marks = 0;
           }
@@ -873,7 +991,8 @@ class EvaluationController {
           });
           let marks;
           if (pmoEval) {
-            marks = pmoEval.dataValues.marks;
+            marks =
+              pmoEval.dataValues.marks_seven + pmoEval.dataValues.marks_eight;
           } else {
             marks = 0;
           }
@@ -891,6 +1010,7 @@ class EvaluationController {
 
         const sts = students.map(st => {
           return {
+            grpId: i + 1,
             rollNo: st.dataValues.rollNo,
             name: st.dataValues.name,
             class: dept ? st.dataValues.degree + dept.dataValues.name : "",
@@ -1358,7 +1478,8 @@ class EvaluationController {
           groupId: groupId,
           studentId: evalData.students[i].rollNo,
           remarks: evalData.remarks,
-          marks: evalData.students[i].marks,
+          marks_seven: evalData.students[i].marks_seven,
+          marks_eight: evalData.students[i].marks_eight,
         });
       }
       res.status(200).json({
@@ -1403,13 +1524,15 @@ class EvaluationController {
             ? pmoEvals.map(evaluation => {
                 return {
                   rollNo: evaluation.studentId,
-                  marks: evaluation.marks,
+                  marks_seven: evaluation.marks_seven,
+                  marks_eight: evaluation.marks_eight,
                 };
               })
             : students.map(student => {
                 return {
                   rollNo: student.rollNo,
-                  marks: 0,
+                  marks_seven: 0,
+                  marks_eight: 0,
                 };
               }),
         },
@@ -1467,7 +1590,8 @@ class EvaluationController {
           groupId: groupId,
           studentId: evalData.students[i].rollNo,
           remarks: evalData.remarks,
-          marks: evalData.students[i].marks,
+          marks_seven: evalData.students[i].marks_seven,
+          marks_eight: evalData.students[i].marks_eight,
         });
       }
       res.status(200).json({
@@ -1512,13 +1636,15 @@ class EvaluationController {
             ? superEvals.map(evaluation => {
                 return {
                   rollNo: evaluation.studentId,
-                  marks: evaluation.marks,
+                  marks_seven: evaluation.marks_seven,
+                  marks_eight: evaluation.marks_eight,
                 };
               })
             : students.map(student => {
                 return {
                   rollNo: student.rollNo,
-                  marks: 0,
+                  marks_seven: 0,
+                  marks_eight: 0,
                 };
               }),
         },
@@ -1556,6 +1682,7 @@ class EvaluationController {
     // Save groupId, student Id, and each type of evaluation there: existingSystem, goals, architecture,pptSkills, Save the marks there
     // I will get a groupId
     // find students in that groupId
+
     const evalData = req.body;
     try {
       const groupId = evalData.groupId;
@@ -1576,10 +1703,10 @@ class EvaluationController {
           groupId: groupId,
           studentId: evalData.students[i].rollNo,
           remarks: evalData.remarks,
-          existingSystem: evalData.students[i].existingSystem,
-          goals: evalData.students[i].goals,
-          architecture: evalData.students[i].architecture,
-          pptSkills: evalData.students[i].pptSkills,
+          existingSystem: roundToTwo(evalData.students[i].existingSystem),
+          goals: roundToTwo(evalData.students[i].goals),
+          architecture: roundToTwo(evalData.students[i].architecture),
+          pptSkills: roundToTwo(evalData.students[i].pptSkills),
         });
       }
       res.status(200).json({
@@ -1698,17 +1825,17 @@ class EvaluationController {
           reqRemarks: evalData.remarks.reqRemarks,
           designRemarks: evalData.remarks.designRemarks,
           sysRemarks: evalData.remarks.sysRemarks,
-          funcReqs: evalData.students[i].funcReqs,
-          interfaces: evalData.students[i].interfaces,
-          usecaseDesc: evalData.students[i].usecaseDesc,
-          usecaseDia: evalData.students[i].usecaseDia,
-          nonFuncReqs: evalData.students[i].nonFuncReqs,
-          domainDia: evalData.students[i].domainDia,
-          classDia: evalData.students[i].classDia,
-          sequenceDia: evalData.students[i].sequenceDia,
-          stateChartDia: evalData.students[i].stateChartDia,
-          collabDia: evalData.students[i].collabDia,
-          sysPrototype: evalData.students[i].sysPrototype,
+          funcReqs: roundToTwo(evalData.students[i].funcReqs),
+          interfaces: roundToTwo(evalData.students[i].interfaces),
+          usecaseDesc: roundToTwo(evalData.students[i].usecaseDesc),
+          usecaseDia: roundToTwo(evalData.students[i].usecaseDia),
+          nonFuncReqs: roundToTwo(evalData.students[i].nonFuncReqs),
+          domainDia: roundToTwo(evalData.students[i].domainDia),
+          classDia: roundToTwo(evalData.students[i].classDia),
+          sequenceDia: roundToTwo(evalData.students[i].sequenceDia),
+          stateChartDia: roundToTwo(evalData.students[i].stateChartDia),
+          collabDia: roundToTwo(evalData.students[i].collabDia),
+          sysPrototype: roundToTwo(evalData.students[i].sysPrototype),
         });
       }
       res.status(200).json({
@@ -1845,14 +1972,14 @@ class EvaluationController {
           codeRemarks: evalData.remarks.codeRemarks,
           testRemarks: evalData.remarks.testRemarks,
           overallRemarks: evalData.remarks.overallRemarks,
-          runProject: evalData.students[i].runProject,
-          codeModify: evalData.students[i].codeModify,
-          testPlan: evalData.students[i].testPlan,
-          testCase: evalData.students[i].testCase,
-          projectPpt: evalData.students[i].projectPpt,
-          userMan: evalData.students[i].userMan,
-          stdTemp: evalData.students[i].stdTemp,
-          skill: evalData.students[i].skill,
+          runProject: roundToTwo(evalData.students[i].runProject),
+          codeModify: roundToTwo(evalData.students[i].codeModify),
+          testPlan: roundToTwo(evalData.students[i].testPlan),
+          testCase: roundToTwo(evalData.students[i].testCase),
+          projectPpt: roundToTwo(evalData.students[i].projectPpt),
+          userMan: roundToTwo(evalData.students[i].userMan),
+          stdTemp: roundToTwo(evalData.students[i].stdTemp),
+          skill: roundToTwo(evalData.students[i].skill),
         });
       }
       res.status(200).json({

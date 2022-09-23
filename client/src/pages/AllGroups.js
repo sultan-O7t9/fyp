@@ -275,7 +275,7 @@ const AllGroups = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/group/create-many",
-        { groups }
+        { groups, userId: localStorage.getItem("USER_ID") }
       );
       console.log(response.data);
       if (response.status === 200) {

@@ -3,7 +3,10 @@ import {
   Button,
   List,
   ListItem,
+  Table,
+  TableBody,
   TableCell,
+  TableHead,
   TableRow,
   TextareaAutosize,
   TextField,
@@ -22,6 +25,7 @@ import Toast from "../components/Toast";
 import RadioButtonGroup from "../components/RadioButtonGroup";
 import AddProject from "../components/AddProject";
 import EditProject from "../components/EditProject";
+import { LegendToggleOutlined } from "@mui/icons-material";
 
 const DataHead = () => null;
 
@@ -51,11 +55,13 @@ const DataBody = props => {
   const isPmo = localStorage.getItem("USER_ROLE").includes("PMO");
 
   const [pmoEvaluationData, setPmoEvaluationData] = useState({});
-  const [pmoMarks, setPmoMarks] = useState("");
+  const [pmoMarks7, setPmoMarks7] = useState({});
+  const [pmoMarks8, setPmoMarks8] = useState({});
   const [pmoRemarks, setPmoRemarks] = useState("");
 
   const [supEvaluationData, setSupEvaluationData] = useState({});
-  const [supMarks, setSupMarks] = useState("");
+  const [supMarks7, setSupMarks7] = useState("");
+  const [supMarks8, setSupMarks8] = useState("");
   const [supRemarks, setSupRemarks] = useState("");
 
   useEffect(() => {
@@ -83,20 +89,26 @@ const DataBody = props => {
   useEffect(() => {
     if (!supEvaluationData.students) return;
     const students = supEvaluationData.students;
-    const marks = {};
+    const m7 = {};
+    const m8 = {};
     students.forEach(student => {
-      marks[student.rollNo] = student.marks;
+      m7[student.rollNo] = student.marks_seven;
+      m8[student.rollNo] = student.marks_eight;
     });
-    setSupMarks(marks);
+    setPmoMarks7(m7);
+    setPmoMarks8(m8);
   }, [supEvaluationData]);
   useEffect(() => {
     if (!pmoEvaluationData.students) return;
     const students = pmoEvaluationData.students;
-    const marks = {};
+    const m7 = {};
+    const m8 = {};
     students.forEach(student => {
-      marks[student.rollNo] = student.marks;
+      m7[student.rollNo] = student.marks_seven;
+      m8[student.rollNo] = student.marks_eight;
     });
-    setPmoMarks(marks);
+    setPmoMarks7(m7);
+    setPmoMarks8(m8);
   }, [pmoEvaluationData]);
 
   useEffect(() => {
@@ -152,17 +164,39 @@ const DataBody = props => {
     getEvaluationData();
   }, [groupId]);
 
-  const changeSupMarks = (rollNo, marks) => {
-    if (marks < 0) return;
-    if (marks > 40) return;
-    const newMarks = { ...supMarks, [rollNo]: marks };
-    setSupMarks(newMarks);
-  };
-  const changePmoMarks = (rollNo, marks) => {
+  const changeSupMarks = (rollNo, marks, type) => {
     if (marks < 0) return;
     if (marks > 20) return;
-    const newMarks = { ...pmoMarks, [rollNo]: marks };
-    setPmoMarks(newMarks);
+    // const newMarks = { ...supMarks, [rollNo]: marks };
+    switch (type) {
+      case "marks_seven":
+        const newMarks7 = { ...pmoMarks7, [rollNo]: marks };
+        setSupMarks7(newMarks7);
+        break;
+      case "marks_eight":
+        const newMarks8 = { ...pmoMarks8, [rollNo]: marks };
+        setSupMarks8(newMarks8);
+        break;
+      default:
+        break;
+    }
+  };
+  const changePmoMarks = (rollNo, marks, type) => {
+    if (marks < 0) return;
+    if (marks > 10) return;
+
+    switch (type) {
+      case "marks_seven":
+        const newMarks7 = { ...pmoMarks7, [rollNo]: marks };
+        setPmoMarks7(newMarks7);
+        break;
+      case "marks_eight":
+        const newMarks8 = { ...pmoMarks8, [rollNo]: marks };
+        setPmoMarks8(newMarks8);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleSupMarks = async () => {
@@ -176,7 +210,8 @@ const DataBody = props => {
     const students = [...supEvaluationData.students];
 
     students.forEach(student => {
-      student.marks = supMarks[student.rollNo];
+      student.marks_seven = supMarks7[student.rollNo];
+      student.marks_eight = supMarks8[student.rollNo];
     });
     const data = {
       groupId: groupId,
@@ -202,7 +237,8 @@ const DataBody = props => {
     const students = [...pmoEvaluationData.students];
 
     students.forEach(student => {
-      student.marks = pmoMarks[student.rollNo];
+      student.marks_seven = pmoMarks7[student.rollNo];
+      student.marks_eight = pmoMarks8[student.rollNo];
     });
     const data = {
       groupId: groupId,
@@ -446,7 +482,7 @@ const DataBody = props => {
         </TableRow>
       )}
       <TableRow>
-        <TableCell colSpan={3}>{""}</TableCell>
+        <TableCell colSpan={4}>{""}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell colSpan={2}>
@@ -598,71 +634,395 @@ const DataBody = props => {
       {localStorage.getItem("USER_ROLE").includes("SUPERVISOR") ? null : (
         <>
           <TableRow>
-            <TableCell colSpan={3}></TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell colSpan={3}>
-              <Typography variant="h4">PMO Evaluation</Typography>
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell colSpan={3}>
-              <Typography variant="body1" style={{ fontWeight: "bold" }}>
-                Project Management Office (Sub-section total:20)
-              </Typography>
-              <Typography>Meetings Deadlines, Attending Workshops</Typography>
-            </TableCell>
-          </TableRow>
-          {/* {localStorage.getItem("USER_ROLE").includes("PMO") ? (*/}
-          <>
-            <TableRow>
-              <TableCell style={{ fontWeight: "bold" }}>Total Marks</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>
-                Marks Obtained
-              </TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Remarks</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell colSpan={1}></TableCell>
-              <TableCell style={{ display: "flex" }}>
-                {pmoEvaluationData.students && pmoEvaluationData.students.length
-                  ? pmoEvaluationData.students.map(student => (
-                      <div
-                        style={{
-                          fontWeight: "bold",
-                          width: "6rem",
-                          marginRight: "1rem",
-                        }}
+            <TableCell colSpan={4}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <Typography variant="h4">PMO Evaluation</Typography>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <Typography
+                        variant="body1"
+                        style={{ fontWeight: "bold" }}
                       >
-                        {student.rollNo}
-                      </div>
-                    ))
-                  : null}
-              </TableCell>
-              <TableCell colSpan={1}>{""}</TableCell>
-            </TableRow>
-
-            <TableRow>
-              <TableCell>20</TableCell>
-              <TableCell>
-                {pmoEvaluationData.students && pmoEvaluationData.students.length
-                  ? pmoEvaluationData.students.map(student => {
-                      const value = pmoMarks[student.rollNo]
-                        ? pmoMarks[student.rollNo]
-                        : 0;
-                      return (
-                        <>
-                          {isPmo ? (
-                            <TextField
-                              style={{ width: "6rem", marginRight: "1rem" }}
-                              value={value}
-                              onChange={e => {
-                                changePmoMarks(student.rollNo, e.target.value);
+                        Project Management Office (Sub-section total:20)
+                      </Typography>
+                      <Typography>
+                        Meetings Deadlines, Attending Workshops
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell style={{ fontWeight: "bold" }}>
+                      Semester
+                    </TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>
+                      Marks Distribution
+                    </TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>
+                      Marks Obtained
+                    </TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>
+                      Remarks
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={1}></TableCell>
+                    <TableCell colSpan={1}></TableCell>
+                    <TableCell style={{ display: "flex" }}>
+                      {pmoEvaluationData.students &&
+                      pmoEvaluationData.students.length
+                        ? pmoEvaluationData.students.map(student => (
+                            <div
+                              style={{
+                                fontWeight: "bold",
+                                width: "6rem",
+                                marginRight: "1rem",
                               }}
-                            />
-                          ) : (
+                            >
+                              {student.rollNo}
+                            </div>
+                          ))
+                        : null}
+                    </TableCell>
+                    <TableCell colSpan={1}>{""}</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>7th Semester</TableCell>
+                    <TableCell>10</TableCell>
+                    <TableCell>
+                      {pmoEvaluationData.students &&
+                      pmoEvaluationData.students.length
+                        ? pmoEvaluationData.students.map(student => {
+                            const value = pmoMarks7[student.rollNo]
+                              ? pmoMarks7[student.rollNo]
+                              : 0;
+                            return (
+                              <>
+                                {isPmo ? (
+                                  <TextField
+                                    style={{
+                                      width: "6rem",
+                                      marginRight: "1rem",
+                                    }}
+                                    value={value}
+                                    onChange={e => {
+                                      changePmoMarks(
+                                        student.rollNo,
+                                        e.target.value,
+                                        "marks_seven"
+                                      );
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography
+                                    style={{
+                                      textAlign: "center",
+                                      width: "6rem",
+                                      marginRight: "1rem",
+                                      display: "inline-block",
+                                    }}
+                                  >
+                                    {value}
+                                  </Typography>
+                                )}
+                              </>
+                            );
+                          })
+                        : null}
+                    </TableCell>
+                    <TableCell rowSpan={2}>
+                      {isPmo ? (
+                        <TextareaAutosize
+                          minRows={8}
+                          value={pmoRemarks}
+                          onChange={e => setPmoRemarks(e.target.value)}
+                        />
+                      ) : (
+                        <Typography variant="body1">{pmoRemarks}</Typography>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>8th Semester</TableCell>
+                    <TableCell>10</TableCell>
+                    <TableCell>
+                      {pmoEvaluationData.students &&
+                      pmoEvaluationData.students.length
+                        ? pmoEvaluationData.students.map(student => {
+                            const value = pmoMarks8[student.rollNo]
+                              ? pmoMarks8[student.rollNo]
+                              : 0;
+                            console.log("VAL", value);
+                            return (
+                              <>
+                                {isPmo ? (
+                                  <TextField
+                                    style={{
+                                      width: "6rem",
+                                      marginRight: "1rem",
+                                    }}
+                                    value={value}
+                                    onChange={e => {
+                                      changePmoMarks(
+                                        student.rollNo,
+                                        e.target.value,
+                                        "marks_eight"
+                                      );
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography
+                                    style={{
+                                      textAlign: "center",
+                                      width: "6rem",
+                                      marginRight: "1rem",
+                                      display: "inline-block",
+                                    }}
+                                  >
+                                    {value}
+                                  </Typography>
+                                )}
+                              </>
+                            );
+                          })
+                        : null}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell style={{ fontWeight: "bold" }}>Total</TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>20</TableCell>
+                    <TableCell>
+                      {pmoEvaluationData.students &&
+                      pmoEvaluationData.students.length
+                        ? pmoEvaluationData.students.map(student => {
+                            let value =
+                              pmoMarks7[student.rollNo] -
+                              0 +
+                              (pmoMarks8[student.rollNo] - 0);
+                            if (value.toString() === "NaN") {
+                              value = 0;
+                            }
+                            console.log("VAL", value);
+                            return (
+                              <>
+                                <Typography
+                                  style={{
+                                    textAlign: "center",
+                                    width: "6rem",
+                                    marginRight: "1rem",
+                                    display: "inline-block",
+                                  }}
+                                >
+                                  {value}
+                                </Typography>
+                              </>
+                            );
+                          })
+                        : null}
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+
+                  {isPmo ? (
+                    <TableRow>
+                      <TableCell colSpan={4}>
+                        <Button
+                          onClick={handlePmoMarks}
+                          variant="contained"
+                          color="primary"
+                          size="large"
+                          style={{ display: "block" }}
+                        >
+                          Save{" "}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
+                </TableBody>
+              </Table>
+            </TableCell>
+          </TableRow>
+
+          {/* {localStorage.getItem("USER_ROLE").includes("PMO") ? (*/}
+          <></>
+        </>
+      )}
+      {/* Supervisor Marks */}
+      <TableRow>
+        <TableCell colSpan={4}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <Typography variant="h4">Supervisor Evaluation</Typography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <Typography variant="body1" style={{ fontWeight: "bold" }}>
+                    Supervisor (Sub-section total: 40)
+                  </Typography>
+                  <Typography>Meetings, Project Progress</Typography>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell style={{ fontWeight: "bold" }}>Semester</TableCell>
+                <TableCell style={{ fontWeight: "bold" }}>
+                  Marks Distribution
+                </TableCell>
+                <TableCell style={{ fontWeight: "bold" }}>
+                  Marks Obtained
+                </TableCell>
+                <TableCell style={{ fontWeight: "bold" }}>Remarks</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell colSpan={1}></TableCell>
+                <TableCell colSpan={1}></TableCell>
+                <TableCell style={{ display: "flex" }}>
+                  {supEvaluationData.students &&
+                  supEvaluationData.students.length
+                    ? supEvaluationData.students.map(student => (
+                        <div
+                          style={{
+                            fontWeight: "bold",
+                            width: "6rem",
+                            marginRight: "1rem",
+                          }}
+                        >
+                          {student.rollNo}
+                        </div>
+                      ))
+                    : null}
+                </TableCell>
+                <TableCell colSpan={1}>{""}</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>7th Semester</TableCell>
+
+                <TableCell>20</TableCell>
+                <TableCell>
+                  {supEvaluationData.students &&
+                  supEvaluationData.students.length
+                    ? supEvaluationData.students.map(student => {
+                        const value = supMarks7[student.rollNo]
+                          ? supMarks7[student.rollNo]
+                          : 0;
+                        return (
+                          <>
+                            {isSupervisor ? (
+                              <TextField
+                                style={{ width: "6rem", marginRight: "1rem" }}
+                                value={value}
+                                onChange={e => {
+                                  changeSupMarks(
+                                    student.rollNo,
+                                    e.target.value,
+                                    "marks_seven"
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <Typography
+                                style={{
+                                  textAlign: "center",
+                                  width: "6rem",
+                                  marginRight: "1rem",
+                                  display: "inline-block",
+                                }}
+                              >
+                                {value}
+                              </Typography>
+                            )}
+                          </>
+                        );
+                      })
+                    : null}
+                </TableCell>
+                <TableCell rowSpan={2}>
+                  {isSupervisor ? (
+                    <TextareaAutosize
+                      minRows={8}
+                      value={supRemarks}
+                      onChange={e => setSupRemarks(e.target.value)}
+                    />
+                  ) : (
+                    <Typography variant="body1">{supRemarks}</Typography>
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>8th Semester</TableCell>
+
+                <TableCell>20</TableCell>
+                <TableCell>
+                  {supEvaluationData.students &&
+                  supEvaluationData.students.length
+                    ? supEvaluationData.students.map(student => {
+                        const value = supMarks8[student.rollNo]
+                          ? supMarks8[student.rollNo]
+                          : 0;
+                        return (
+                          <>
+                            {isSupervisor ? (
+                              <TextField
+                                style={{ width: "6rem", marginRight: "1rem" }}
+                                value={value}
+                                onChange={e => {
+                                  changeSupMarks(
+                                    student.rollNo,
+                                    e.target.value,
+                                    "marks_eight"
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <Typography
+                                style={{
+                                  textAlign: "center",
+                                  width: "6rem",
+                                  marginRight: "1rem",
+                                  display: "inline-block",
+                                }}
+                              >
+                                {value}
+                              </Typography>
+                            )}
+                          </>
+                        );
+                      })
+                    : null}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell style={{ fontWeight: "bold" }}>Total</TableCell>
+                <TableCell style={{ fontWeight: "bold" }}>40</TableCell>
+                <TableCell>
+                  {supEvaluationData.students &&
+                  supEvaluationData.students.length
+                    ? supEvaluationData.students.map(student => {
+                        let value =
+                          supMarks7[student.rollNo] -
+                          0 +
+                          (supMarks8[student.rollNo] - 0);
+                        if (value.toString() === "NaN") {
+                          value = 0;
+                        }
+                        console.log("VAL", value);
+                        return (
+                          <>
                             <Typography
                               style={{
+                                textAlign: "center",
                                 width: "6rem",
                                 marginRight: "1rem",
                                 display: "inline-block",
@@ -670,153 +1030,38 @@ const DataBody = props => {
                             >
                               {value}
                             </Typography>
-                          )}
-                        </>
-                      );
-                    })
-                  : null}
-              </TableCell>
-              <TableCell>
-                {isPmo ? (
-                  <TextareaAutosize
-                    minRows={4}
-                    value={pmoRemarks}
-                    onChange={e => setPmoRemarks(e.target.value)}
-                  />
-                ) : (
-                  <Typography variant="body1">{pmoRemarks}</Typography>
-                )}
-              </TableCell>
-            </TableRow>
-
-            {isPmo ? (
-              <TableRow>
-                <TableCell colSpan={3}>
-                  <Button
-                    onClick={handlePmoMarks}
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    style={{ display: "block" }}
-                  >
-                    Save{" "}
-                  </Button>
+                          </>
+                        );
+                      })
+                    : null}
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
-            ) : null}
-          </>
-        </>
-      )}
-      {/* Supervisor Marks */}
-      <TableRow>
-        <TableCell colSpan={3}></TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell colSpan={3}>
-          <Typography variant="h4">Supervisor Evaluation</Typography>
+
+              {isSupervisor ? (
+                <TableRow>
+                  <TableCell colSpan={4}>
+                    <Button
+                      onClick={handleSupMarks}
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      style={{ display: "block" }}
+                    >
+                      Save{" "}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ) : null}
+            </TableBody>
+          </Table>
         </TableCell>
       </TableRow>
-      <TableRow>
-        <TableCell colSpan={3}>
-          <Typography variant="body1" style={{ fontWeight: "bold" }}>
-            Supervisor (Sub-section total: 40)
-          </Typography>
-          <Typography>Meetings, Project Progress</Typography>
-        </TableCell>
-      </TableRow>
 
-      <>
-        <TableRow>
-          <TableCell style={{ fontWeight: "bold" }}>Total Marks</TableCell>
-          <TableCell style={{ fontWeight: "bold" }}>Marks Obtained</TableCell>
-          <TableCell style={{ fontWeight: "bold" }}>Remarks</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell colSpan={1}></TableCell>
-          <TableCell style={{ display: "flex" }}>
-            {supEvaluationData.students && supEvaluationData.students.length
-              ? supEvaluationData.students.map(student => (
-                  <div
-                    style={{
-                      fontWeight: "bold",
-                      width: "6rem",
-                      marginRight: "1rem",
-                    }}
-                  >
-                    {student.rollNo}
-                  </div>
-                ))
-              : null}
-          </TableCell>
-          <TableCell colSpan={1}>{""}</TableCell>
-        </TableRow>
-
-        <TableRow>
-          <TableCell>40</TableCell>
-          <TableCell>
-            {supEvaluationData.students && supEvaluationData.students.length
-              ? supEvaluationData.students.map(student => {
-                  const value = supMarks[student.rollNo]
-                    ? supMarks[student.rollNo]
-                    : 0;
-                  return (
-                    <>
-                      {isSupervisor ? (
-                        <TextField
-                          style={{ width: "6rem", marginRight: "1rem" }}
-                          value={value}
-                          onChange={e => {
-                            changeSupMarks(student.rollNo, e.target.value);
-                          }}
-                        />
-                      ) : (
-                        <Typography
-                          style={{
-                            width: "6rem",
-                            marginRight: "1rem",
-                            display: "inline-block",
-                          }}
-                        >
-                          {value}
-                        </Typography>
-                      )}
-                    </>
-                  );
-                })
-              : null}
-          </TableCell>
-          <TableCell>
-            {isSupervisor ? (
-              <TextareaAutosize
-                minRows={4}
-                value={supRemarks}
-                onChange={e => setSupRemarks(e.target.value)}
-              />
-            ) : (
-              <Typography variant="body1">{supRemarks}</Typography>
-            )}
-          </TableCell>
-        </TableRow>
-
-        {isSupervisor ? (
-          <TableRow>
-            <TableCell colSpan={3}>
-              <Button
-                onClick={handleSupMarks}
-                variant="contained"
-                color="primary"
-                size="large"
-                style={{ display: "block" }}
-              >
-                Save{" "}
-              </Button>
-            </TableCell>
-          </TableRow>
-        ) : null}
-      </>
+      <></>
       {localStorage.getItem("USER_ROLE").includes("SUPERVISOR") ? null : (
         <TableRow>
-          <TableCell colSpan={3}>
+          <TableCell colSpan={4}>
             {/* <Typography variant="h6">
             Detailed Report
           </Typography> */}

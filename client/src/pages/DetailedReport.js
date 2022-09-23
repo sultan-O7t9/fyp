@@ -338,7 +338,7 @@ const DataBody = props => {
     const students = supEvaluationData.students;
     const marks = {};
     students.forEach(student => {
-      marks[student.rollNo] = student.marks;
+      marks[student.rollNo] = student.marks_seven = student.marks_eight;
     });
     setSupMarks(marks);
     setTotalMarks(marks);
@@ -349,7 +349,7 @@ const DataBody = props => {
     const students = pmoEvaluationData.students;
     const marks = {};
     students.forEach(student => {
-      marks[student.rollNo] = student.marks;
+      marks[student.rollNo] = student.marks_seven + student.marks_eight;
     });
     setPmoMarks(marks);
   }, [pmoEvaluationData]);

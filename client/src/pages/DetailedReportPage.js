@@ -145,6 +145,13 @@ const DataBody = props => {
   const [pmoMarks, setPmoMarks] = useState("");
   const [pmoRemarks, setPmoRemarks] = useState("");
 
+  useEffect(() => {
+    console.log("PMO", pmoMarks);
+    console.log("SUP", supMarks);
+    console.log(pmoEvaluationData);
+    console.log(supEvaluationData);
+  }, [pmoMarks, supMarks, pmoEvaluationData, supEvaluationData]);
+
   //Proposal
 
   useEffect(() => {
@@ -326,7 +333,8 @@ const DataBody = props => {
     const students = supEvaluationData.students;
     const marks = {};
     students.forEach(student => {
-      marks[student.rollNo] = student.marks;
+      console.log(student);
+      marks[student.rollNo] = student.marks_seven + student.marks_eight;
     });
     setSupMarks(marks);
     setTotalMarks(marks);
@@ -337,7 +345,8 @@ const DataBody = props => {
     const students = pmoEvaluationData.students;
     const marks = {};
     students.forEach(student => {
-      marks[student.rollNo] = student.marks;
+      console.log("STU", student);
+      marks[student.rollNo] = student.marks_seven + student.marks_eight;
     });
     setPmoMarks(marks);
   }, [pmoEvaluationData]);

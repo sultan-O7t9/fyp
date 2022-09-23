@@ -8,7 +8,7 @@ import { Backdrop, Button } from "@mui/material";
 import { useHistory } from "react-router-dom";
 
 const Semester8ReportComponent = props => {
-  const { data, setDisplay, setDisabled } = props;
+  const { data, setDisplay, withMarks, setDisabled, pmoDept } = props;
   const rptRef = useRef(null);
 
   const generatePDF = async () => {
@@ -213,18 +213,28 @@ const Semester8ReportComponent = props => {
                           Complete running project in compilance with
                           requirement and design document
                         </td>
-                        <td style={tdStyles}>15</td>
-                        <td style={tdStyles}>{student.d3Eval.runProject}</td>
-                        <td style={tdStyles} rowSpan={2}>
-                          {/* remarks */}
+                        <td style={{ ...tdStyles, textAlign: "center" }}>15</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.runProject : ""}
+                        </td>
+                        <td
+                          style={{ ...tdStyles, textAlign: "center" }}
+                          rowSpan={2}
+                        >
+                          {withMarks
+                            ? student.d3Eval.runProject +
+                              student.d3Eval.codeModify
+                            : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>
                           Run time code modification & understanding
                         </td>
-                        <td style={tdStyles}>15</td>
-                        <td style={tdStyles}>{student.d3Eval.codeModify}</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>15</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.codeModify : ""}
+                        </td>
                       </tr>
                       {/* TESTING */}
                       <tr>
@@ -235,18 +245,27 @@ const Semester8ReportComponent = props => {
                       </tr>
                       <tr>
                         <td style={tdStyles}>Test Plan</td>
-                        <td style={tdStyles}>5</td>
-                        <td style={tdStyles}>{student.d3Eval.testPlan}</td>
-                        <td style={tdStyles} rowSpan={2}>
-                          {/* remarks */}
+                        <td style={{ ...tdStyles, textAlign: "center" }}>5</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.testPlan : ""}
+                        </td>
+                        <td
+                          style={{ ...tdStyles, textAlign: "center" }}
+                          rowSpan={2}
+                        >
+                          {withMarks
+                            ? student.d3Eval.testPlan + student.d3Eval.testCase
+                            : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>
                           Test Case Design and Implementation
                         </td>
-                        <td style={tdStyles}>15</td>
-                        <td style={tdStyles}>{student.d3Eval.testCase}</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>15</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.testCase : ""}
+                        </td>
                       </tr>
                       {/* Overall System & Documentation */}
                       <tr>
@@ -259,26 +278,42 @@ const Semester8ReportComponent = props => {
                       </tr>
                       <tr>
                         <td style={tdStyles}>Project presentation</td>
-                        <td style={tdStyles}>15</td>
-                        <td style={tdStyles}>{student.d3Eval.projectPpt}</td>
-                        <td style={tdStyles} rowSpan={2}>
-                          {/* remarks */}
+                        <td style={{ ...tdStyles, textAlign: "center" }}>15</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.projectPpt : ""}
+                        </td>
+                        <td
+                          style={{ ...tdStyles, textAlign: "center" }}
+                          rowSpan={2}
+                        >
+                          {withMarks
+                            ? student.d3Eval.projectPpt +
+                              student.d3Eval.userMan +
+                              student.d3Eval.stdTemp +
+                              student.d3Eval.skill
+                            : ""}
                         </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>User Manual</td>
-                        <td style={tdStyles}>10</td>
-                        <td style={tdStyles}>{student.d3Eval.userMan}</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>10</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.userMan : ""}
+                        </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>Standard Template</td>
-                        <td style={tdStyles}>5</td>
-                        <td style={tdStyles}>{student.d3Eval.stdTemp}</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>5</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.stdTemp : ""}
+                        </td>
                       </tr>
                       <tr>
                         <td style={tdStyles}>Overall skill set</td>
-                        <td style={tdStyles}>10</td>
-                        <td style={tdStyles}>{student.d3Eval.skill}</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>10</td>
+                        <td style={{ ...tdStyles, textAlign: "center" }}>
+                          {withMarks ? student.d3Eval.skill : ""}
+                        </td>
                       </tr>
                       {/* Total */}
                       <tr>
@@ -295,11 +330,24 @@ const Semester8ReportComponent = props => {
                           (Meetings, Project progress)
                         </td>
                         <td style={{ ...tdStyles, width: "12%" }}></td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
-                          {student.supEval}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
+                          {withMarks ? student.supEval : ""}
                         </td>
-                        <td style={{ ...tdStyles, width: "26%" }} rowSpan={1}>
-                          {/* remarks */}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "26%",
+                            textAlign: "center",
+                          }}
+                          rowSpan={1}
+                        >
+                          {withMarks ? student.supEval : ""}
                         </td>
                       </tr>
 
@@ -316,11 +364,24 @@ const Semester8ReportComponent = props => {
                           (Meeting Deadlines, Attending Workshops)
                         </td>
                         <td style={{ ...tdStyles, width: "12%" }}></td>
-                        <td style={{ ...tdStyles, width: "12%" }}>
-                          {student.pmoEval}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "12%",
+                            textAlign: "center",
+                          }}
+                        >
+                          {withMarks ? student.pmoEval : ""}
                         </td>
-                        <td style={{ ...tdStyles, width: "26%" }} rowSpan={2}>
-                          {/* remarks */}
+                        <td
+                          style={{
+                            ...tdStyles,
+                            width: "26%",
+                            textAlign: "center",
+                          }}
+                          rowSpan={2}
+                        >
+                          {withMarks ? student.pmoEval : ""}
                         </td>
                       </tr>
 
@@ -332,45 +393,59 @@ const Semester8ReportComponent = props => {
                         </td>
                         <td style={{ ...tdStyles, width: "12%" }}>120</td>
                         <td style={{ ...tdStyles, width: "12%" }}>
-                          {student.total}
+                          {withMarks
+                            ? +(Math.round(student.total + "e+2") + "e-2")
+                            : ""}
                         </td>
                       </tr>
                     </tbody>
                   </table>
 
                   <div style={{ margin: "4px" }}>
-                    <p
+                    <div
                       style={{
                         ...infoStyles,
-                        fontWeight: "bold",
+                        // fontWeight: "bold",
                         fontSize: "13px",
+                        // borderBottom: "1px solid black",
+                        display: "flex",
+                        justifyContent: "space-between",
                       }}
                     >
-                      Evaluator 1 (Name, Signature &
-                      Date):_________________________________
-                    </p>
-                    <p
+                      <span>
+                        <b>Evaluator 1 (Name, Signature & Date): </b>
+                        {student.evaluators[0]}
+                      </span>
+                      <span>{new Date().toLocaleDateString()}</span>
+                    </div>
+                    <div
                       style={{
                         ...infoStyles,
-                        fontWeight: "bold",
+                        // fontWeight: "bold",
                         fontSize: "13px",
+                        // borderBottom: "1px solid black",
+                        display: "flex",
+                        justifyContent: "space-between",
                       }}
                     >
-                      Evaluator 2 (Name, Signature &
-                      Date):_________________________________
-                    </p>
+                      <span>
+                        <b>Evaluator 2 (Name, Signature & Date): </b>
+                        {student.evaluators[1]}
+                      </span>
+                      <span>{new Date().toLocaleDateString()}</span>
+                    </div>
                   </div>
                   <div
                     style={{
                       color: "#555",
                       fontWeight: "bold",
                       fontSize: "10px",
-                      marginTop: "20px",
+                      marginTop: "60px",
                       textAlign: "center",
                     }}
                   >
-                    Project Management Office (PMO-SE), C & IT Evening Program
-                    Marghzar Campus, University of Gujrat.
+                    Project Management Office (PMO-{pmoDept}), C & IT Evening
+                    Program Marghzar Campus, University of Gujrat.
                   </div>
                 </div>
               );
@@ -385,7 +460,7 @@ const Semester8ReportComponent = props => {
 };
 
 const Semester8Report = props => {
-  const { data, setDisplay, setDisabled } = props;
+  const { data, setDisplay, setDisabled, withMarks, pmoDept } = props;
   console.log("data", data);
   return (
     <Backdrop
@@ -397,6 +472,8 @@ const Semester8Report = props => {
     >
       <Semester8ReportComponent
         data={data}
+        pmoDept={pmoDept}
+        withMarks={withMarks}
         setDisabled={setDisabled}
         // setPageDims={setPageDims}
         setDisplay={setDisplay}
