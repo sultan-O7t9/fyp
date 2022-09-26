@@ -8,6 +8,7 @@ import Styles from "./auth.styles";
 import axios from "axios";
 import Link from "../components/Link";
 import PasswordField from "../components/PasswordField";
+import { first_login } from "../utils/keys";
 
 const Login = () => {
   const history = useHistory();
@@ -31,9 +32,10 @@ const Login = () => {
         "http://localhost:5000/api/auth/login",
         { email, password }
       );
+      console.log(response.data);
+      localStorage.setItem(first_login, response.data.first_login);
       dispatch(loginUser(response.data));
       // console.log(response.data);
-
       history.replace("/");
     } catch (error) {
       //  Generate an alert here.

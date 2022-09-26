@@ -3,6 +3,7 @@ import jwt_decode from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
+import FacultyResetPassword from "./pages/FacultyResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UploadFile from "./components/UploadFile";
 import GroupMainLayout from "./layouts/GroupMainLayouot";
@@ -34,6 +35,7 @@ import GroupDetail from "./pages/GroupDetail";
 import GroupLogin from "./pages/GroupLogin";
 import HODLogin from "./pages/HODLogin";
 import Login from "./pages/Login";
+import PmoSettings from "./pages/PmoSettings";
 import ProposalEvaluationPage from "./pages/ProposalEvaluationPage";
 import ProposalSubmissionPage from "./pages/ProposalSubmissionPage";
 import Register from "./pages/Register";
@@ -195,6 +197,11 @@ const App = () => {
       <Route exact path="/admin" component={AdminLogin} />
       <Route exact path="/hod" component={HODLogin} />
       <Route exact path="/register" component={Register} />
+      <ProtectedRoute
+        exact
+        path="/reset-pass"
+        component={FacultyResetPassword}
+      />
       <ProtectedRoute exact path="/register-group" component={RegisterGroup} />
       <ProtectedRoute exact path="/main/info" component={ViewGroup} />
       <ProtectedRoute
@@ -224,52 +231,71 @@ const App = () => {
           <Route exact path="/main/group/:id" component={GroupDetail} />
         </GroupMainLayout>
       ) : (
-        <MainLayout>
-          <ProtectedRoute exact path="/groups" component={AllGroups} />
-          <ProtectedRoute exact path="/groups/:id" component={GroupDetail} />
-          <ProtectedRoute
-            exact
-            path="/sup/deliverable/detail/:id"
-            component={SupervisorProposal}
-          />
-          <ProtectedRoute
-            exact
-            path="/groups/d2/:id"
-            component={SupervisorDocumentation}
-          />
-          <ProtectedRoute
-            exact
-            path="/groups/d3/:id"
-            component={SupervisorFinalDeliverable}
-          />
-          <ProtectedRoute exact path="/" component={Dashboard} />
-          <ProtectedRoute
-            exact
-            path="/deliverable/:id"
-            component={DeliverableDetail}
-          />
-          <ProtectedRoute
-            exact
-            path="/deliverable/sched/:id"
-            component={EvaluationScheduleDetail}
-          />
-          <ProtectedRoute
-            exact
-            path="/sup/deliverable/:id"
-            component={SupervisorDeliverableDetail}
-          />
-          <ProtectedRoute
-            exact
-            path="/proposal/eval/"
-            component={ProposalEvaluationPage}
-          />
-          <ProtectedRoute exact path="/d2/eval/" component={D2EvaluationPage} />
-          <ProtectedRoute exact path="/d3/eval/" component={D3EvaluationPage} />
-          <ProtectedRoute exact path="/students" component={AllStudents} />
-          <ProtectedRoute exact path="/committees" component={AllCommittees} />
-          <ProtectedRoute exact path="/comm" component={CommunicationPage} />
-          <ProtectedRoute exact path="/rep" component={ReportsPage} />
-        </MainLayout>
+        <>
+          <MainLayout>
+            <ProtectedRoute
+              exact
+              path="/pmo/settings"
+              component={PmoSettings}
+            />
+            <ProtectedRoute exact path="/groups" component={AllGroups} />
+            <ProtectedRoute exact path="/groups/:id" component={GroupDetail} />
+            <ProtectedRoute
+              exact
+              path="/sup/deliverable/detail/:id"
+              component={SupervisorProposal}
+            />
+            <ProtectedRoute
+              exact
+              path="/groups/d2/:id"
+              component={SupervisorDocumentation}
+            />
+            <ProtectedRoute
+              exact
+              path="/groups/d3/:id"
+              component={SupervisorFinalDeliverable}
+            />
+            <ProtectedRoute exact path="/" component={Dashboard} />
+            <ProtectedRoute
+              exact
+              path="/deliverable/:id"
+              component={DeliverableDetail}
+            />
+            <ProtectedRoute
+              exact
+              path="/deliverable/sched/:id"
+              component={EvaluationScheduleDetail}
+            />
+            <ProtectedRoute
+              exact
+              path="/sup/deliverable/:id"
+              component={SupervisorDeliverableDetail}
+            />
+            <ProtectedRoute
+              exact
+              path="/proposal/eval/"
+              component={ProposalEvaluationPage}
+            />
+            <ProtectedRoute
+              exact
+              path="/d2/eval/"
+              component={D2EvaluationPage}
+            />
+            <ProtectedRoute
+              exact
+              path="/d3/eval/"
+              component={D3EvaluationPage}
+            />
+            <ProtectedRoute exact path="/students" component={AllStudents} />
+            <ProtectedRoute
+              exact
+              path="/committees"
+              component={AllCommittees}
+            />
+            <ProtectedRoute exact path="/comm" component={CommunicationPage} />
+            <ProtectedRoute exact path="/rep" component={ReportsPage} />
+          </MainLayout>
+        </>
       )}
     </Switch>
   );

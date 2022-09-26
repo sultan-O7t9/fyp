@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import AppBarMenu from "./AppBarMenu";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export default function MainAppbar(props) {
   const { toggleSidebar, menu } = props;
@@ -31,12 +32,19 @@ export default function MainAppbar(props) {
         ) : null}
         <Box
           component="div"
-          sx={{ flexGrow: 1, justifyContent: "flex-end", display: "flex" }}
+          sx={{
+            flexGrow: 1,
+            justifyContent: "flex-end",
+            display: "flex",
+            alignitems: "center",
+          }}
         >
           {currentRole.includes("PMO") ||
           currentRole.includes("SUPERVISOR") ||
           currentRole.includes("EVALUATOR") ? (
-            <p style={{ fontSize: "12px" }}>Logged in as {currentRole}</p>
+            <p style={{ fontSize: "12px", marginLeft: "1rem" }}>
+              Logged in as {currentRole}
+            </p>
           ) : null}
         </Box>
 

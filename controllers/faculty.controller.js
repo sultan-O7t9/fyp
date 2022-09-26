@@ -597,6 +597,101 @@ class FacultyController {
       });
     }
   };
+  static updateEmailPassword = async (req, res) => {
+    const { userId, mailPassword } = req.body;
+    try {
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      if (faculty) {
+        await faculty.update({
+          mailPassword: mailPassword,
+        });
+
+        // sendMail(
+        //   [faculty].map(faculty => {
+        //     return {
+        //       // email: faculty.dataValues.email,
+        //       email: "18094198-079@uog.edu.pk",
+        //       subject: "Faculty Member Registration",
+        //       body: `
+
+        //        Your account has been updated, successfully.
+
+        //        Your credentials are:
+        //           Email: ${faculty.dataValues.email}
+        //           Password:${faculty.dataValues.password}
+        //        `,
+        //     };
+        //   })
+        // );
+
+        res.json({
+          message: "Password updated successfully",
+          mail: true,
+          faculty,
+        });
+      } else {
+        throw new Error("Invalid Faculty Id");
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error updating faculty",
+        error: err,
+      });
+    }
+  };
+  static changePassword = async (req, res) => {
+    const { userId, password } = req.body;
+    try {
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      if (faculty) {
+        await faculty.update({
+          password: password,
+          first_login: false,
+        });
+
+        // sendMail(
+        //   [faculty].map(faculty => {
+        //     return {
+        //       // email: faculty.dataValues.email,
+        //       email: "18094198-079@uog.edu.pk",
+        //       subject: "Faculty Member Registration",
+        //       body: `
+
+        //        Your account has been updated, successfully.
+
+        //        Your credentials are:
+        //           Email: ${faculty.dataValues.email}
+        //           Password:${faculty.dataValues.password}
+        //        `,
+        //     };
+        //   })
+        // );
+
+        res.json({
+          message: "Password updated successfully",
+          mail: true,
+          faculty,
+        });
+      } else {
+        throw new Error("Invalid Faculty Id");
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Error updating faculty",
+        error: err,
+      });
+    }
+  };
 
   static acceptGroupSupervision = async (req, res) => {
     // login

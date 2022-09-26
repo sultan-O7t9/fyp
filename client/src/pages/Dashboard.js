@@ -7,6 +7,7 @@ import Main from "../components/Main";
 import jwt_decode from "jwt-decode";
 import { Redirect, useHistory } from "react-router-dom";
 import axios from "axios";
+import { first_login } from "../utils/keys";
 
 const Deliverables = [
   {
@@ -34,6 +35,8 @@ const Dashboard = () => {
   // const token = useSelector(state => state.auth.accessToken);
   const [role, setRole] = useState("");
   const history = useHistory();
+
+  const fl = localStorage.getItem(first_login);
 
   useEffect(() => {
     // console.log(token);
@@ -66,6 +69,10 @@ const Dashboard = () => {
     };
     getDeliverables();
   }, []);
+
+  if (fl === "true") {
+    return <Redirect to="/reset-pass" />;
+  }
 
   return (
     <div>

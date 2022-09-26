@@ -19,6 +19,16 @@ module.exports = (sequelize, DataTypes) => {
           isEmail: true,
         },
       },
+      mailPassword: {
+        type: DataTypes.STRING,
+        validate: {
+          len: [6, 20],
+        },
+      },
+      first_login: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
       password: {
         type: DataTypes.STRING,
         validate: {

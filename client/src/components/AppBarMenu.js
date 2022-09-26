@@ -6,6 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 // import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
+import SettingsIcon from "@mui/icons-material/Settings";
 import Typography from "@mui/material/Typography";
 // import Tooltip from "@mui/material/Tooltip";
 // import PersonAdd from "@mui/icons-material/PersonAdd";
@@ -82,14 +83,34 @@ export default function AppBarMenu(props) {
       {toast ? (
         <Toast open={toast} setOpen={setToast} message={toastMessage} />
       ) : null}
-      <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          textAlign: "center",
+          ml: 4,
+        }}
+      >
         {/* <Typography sx={{ minWidth: 100 }}>Contact</Typography>
         <Typography sx={{ minWidth: 100 }}>Profile</Typography> */}
         {/* <Tooltip title="Account settings"> */}
+        {currentRole.includes("PMO") ? (
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={() => {
+              history.push("/pmo/settings");
+            }}
+          >
+            <SettingsIcon />
+          </IconButton>
+        ) : null}
         <IconButton
           onClick={handleClick}
           size="small"
-          sx={{ ml: 2, color: "white" }}
+          sx={{ ml: 1, color: "white" }}
           aria-controls={open ? "account-menu" : undefined}
           // aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}

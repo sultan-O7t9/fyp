@@ -391,6 +391,7 @@ module.exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
   try {
+    let first_login = false;
     const user = {};
     if (email.includes("@")) {
       const facultyMember = await FacultyMember.findOne({
@@ -401,6 +402,7 @@ module.exports.loginUser = async (req, res) => {
       });
       if (facultyMember) {
         user.id = facultyMember.dataValues.id;
+        first_login = facultyMember.dataValues.first_login;
         // user.role = ["PMO","SUPERVISOR","EVALUATOR"]
         const userRoles = await Faculty_Role.findAll({
           where: {
@@ -468,6 +470,7 @@ module.exports.loginUser = async (req, res) => {
     refreshTokens.push(refreshToken);
     res.status(200).json({
       login: true,
+      first_login,
       accessToken,
       refreshToken,
     });
