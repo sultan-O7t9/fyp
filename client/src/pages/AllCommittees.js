@@ -23,6 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Redirect } from "react-router-dom";
 import EditCommittee from "./EditCommittee";
+import { USER_ROLE } from "../utils/keys";
 const DATA = {
   heads: ["Committee ID", "Members", "Groups"],
   data: [
@@ -149,8 +150,8 @@ const DataBody = ({ data, editCommittee, setData }) => {
 
 const AllCommittees = () => {
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("PMO");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("PMO");
   const [heads, setHeads] = useState(["Committee ID", "Members", "Groups", ""]);
   const [showAddCommittee, setShowAddCommittee] = useState(false);
   const [showEditCommittee, setShowEditCommittee] = useState(false);

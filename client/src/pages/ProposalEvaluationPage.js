@@ -33,6 +33,7 @@ import AddSchedule from "../components/AddSchedule";
 import EditSchedule from "../components/EditSchedule";
 import RadioButtonGroup from "../components/RadioButtonGroup";
 import LogsModal from "../components/LogsModal";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const DATA = {
   // heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
@@ -273,7 +274,7 @@ const DataBody = props => {
     const facultyRes = await axios.post(
       "http://localhost:5000/api/faculty/get-sup-id",
       {
-        id: localStorage.getItem("USER_ID"),
+        id: localStorage.getItem(USER_ID),
       }
     );
     console.log(facultyRes.data.faculty);
@@ -286,7 +287,7 @@ const DataBody = props => {
           groupId: groupId,
           text: `Existing System Marks of ${
             student.rollNo
-          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+          } was changed by ${localStorage.getItem(USER_ROLE)}: ${
             facultyRes.data.faculty.hasOwnProperty("name")
               ? facultyRes.data.faculty.name
               : null
@@ -302,7 +303,7 @@ const DataBody = props => {
           groupId: groupId,
           text: `Architecture Marks of ${
             student.rollNo
-          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+          } was changed by ${localStorage.getItem(USER_ROLE)}: ${
             facultyRes.data.faculty.hasOwnProperty("name")
               ? facultyRes.data.faculty.name
               : null
@@ -318,7 +319,7 @@ const DataBody = props => {
           groupId: groupId,
           text: `Presentation Skills Marks of ${
             student.rollNo
-          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+          } was changed by ${localStorage.getItem(USER_ROLE)}: ${
             facultyRes.data.faculty.hasOwnProperty("name")
               ? facultyRes.data.faculty.name
               : null
@@ -332,7 +333,7 @@ const DataBody = props => {
           groupId: groupId,
           text: `Goals Marks of ${
             student.rollNo
-          } was changed by ${localStorage.getItem("USER_ROLE")}: ${
+          } was changed by ${localStorage.getItem(USER_ROLE)}: ${
             facultyRes.data.faculty.hasOwnProperty("name")
               ? facultyRes.data.faculty.name
               : null
@@ -375,7 +376,7 @@ const DataBody = props => {
       // const log = {
       //   deliverableId: deliverableId,
       //   groupId: groupId,
-      //   text: `Marks Changed By ${localStorage.getItem("USER_ROLE")}: ${
+      //   text: `Marks Changed By ${localStorage.getItem(USER_ROLE)}: ${
       //     facultyRes.data.faculty.hasOwnProperty("name")
       //       ? facultyRes.data.faculty.name
       //       : null
@@ -787,7 +788,7 @@ const DataBody = props => {
 };
 
 const ProposalEvaluationPage = props => {
-  // const roles = localStorage.getItem("USER_ROLE");
+  // const roles = localStorage.getItem(USER_ROLE);
   // const [file, setFile] = useState({});
   // const [name, setName] = useState("");
   // const [deliverableData, setDeliverableData] = useState({
@@ -795,8 +796,8 @@ const ProposalEvaluationPage = props => {
   //   template: "",
   // });
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    !localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
+    localStorage.getItem(USER_ROLE) &&
+    !localStorage.getItem(USER_ROLE).includes("SUPERVISOR");
   const [showLogsModal, setShowLogsModal] = useState(false);
   const [logsData, setLogsData] = useState([]);
   const [logs, setLogs] = useState([]);

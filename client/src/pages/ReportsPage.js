@@ -28,6 +28,7 @@ import FinalMarksReport from "./FinalMarksReport";
 import Semester8Report from "./Semester8Report";
 import FinalResultPerforma from "./FinalResultPerforma";
 import CoverLetterReport from "./CoverLetterReport";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const ReportsPage = () => {
   const history = useHistory();
@@ -70,8 +71,8 @@ const ReportsPage = () => {
   const [fileUrl, setFileUrl] = useState("");
 
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("PMO");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("PMO");
   console.log(isEligible);
 
   useEffect(() => {
@@ -142,7 +143,7 @@ const ReportsPage = () => {
 
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/7th-eval",
-          { groups: grps, userId: localStorage.getItem("USER_ID") }
+          { groups: grps, userId: localStorage.getItem(USER_ID) }
         );
         console.log(res.data);
         setPmoDept(res.data.pmoDept);
@@ -158,7 +159,7 @@ const ReportsPage = () => {
         setDisabled(true);
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/8th-eval",
-          { groups: grps, userId: localStorage.getItem("USER_ID") }
+          { groups: grps, userId: localStorage.getItem(USER_ID) }
         );
         console.log(res.data);
         setRptData(res.data.students);
@@ -176,7 +177,7 @@ const ReportsPage = () => {
 
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/all-eval",
-          { groups: grps, userId: localStorage.getItem("USER_ID") }
+          { groups: grps, userId: localStorage.getItem(USER_ID) }
         );
         console.log(res.data);
         setRptData(res.data.studetns);
@@ -215,7 +216,7 @@ const ReportsPage = () => {
 
         const res = await axios.post(
           "http://localhost:5000/api/evaluation/cover",
-          { groups: grps, userId: localStorage.getItem("USER_ID") }
+          { groups: grps, userId: localStorage.getItem(USER_ID) }
         );
         console.log(res.data);
         // setRptData(res.data.students);
@@ -241,7 +242,7 @@ const ReportsPage = () => {
     //     ? semesters.find(s => s.id == selectedSemester).groups.map(g => g.id)
     //     : selectedGroups,
     //   semester: selectedSemester,
-    //   userId: localStorage.getItem("USER_ID"),
+    //   userId: localStorage.getItem(USER_ID),
     // };
     // console.log(data);
     // try {

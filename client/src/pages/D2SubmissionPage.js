@@ -28,11 +28,12 @@ import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 // import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import DeliverableSubmissionDetail from "./DeliverableSubmissionDetails";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const DataHead = () => null;
 
 const DataBody = () => {
-  const role = localStorage.getItem("USER_ROLE");
+  const role = localStorage.getItem(USER_ROLE);
   const history = useHistory();
 
   const [deliverableData, setDeliverableData] = useState({});
@@ -56,7 +57,7 @@ const DataBody = () => {
           "http://localhost:5000/api/deliverable/get-grp-submission",
           {
             deliverableId: 2,
-            groupId: localStorage.getItem("USER_ID"),
+            groupId: localStorage.getItem(USER_ID),
           }
         );
         console.log(deliverableRes.data.versions);
@@ -91,7 +92,7 @@ const DataBody = () => {
           "http://localhost:5000/api/deliverable/ex-get-grp",
           {
             deliverableId: 2,
-            groupId: localStorage.getItem("USER_ID"),
+            groupId: localStorage.getItem(USER_ID),
           }
         );
         let ex = {};
@@ -279,7 +280,7 @@ const DataBody = () => {
     const data = new FormData();
     data.append("file", file);
     data.append("deliverableId", 2);
-    data.append("groupId", localStorage.getItem("USER_ID"));
+    data.append("groupId", localStorage.getItem(USER_ID));
     data.append("projectId", localStorage.getItem("PROJECT_ID"));
     console.log(data);
     try {

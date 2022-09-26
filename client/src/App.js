@@ -50,6 +50,13 @@ import SupervisorFinalDeliverable from "./pages/SupervisorFinalDeliverable";
 import SupervisorProposal from "./pages/SupervisorProposal";
 import ViewGroup from "./pages/ViewGroup";
 import { logoutUser, readUser, refreshAuthToken } from "./store/actions/auth";
+import {
+  accessToken as keyAccessToken,
+  refreshToken as keyRefreshToken,
+  USER_ID,
+  USER_ROLE,
+  USER_ROLES,
+} from "./utils/keys";
 
 const AdminRoutes = () => {
   return (
@@ -86,7 +93,7 @@ const App = () => {
   axios.interceptors.request.use(
     config => {
       if (config.url === "http://localhost:5000/api/auth/login") return config;
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem(keyAccessToken);
       if (accessToken) {
         config.headers["x-auth-token"] = accessToken;
       }
@@ -104,7 +111,7 @@ const App = () => {
     },
     function (error) {
       const originalRequest = error.config;
-      let refreshToken = localStorage.getItem("refreshToken");
+      let refreshToken = localStorage.getItem(keyRefreshToken);
       if (refreshToken && error.response.status === 401) {
         return axios
           .post("http://localhost:5000/api/auth/refresh", {
@@ -114,8 +121,8 @@ const App = () => {
             dispatch(
               refreshAuthToken(res.data.accessToken, res.data.refreshToken)
             );
-            // localStorage.setItem("accessToken", res.data.accessToken);
-            // localStorage.setItem("refreshToken", res.data.refreshToken);
+            // localStorage.setItem(accessToken, res.data.accessToken);
+            // localStorage.setItem(refreshToken, res.data.refreshToken);
 
             console.log("Access token refreshed!");
             return axios(originalRequest);
@@ -132,18 +139,18 @@ const App = () => {
     if (token) {
       const data = jwt_decode(token);
       console.log(data);
-      localStorage.setItem("USER_ID", data.id);
+      localStorage.setItem(USER_ID, data.id);
       if (data.hasOwnProperty("role")) {
-        localStorage.setItem("USER_ROLES", data.role);
+        localStorage.setItem(USER_ROLES, data.role);
         localStorage.setItem(
-          "USER_ROLE",
-          localStorage.getItem("USER_ROLE")
-            ? localStorage.getItem("USER_ROLE")
+          USER_ROLE,
+          localStorage.getItem(USER_ROLE)
+            ? localStorage.getItem(USER_ROLE)
             : data.role[0]
         );
         setRoles(data.role);
       } else {
-        localStorage.setItem("USER_ROLE", "ADMIN");
+        localStorage.setItem(USER_ROLE, "ADMIN");
       }
     }
   }, [token]);

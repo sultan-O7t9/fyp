@@ -22,6 +22,7 @@ import Link from "../components/Link";
 import Main from "../components/Main";
 import Select from "../components/Select";
 import Toast from "../components/Toast";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 import styles from "./auth.styles";
 import ManageGroup from "./ManageGroup";
 
@@ -50,7 +51,7 @@ import ManageGroup from "./ManageGroup";
 // };
 
 const AllGroups = () => {
-  const isPMO = localStorage.getItem("USER_ROLE").includes("PMO");
+  const isPMO = localStorage.getItem(USER_ROLE).includes("PMO");
 
   const [heads, setHeads] = useState([]);
   const [open, setOpen] = useState(false);
@@ -126,17 +127,17 @@ const AllGroups = () => {
     const getGroups = async () => {
       try {
         let filteredGroups = [];
-        if (localStorage.getItem("USER_ROLE").includes("PMO")) {
+        if (localStorage.getItem(USER_ROLE).includes("PMO")) {
           const res = await axios.post(
             "http://localhost:5000/api/group/get-groups/",
-            { userId: localStorage.getItem("USER_ID") }
+            { userId: localStorage.getItem(USER_ID) }
           );
           console.log(res.data.groups);
           filteredGroups = currentSemester
             ? res.data.groups.filter(g => g.semesterId === currentSemester)
             : res.data.groups;
-        } else if (localStorage.getItem("USER_ROLE").includes("SUPERVISOR")) {
-          const userId = localStorage.getItem("USER_ID");
+        } else if (localStorage.getItem(USER_ROLE).includes("SUPERVISOR")) {
+          const userId = localStorage.getItem(USER_ID);
           console.log("USER_ID", userId);
           const res2 = await axios.post(
             "http://localhost:5000/api/group/get-groups-sup/",
@@ -165,9 +166,9 @@ const AllGroups = () => {
     //     let filteredGroups = currentSemester
     //       ? res.data.groups.filter(g => g.semesterId === currentSemester)
     //       : res.data.groups;
-    //     if (localStorage.getItem("USER_ROLE").includes("SUPERVISOR")) {
+    //     if (localStorage.getItem(USER_ROLE).includes("SUPERVISOR")) {
     //       filteredGroups = filteredGroups.filter(
-    //         g => g.supervisorId != localStorage.getItem("USER_ID")
+    //         g => g.supervisorId != localStorage.getItem(USER_ID)
     //       );
     //       console.log(filteredGroups);
     //     }
@@ -275,7 +276,7 @@ const AllGroups = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/group/create-many",
-        { groups, userId: localStorage.getItem("USER_ID") }
+        { groups, userId: localStorage.getItem(USER_ID) }
       );
       console.log(response.data);
       if (response.status === 200) {
@@ -357,7 +358,7 @@ const AllGroups = () => {
               <Typography variant="h3">Groups</Typography>
             </Box>
             <Box style={{ display: "flex", flexDirection: "column" }}>
-              {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+              {localStorage.getItem(USER_ROLE).includes("PMO") ? (
                 <Box style={{ marginBottom: ".5rem" }}>
                   <ImportFromExcel
                     label="Import Groups"
@@ -391,7 +392,7 @@ const AllGroups = () => {
                   /> */}
                 </>
               ) : null}
-              {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+              {localStorage.getItem(USER_ROLE).includes("PMO") ? (
                 <Button
                   style={{ marginTop: ".5rem" }}
                   variant="contained"
@@ -403,7 +404,7 @@ const AllGroups = () => {
               ) : null}
             </Box>
           </Box>
-          {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+          {localStorage.getItem(USER_ROLE).includes("PMO") ? (
             <>
               <Box sx={{ marginBottom: "3rem" }}>
                 <Box

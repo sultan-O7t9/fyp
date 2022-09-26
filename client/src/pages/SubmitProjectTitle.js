@@ -8,6 +8,7 @@ import RadioButtonGroup from "../components/RadioButtonGroup";
 import { useHistory, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../store/actions/auth";
+import { refreshToken, USER_ID } from "../utils/keys";
 
 const SubmitProjectTitle = () => {
   const typeItems = [
@@ -35,7 +36,7 @@ const SubmitProjectTitle = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   // const params=useParams();
-  const groupId = localStorage.getItem("USER_ID");
+  const groupId = localStorage.getItem(USER_ID);
   if (!groupId) history.replace("/group");
   // useEffect(() => {
   //   axios
@@ -94,7 +95,7 @@ const SubmitProjectTitle = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/logout",
-        { token: localStorage.getItem("refreshToken") }
+        { token: localStorage.getItem(refreshToken) }
       );
       if (response.data.logout) {
         dispatch(logoutUser());

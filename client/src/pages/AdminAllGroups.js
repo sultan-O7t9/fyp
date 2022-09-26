@@ -34,6 +34,7 @@ import { Redirect, useHistory } from "react-router-dom";
 import Select from "../components/Select";
 import styles from "./auth.styles";
 import AdminMainLayout from "../layouts/AdminMainLayout";
+import { USER_ROLE } from "../utils/keys";
 
 const DATA = {
   heads: ["Group ID", "Members", "Project Title", "Supervisor"],
@@ -322,8 +323,8 @@ const DataBody = ({ data, depts }) => {
 
 const AdminAllGroups = () => {
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("HOD");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("HOD");
   const [heads, setHeads] = useState([
     "Group ID",
     "Project Title",

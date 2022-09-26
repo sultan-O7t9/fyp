@@ -30,12 +30,13 @@ import Toast from "../components/Toast";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+import { GROUP_NAME, PROJECT_ID, USER_ID, USER_ROLE } from "../utils/keys";
 // import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 
 const DataHead = () => null;
 
 const DataBody = ({ versionData }) => {
-  const role = localStorage.getItem("USER_ROLE");
+  const role = localStorage.getItem(USER_ROLE);
   const history = useHistory();
 
   const [deliverableData, setDeliverableData] = useState({});
@@ -57,7 +58,7 @@ const DataBody = ({ versionData }) => {
           "http://localhost:5000/api/deliverable/get-grp-submission",
           {
             deliverableId: 1,
-            groupId: localStorage.getItem("USER_ID"),
+            groupId: localStorage.getItem(USER_ID),
           }
         );
         console.log(deliverableRes.data.versions);
@@ -92,7 +93,7 @@ const DataBody = ({ versionData }) => {
           "http://localhost:5000/api/deliverable/ex-get-grp",
           {
             deliverableId: 1,
-            groupId: localStorage.getItem("USER_ID"),
+            groupId: localStorage.getItem(USER_ID),
           }
         );
         let ex = {};
@@ -273,8 +274,8 @@ const DataBody = ({ versionData }) => {
     const data = new FormData();
     data.append("file", file);
     data.append("deliverableId", 1);
-    data.append("groupId", localStorage.getItem("USER_ID"));
-    data.append("projectId", localStorage.getItem("PROJECT_ID"));
+    data.append("groupId", localStorage.getItem(USER_ID));
+    data.append("projectId", localStorage.getItem(PROJECT_ID));
     console.log(data);
     try {
       const res = await axios.post(
@@ -583,7 +584,7 @@ const DeliverableSubmissionDetail = props => {
   const { deliverableId, data, setDisplay } = props;
   console.log(data);
 
-  const groupName = localStorage.getItem("GROUP_NAME");
+  const groupName = localStorage.getItem(GROUP_NAME);
   return (
     <Backdrop
       sx={{

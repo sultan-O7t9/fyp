@@ -20,6 +20,7 @@ import { useHistory } from "react-router-dom";
 import { logoutUser } from "../store/actions/auth";
 import { useEffect } from "react";
 import Toast from "./Toast";
+import { refreshToken, USER_ROLE, USER_ROLES } from "../utils/keys";
 
 export default function AppBarMenu(props) {
   const { currentRole, setCurrentRole } = props;
@@ -40,8 +41,8 @@ export default function AppBarMenu(props) {
   useEffect(() => {
     const getAllRoles = async () => {
       if (
-        localStorage.getItem("USER_ROLES").includes("group") ||
-        localStorage.getItem("USER_ROLES").includes("HOD")
+        localStorage.getItem(USER_ROLES).includes("group") ||
+        localStorage.getItem(USER_ROLES).includes("HOD")
       ) {
         console.log("its a group");
         return;
@@ -63,7 +64,7 @@ export default function AppBarMenu(props) {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/logout",
-        { token: localStorage.getItem("refreshToken") }
+        { token: localStorage.getItem(refreshToken) }
       );
       if (response.data.logout) {
         localStorage.clear();
@@ -133,10 +134,10 @@ export default function AppBarMenu(props) {
           ? roles.map(role => (
               <MenuItem
                 key={role}
-                disabled={localStorage.getItem("USER_ROLE").includes(role)}
+                disabled={localStorage.getItem(USER_ROLE).includes(role)}
                 onClick={() => {
                   console.log(role);
-                  localStorage.setItem("USER_ROLE", [role]);
+                  localStorage.setItem(USER_ROLE, [role]);
                   history.replace("/");
                   setToastMessage("Logged in as " + role);
                   setCurrentRole(role);

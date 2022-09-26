@@ -18,6 +18,7 @@ import GroupsDataBody from "../components/GroupsDataBody";
 import GroupsDataHead from "../components/GroupsDataHead";
 import Link from "../components/Link";
 import Main from "../components/Main";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 import ManageGroup from "./ManageGroup";
 
 // const DATA = {
@@ -45,7 +46,7 @@ import ManageGroup from "./ManageGroup";
 // };
 
 const AllProposals = () => {
-  const isPMO = localStorage.getItem("USER_ROLE") === "PMO";
+  const isPMO = localStorage.getItem(USER_ROLE) === "PMO";
   const [heads, setHeads] = useState([
     "Group ID",
     "Members",
@@ -69,7 +70,7 @@ const AllProposals = () => {
     axios
       .get(
         "http://localhost:5000/api/group/get-all/" +
-          localStorage.getItem("USER_ID")
+          localStorage.getItem(USER_ID)
       )
       .then(res => {
         setBody(res.data.groups);

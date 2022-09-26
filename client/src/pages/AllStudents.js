@@ -33,6 +33,7 @@ import EditStudent from "../components/EditStudent";
 import NumberFilter from "@inovua/reactdatagrid-community/NumberFilter";
 import SelectFilter from "@inovua/reactdatagrid-community/SelectFilter";
 import DateFilter from "@inovua/reactdatagrid-community/DateFilter";
+import { USER_ROLE } from "../utils/keys";
 
 const DATA = {
   heads: ["Group ID", "Members", "Project Title", "Supervisor"],
@@ -285,8 +286,8 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
 
 const AllStudents = () => {
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("PMO");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("PMO");
   const [heads, setHeads] = useState(["Name", "Roll No", "Group"]);
   const [body, setBody] = useState([]);
   const [refresh, setRefresh] = useState(false);

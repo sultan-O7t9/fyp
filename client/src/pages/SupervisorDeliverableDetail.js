@@ -30,6 +30,7 @@ import DeliverableSettingsModal from "../components/DeliverableSettingsModal";
 import Toast from "../components/Toast";
 import AddSchedule from "../components/AddSchedule";
 import EditSchedule from "../components/EditSchedule";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const DATA = {
   // heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
@@ -87,7 +88,7 @@ const DataHead = () => {
 };
 
 const DataBody = () => {
-  const roles = localStorage.getItem("USER_ROLE");
+  const roles = localStorage.getItem(USER_ROLE);
   const [submissionsData, setSubmissionsData] = useState([]);
   const [gridData, setGridData] = useState([]);
   const [gridCols, setGridCols] = useState([]);
@@ -111,7 +112,7 @@ const DataBody = () => {
   //   { text: "Rejected", id: 3 },
   //   { text: "Revised", id: 4 },
   // ];
-  const userId = localStorage.getItem("USER_ID");
+  const userId = localStorage.getItem(USER_ID);
   //Get all submissions of the deliverabale
 
   useEffect(() => {
@@ -393,7 +394,7 @@ const DataBody = () => {
 
 const DataBody2 = props => {
   const { showScheduleModal } = props;
-  const userId = localStorage.getItem("USER_ID");
+  const userId = localStorage.getItem(USER_ID);
   const history = useHistory();
   const params = useParams();
   const deliverableId = params.id;
@@ -466,7 +467,7 @@ const DataBody2 = props => {
             const isEvaluator =
               evaluators.filter(user => user == userId).length == 1;
             const evalRole = localStorage
-              .getItem("USER_ROLE")
+              .getItem(USER_ROLE)
               .includes("EVALUATOR");
             console.log("HELLO", userId, isEvaluator, evalRole);
             return (
@@ -526,7 +527,7 @@ const DataBody2 = props => {
                     >
                       <DeleteIcon />
                     </IconButton>
-                    {localStorage.getItem("USER_ROLE").includes("EVALUATOR") &&
+                    {localStorage.getItem(USER_ROLE).includes("EVALUATOR") &&
                     isEvaluator ? (
                       <Button
                         variant="contained"
@@ -550,10 +551,10 @@ const DataBody2 = props => {
 
 const SupervisorDeliverableDetail = props => {
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("SUPERVISOR");
 
-  const roles = localStorage.getItem("USER_ROLE");
+  const roles = localStorage.getItem(USER_ROLE);
   const [file, setFile] = useState({});
   const [name, setName] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -638,7 +639,7 @@ const SupervisorDeliverableDetail = props => {
 
   useEffect(() => {
     const getGroups = async () => {
-      const userId = localStorage.getItem("USER_ID");
+      const userId = localStorage.getItem(USER_ID);
       try {
         const res2 = await axios.post(
           "http://localhost:5000/api/group/get-groups-sup/",
@@ -664,7 +665,7 @@ const SupervisorDeliverableDetail = props => {
       groupId: exGroup,
       deliverableId: deliverableId,
       days: days,
-      supervisorId: localStorage.getItem("USER_ID"),
+      supervisorId: localStorage.getItem(USER_ID),
     };
 
     console.log(data);

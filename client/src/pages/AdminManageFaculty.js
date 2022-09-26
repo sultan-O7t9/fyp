@@ -27,6 +27,7 @@ import { Redirect, useHistory } from "react-router-dom";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+import { USER_ROLE } from "../utils/keys";
 
 const DATA = {
   heads: ["Name", "Department", "Role"],
@@ -229,8 +230,8 @@ const DataBody = ({ data, editCommittee, setData }) => {
 
 const AdminManageFaculty = () => {
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("HOD");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("HOD");
   const [heads, setHeads] = useState(["Name", "Department", "Email"]);
   const [showAddCommittee, setShowAddCommittee] = useState(false);
   const [body, setBody] = useState([]);

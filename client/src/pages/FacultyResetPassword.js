@@ -10,7 +10,7 @@ import Toast from "../components/Toast";
 
 import PasswordField from "../components/PasswordField";
 import { BG } from "../utils/Theme";
-import { first_login } from "../utils/keys";
+import { first_login, USER_ID, USER_ROLE } from "../utils/keys";
 
 const Inputs = ({ mailPassword, setMailPassword }) => {
   // const [pwd, setPwd] = useState("");
@@ -48,8 +48,8 @@ const FacultyResetPassword = () => {
   const [tMsg, setTMsg] = useState("");
   const history = useHistory();
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("PMO");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("PMO");
   console.log(isEligible);
 
   const updateMailPasswordHandler = async () => {
@@ -59,7 +59,7 @@ const FacultyResetPassword = () => {
     //   return;
     // }
     const data = {
-      userId: localStorage.getItem("USER_ID"),
+      userId: localStorage.getItem(USER_ID),
       password: mailPassword,
     };
     console.log(data);

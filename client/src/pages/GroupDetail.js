@@ -26,12 +26,13 @@ import RadioButtonGroup from "../components/RadioButtonGroup";
 import AddProject from "../components/AddProject";
 import EditProject from "../components/EditProject";
 import { LegendToggleOutlined } from "@mui/icons-material";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const DataHead = () => null;
 
 const DataBody = props => {
   // const { groupInfo, setRefresh } = props;
-  const role = localStorage.getItem("USER_ROLE");
+  const role = localStorage.getItem(USER_ROLE);
   const history = useHistory();
   const [showAddProject, setShowAddProject] = useState(false);
   const [showEditProject, setShowEditProject] = useState(false);
@@ -49,10 +50,10 @@ const DataBody = props => {
   // const [groupInfo, setGroupInfo] = useState({});
 
   const isSupervisor =
-    localStorage.getItem("USER_ROLE").includes("SUPERVISOR") &&
+    localStorage.getItem(USER_ROLE).includes("SUPERVISOR") &&
     groupInfo.hasOwnProperty("supervisor") &&
-    groupInfo.supervisor.id == localStorage.getItem("USER_ID");
-  const isPmo = localStorage.getItem("USER_ROLE").includes("PMO");
+    groupInfo.supervisor.id == localStorage.getItem(USER_ID);
+  const isPmo = localStorage.getItem(USER_ROLE).includes("PMO");
 
   const [pmoEvaluationData, setPmoEvaluationData] = useState({});
   const [pmoMarks7, setPmoMarks7] = useState({});
@@ -408,7 +409,7 @@ const DataBody = props => {
           )}
         </TableCell>
       </TableRow>
-      {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+      {localStorage.getItem(USER_ROLE).includes("PMO") ? (
         <TableRow>
           <TableCell colSpan={1}>
             <Typography variant="h6">Booklets</Typography>
@@ -489,7 +490,7 @@ const DataBody = props => {
           <Typography variant="h4">Project Details</Typography>
         </TableCell>
         <TableCell colSpan={1}>
-          {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+          {localStorage.getItem(USER_ROLE).includes("PMO") ? (
             groupInfo.hasOwnProperty("project") && groupInfo.project.title ? (
               <Button
                 variant="contained"
@@ -631,7 +632,7 @@ const DataBody = props => {
           </TableCell>
         ) : null}
       </TableRow> */}
-      {localStorage.getItem("USER_ROLE").includes("SUPERVISOR") ? null : (
+      {localStorage.getItem(USER_ROLE).includes("SUPERVISOR") ? null : (
         <>
           <TableRow>
             <TableCell colSpan={4}>
@@ -850,7 +851,7 @@ const DataBody = props => {
             </TableCell>
           </TableRow>
 
-          {/* {localStorage.getItem("USER_ROLE").includes("PMO") ? (*/}
+          {/* {localStorage.getItem(USER_ROLE).includes("PMO") ? (*/}
           <></>
         </>
       )}
@@ -1059,7 +1060,7 @@ const DataBody = props => {
       </TableRow>
 
       <></>
-      {localStorage.getItem("USER_ROLE").includes("SUPERVISOR") ? null : (
+      {localStorage.getItem(USER_ROLE).includes("SUPERVISOR") ? null : (
         <TableRow>
           <TableCell colSpan={4}>
             {/* <Typography variant="h6">

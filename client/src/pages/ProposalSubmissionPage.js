@@ -27,12 +27,13 @@ import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import DeliverableSubmissionDetail from "./DeliverableSubmissionDetails";
+import { GROUP_NAME, PROJECT_ID, USER_ID, USER_ROLE } from "../utils/keys";
 // import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 
 const DataHead = () => null;
 
 const DataBody = () => {
-  const role = localStorage.getItem("USER_ROLE");
+  const role = localStorage.getItem(USER_ROLE);
   const history = useHistory();
 
   const [deliverableData, setDeliverableData] = useState({});
@@ -56,7 +57,7 @@ const DataBody = () => {
           "http://localhost:5000/api/deliverable/get-grp-submission",
           {
             deliverableId: 1,
-            groupId: localStorage.getItem("USER_ID"),
+            groupId: localStorage.getItem(USER_ID),
           }
         );
         console.log(deliverableRes.data.versions);
@@ -91,7 +92,7 @@ const DataBody = () => {
           "http://localhost:5000/api/deliverable/ex-get-grp",
           {
             deliverableId: 1,
-            groupId: localStorage.getItem("USER_ID"),
+            groupId: localStorage.getItem(USER_ID),
           }
         );
         let ex = {};
@@ -280,8 +281,8 @@ const DataBody = () => {
     const data = new FormData();
     data.append("file", file);
     data.append("deliverableId", 1);
-    data.append("groupId", localStorage.getItem("USER_ID"));
-    data.append("projectId", localStorage.getItem("PROJECT_ID"));
+    data.append("groupId", localStorage.getItem(USER_ID));
+    data.append("projectId", localStorage.getItem(PROJECT_ID));
     console.log(data);
     try {
       const res = await axios.post(
@@ -595,7 +596,7 @@ const DataBody = () => {
 };
 
 const ProposalSubmissionPage = () => {
-  const groupName = localStorage.getItem("GROUP_NAME");
+  const groupName = localStorage.getItem(GROUP_NAME);
   return (
     <ContainerFluid title={groupName} maxWidth="lg">
       <Main styles={{ padding: "1.5rem" }}>

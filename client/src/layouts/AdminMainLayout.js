@@ -3,20 +3,21 @@ import Sidebar from "../components/Sidebar";
 import { Box } from "@mui/material";
 import MainAppbar from "../components/MainAppbar";
 import { BG } from "../utils/Theme";
+import { HOD_ID } from "../utils/keys";
 
 const navLinks = [
   {
-    name: localStorage.getItem("HOD_ID") ? "" : "Faculty",
+    name: localStorage.getItem(HOD_ID) ? "" : "Faculty",
     path: "/admin/faculty",
     icon: "dashboard",
   },
   {
     name: "Groups",
-    path: localStorage.getItem("HOD_ID") ? "/hod/groups" : "/admin/groups",
+    path: localStorage.getItem(HOD_ID) ? "/hod/groups" : "/admin/groups",
     icon: "group",
   },
   {
-    name: localStorage.getItem("HOD_ID") ? "" : "Departments",
+    name: localStorage.getItem(HOD_ID) ? "" : "Departments",
     path: "/admin/dept",
     icon: "person",
   },

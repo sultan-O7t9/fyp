@@ -24,12 +24,13 @@ import axios from "axios";
 import RadioButtonGroup from "../components/RadioButtonGroup";
 import UploadFile from "../components/UploadFile";
 import Toast from "../components/Toast";
+import { USER_ROLE } from "../utils/keys";
 
 const DataHead = () => null;
 
 const DataBody = props => {
   const { deliverableId, groupId, projectTitle } = props;
-  const role = localStorage.getItem("USER_ROLE");
+  const role = localStorage.getItem(USER_ROLE);
   const history = useHistory();
   const [modal, setModal] = useState(false);
 
@@ -463,8 +464,8 @@ const DataBody = props => {
 
 const SupervisorProposal = () => {
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("SUPERVISOR");
   const params = useParams();
   const history = useHistory();
   const { deliverableId, groupId } = history.location.state;

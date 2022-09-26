@@ -24,6 +24,7 @@ import TabsPanel from "./TabsPanel";
 import { useRef } from "react";
 import MailItem from "../components/MailItem";
 import ImportFromExcel from "../components/ImportFromExcel";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const Deliverables = [
   {
@@ -210,8 +211,8 @@ const CommunicationPage = () => {
   const [importedMails, setImportedMails] = useState([]);
 
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("PMO");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("PMO");
   console.log(isEligible);
 
   useEffect(() => {
@@ -243,7 +244,7 @@ const CommunicationPage = () => {
       try {
         const res = await axios.post(
           "http://localhost:5000/api/sem/get-mails",
-          { userId: localStorage.getItem("USER_ID") }
+          { userId: localStorage.getItem(USER_ID) }
         );
         console.log(res.data);
         setMails(res.data.mails);
@@ -286,7 +287,7 @@ const CommunicationPage = () => {
         : selectedGroups,
       semester: selectedSemester,
       mails: importedMails,
-      userId: localStorage.getItem("USER_ID"),
+      userId: localStorage.getItem(USER_ID),
     };
     console.log(data);
     try {
@@ -307,7 +308,7 @@ const CommunicationPage = () => {
   const handleDeleteMails = async () => {
     try {
       const res = await axios.post("http://localhost:5000/api/sem/send-mail", {
-        userId: localStorage.getItem("USER_ID"),
+        userId: localStorage.getItem(USER_ID),
       });
       console.log(res.data.delete);
 

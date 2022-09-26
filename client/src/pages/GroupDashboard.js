@@ -18,11 +18,12 @@ import MenuButton from "../components/MenuButton";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import ItemCard from "../components/ItemCard";
+import { GROUP_NAME, PROJECT_ID, USER_ID } from "../utils/keys";
 
 const DataHead = () => null;
 
 const DataBody = () => {
-  const groupID = localStorage.getItem("USER_ID");
+  const groupID = localStorage.getItem(USER_ID);
   const history = useHistory();
   const [projectData, setProjectData] = useState({});
   const [proposalDeadline, setProposalDeadline] = useState("None");
@@ -37,7 +38,7 @@ const DataBody = () => {
           "http://localhost:5000/api/project/get-grp/" + groupID
         );
         console.log(projectRes.data.project);
-        localStorage.setItem("PROJECT_ID", projectRes.data.project.id);
+        localStorage.setItem(PROJECT_ID, projectRes.data.project.id);
         setProjectData(projectRes.data.project);
       } catch (err) {
         console.log(err);
@@ -182,7 +183,7 @@ const DataBody = () => {
 };
 
 const GroupDashboard = () => {
-  const groupID = localStorage.getItem("USER_ID");
+  const groupID = localStorage.getItem(USER_ID);
   const [groupData, setGroupData] = useState({});
   useEffect(() => {
     const getData = async () => {
@@ -192,7 +193,7 @@ const GroupDashboard = () => {
         );
         console.log(res.data.group);
         setGroupData(res.data.group);
-        localStorage.setItem("GROUP_NAME", res.data.group.name);
+        localStorage.setItem(GROUP_NAME, res.data.group.name);
       } catch (err) {
         console.log(err);
       }

@@ -1,10 +1,11 @@
 import { Paper, Typography } from "@mui/material";
 import { Box } from "@mui/system";
+import { USER_ROLE } from "../utils/keys";
 import Link from "./Link";
 
 const ItemCard = props => {
   const { styles, item, index, manual } = props;
-  const roles = localStorage.getItem("USER_ROLE");
+  const roles = localStorage.getItem(USER_ROLE);
   let route = item.link;
   if (roles.includes("PMO")) route = "/deliverable/" + item.id;
   else if (roles.includes("SUPERVISOR")) route = "/sup/deliverable/" + item.id;

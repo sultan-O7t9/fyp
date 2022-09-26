@@ -9,6 +9,7 @@ import { Button, Typography } from "@mui/material";
 import Toast from "../components/Toast";
 
 import PasswordField from "../components/PasswordField";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const Inputs = ({ mailPassword, setMailPassword }) => {
   // const [pwd, setPwd] = useState("");
@@ -46,8 +47,8 @@ const PmoSettings = () => {
   const [tMsg, setTMsg] = useState("");
 
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    localStorage.getItem("USER_ROLE").includes("PMO");
+    localStorage.getItem(USER_ROLE) &&
+    localStorage.getItem(USER_ROLE).includes("PMO");
   console.log(isEligible);
 
   const updateMailPasswordHandler = async () => {
@@ -57,7 +58,7 @@ const PmoSettings = () => {
     //   return;
     // }
     const data = {
-      userId: localStorage.getItem("USER_ID"),
+      userId: localStorage.getItem(USER_ID),
       mailPassword,
     };
     console.log(data);

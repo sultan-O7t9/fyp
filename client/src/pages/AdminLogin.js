@@ -8,6 +8,7 @@ import Styles from "./auth.styles";
 import axios from "axios";
 import Link from "../components/Link";
 import PasswordField from "../components/PasswordField";
+import { ADMIN_ID, USER_ROLE } from "../utils/keys";
 
 const AdminLogin = () => {
   const history = useHistory();
@@ -34,8 +35,8 @@ const AdminLogin = () => {
         }
       );
       // console.log(response.data);
-      localStorage.setItem("ADMIN_ID", response.data.id);
-      localStorage.setItem("USER_ROLE", ["HOD"]);
+      localStorage.setItem(ADMIN_ID, response.data.id);
+      localStorage.setItem(USER_ROLE, ["HOD"]);
       history.replace("/admin/faculty", response.data);
       dispatch(loginUser(response.data));
     } catch (error) {

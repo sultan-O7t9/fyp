@@ -16,11 +16,12 @@ import Link from "../components/Link";
 import Main from "../components/Main";
 import MenuButton from "../components/MenuButton";
 import { useHistory } from "react-router-dom";
+import { USER_ROLE } from "../utils/keys";
 
 const DataHead = () => null;
 
 const DataBody = () => {
-  const role = localStorage.getItem("USER_ROLE");
+  const role = localStorage.getItem(USER_ROLE);
   const history = useHistory();
   const [modal, setModal] = useState(false);
   return (

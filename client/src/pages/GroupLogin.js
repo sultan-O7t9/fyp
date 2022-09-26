@@ -8,6 +8,7 @@ import Styles from "./auth.styles";
 import axios from "axios";
 import Link from "../components/Link";
 import PasswordField from "../components/PasswordField";
+import { USER_ID } from "../utils/keys";
 
 const GroupLogin = () => {
   const history = useHistory();
@@ -40,7 +41,7 @@ const GroupLogin = () => {
       //   const { accessToken } = response.data;
       dispatch(loginUser(response.data));
       history.replace("/main/student");
-      const groupID = localStorage.getItem("USER_ID");
+      const groupID = localStorage.getItem(USER_ID);
 
       axios
         .get(`http://localhost:5000/api/project/get-grp/${groupID}`)

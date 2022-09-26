@@ -12,6 +12,7 @@ import axios from "axios";
 import { useEffect } from "react";
 // import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { useState } from "react";
+import { USER_ID } from "../utils/keys";
 import Select from "./Select";
 import UploadFile from "./UploadFile";
 import UploadFileInput from "./UploadFileInput";
@@ -80,7 +81,7 @@ const DeliverableSettingsModal = props => {
 
   const submitDeliverable = async e => {
     const data = {
-      userId: localStorage.getItem("USER_ID"),
+      userId: localStorage.getItem(USER_ID),
       deliverableId: deliverable.id,
       deadline: deliverableDeadline
         ? deliverableDeadline

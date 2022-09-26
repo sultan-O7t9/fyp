@@ -22,13 +22,14 @@ import axios from "axios";
 import MainAppbar from "../components/MainAppbar";
 import styles from "./auth.styles";
 import StudentManageGroup from "./StudentManageGroup";
+import { USER_ID } from "../utils/keys";
 
 const DataHead = () => null;
 
 const DataBody = props => {
   const [showEditModal, setShowEditModal] = useState(false);
   const history = useHistory();
-  const groupId = localStorage.getItem("USER_ID");
+  const groupId = localStorage.getItem(USER_ID);
   // console.log(id);
   const [groupInfo, setGroupInfo] = useState({});
 

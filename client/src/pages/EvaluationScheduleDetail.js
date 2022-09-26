@@ -37,6 +37,7 @@ import { useCallback } from "react";
 import ExtensionModal from "../components/ExtensionModal";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import ScheduleReport, { ScheduleReportComponent } from "./ScheduleReport";
+import { USER_ID, USER_ROLE } from "../utils/keys";
 
 const DATA = {
   // heads: ["Group ID", "Project Title", "Submitted On", "Submission"],
@@ -95,7 +96,7 @@ const DataHead = () => {
 };
 
 // const DataBody = () => {
-//   const roles = localStorage.getItem("USER_ROLE");
+//   const roles = localStorage.getItem(USER_ROLE);
 //   const [submissionsData, setSubmissionsData] = useState([]);
 //   const [gridData, setGridData] = useState([]);
 //   const [gridCols, setGridCols] = useState([]);
@@ -129,7 +130,7 @@ const DataHead = () => {
 //   //   { text: "Rejected", id: 3 },
 //   //   { text: "Revised", id: 4 },
 //   // ];
-//   const userId = localStorage.getItem("USER_ID");
+//   const userId = localStorage.getItem(USER_ID);
 //   //Get all submissions of the deliverabale
 
 //   useEffect(() => {
@@ -450,7 +451,7 @@ const DataBody2 = props => {
     deliverableDeadline,
     setToEdit,
   } = props;
-  const userId = localStorage.getItem("USER_ID");
+  const userId = localStorage.getItem(USER_ID);
   const [pageDims, setPageDims] = useState({});
 
   const [open, setOpen] = useState(false);
@@ -493,7 +494,7 @@ const DataBody2 = props => {
         //     sched => !!sched.committee.evaluators.find(e => e.id == userId)
         //   ))
         // );
-        if (localStorage.getItem("USER_ROLE").includes("EVALUATOR")) {
+        if (localStorage.getItem(USER_ROLE).includes("EVALUATOR")) {
           console.log("evaluator");
           // schedules = schedules.filter(
           //   sched => !!sched.committee.evaluators.find(e => e.id != userId)
@@ -509,7 +510,7 @@ const DataBody2 = props => {
           console.log(filteredSchedules);
           schedules = filteredSchedules;
         }
-        console.log(localStorage.getItem("USER_ROLE"));
+        console.log(localStorage.getItem(USER_ROLE));
         console.log(schedules);
         setSchedulesData(schedules);
       } catch (err) {
@@ -565,7 +566,7 @@ const DataBody2 = props => {
               alignItems: "flex-end",
             }}
           >
-            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+            {localStorage.getItem(USER_ROLE).includes("PMO") ? (
               <Box
                 style={{
                   height: "100%",
@@ -807,7 +808,7 @@ const DataBody2 = props => {
           deliverableId={deliverableId}
         />
       ) : null}
-      {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+      {localStorage.getItem(USER_ROLE).includes("PMO") ? (
         <Card
           variant="outlined"
           style={{
@@ -887,7 +888,7 @@ const DataBody2 = props => {
   //           const isEvaluator =
   //             evaluators.filter(user => user == userId).length == 1;
   //           const evalRole = localStorage
-  //             .getItem("USER_ROLE")
+  //             .getItem(USER_ROLE)
   //             .includes("EVALUATOR");
   //           console.log("HELLO", userId, isEvaluator, evalRole);
   //           return (
@@ -937,7 +938,7 @@ const DataBody2 = props => {
   //                     <EditIcon />
   //                   </IconButton> */}
 
-  //                   {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+  //                   {localStorage.getItem(USER_ROLE).includes("PMO") ? (
   //                     <IconButton
   //                       style={{ marginRight: "1rem" }}
   //                       onClick={() => {
@@ -949,7 +950,7 @@ const DataBody2 = props => {
   //                       <DeleteIcon />
   //                     </IconButton>
   //                   ) : null}
-  //                   {localStorage.getItem("USER_ROLE").includes("EVALUATOR") &&
+  //                   {localStorage.getItem(USER_ROLE).includes("EVALUATOR") &&
   //                   isEvaluator ? (
   //                     <Button
   //                       variant="contained"
@@ -973,9 +974,9 @@ const DataBody2 = props => {
 
 const EvaluationScheduleDetail = props => {
   const isEligible =
-    localStorage.getItem("USER_ROLE") &&
-    !localStorage.getItem("USER_ROLE").includes("SUPERVISOR");
-  const roles = localStorage.getItem("USER_ROLE");
+    localStorage.getItem(USER_ROLE) &&
+    !localStorage.getItem(USER_ROLE).includes("SUPERVISOR");
+  const roles = localStorage.getItem(USER_ROLE);
   const [file, setFile] = useState({});
   const [name, setName] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);

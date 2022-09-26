@@ -35,7 +35,7 @@ const AddSchedule = props => {
         const res = await axios.get(
           "http://localhost:5000/api/committee/get-all"
           //   "http://localhost:5000/api/group/get-all/" +
-          //     localStorage.getItem("USER_ID")
+          //     localStorage.getItem(USER_ID)
         );
         console.log("DETAILED GROUPS", res.data);
         setData(res.data.committees);

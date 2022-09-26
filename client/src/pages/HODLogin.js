@@ -8,6 +8,7 @@ import Styles from "./auth.styles";
 import axios from "axios";
 import Link from "../components/Link";
 import PasswordField from "../components/PasswordField";
+import { HOD_ID, USER_ROLE } from "../utils/keys";
 
 const HODLogin = () => {
   const history = useHistory();
@@ -31,8 +32,8 @@ const HODLogin = () => {
         password,
       });
       // console.log(response.data);
-      localStorage.setItem("HOD_ID", response.data.id);
-      localStorage.setItem("USER_ROLE", ["HOD"]);
+      localStorage.setItem(HOD_ID, response.data.id);
+      localStorage.setItem(USER_ROLE, ["HOD"]);
       history.replace("/hod/groups", response.data);
       dispatch(loginUser(response.data));
     } catch (error) {

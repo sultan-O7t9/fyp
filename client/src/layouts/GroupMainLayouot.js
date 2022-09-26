@@ -8,7 +8,7 @@ const navLinks = [
   { name: "Dashboard", path: "/main/student", icon: "dashboard" },
   // {
   //   name: "Details",
-  //   path: "/main/group/" + localStorage.getItem("USER_ID"),
+  //   path: "/main/group/" + localStorage.getItem(USER_ID),
   //   icon: "group",
   // },
 ];

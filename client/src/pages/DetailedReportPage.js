@@ -1639,7 +1639,7 @@ const DataBody = props => {
 };
 
 const DetailedReportPage = props => {
-  // const roles = localStorage.getItem("USER_ROLE");
+  // const roles = localStorage.getItem(USER_ROLE);
   // const [file, setFile] = useState({});
   // const [name, setName] = useState("");
   const [deliverableData, setDeliverableData] = useState({

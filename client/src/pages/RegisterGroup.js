@@ -7,6 +7,7 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../store/actions/auth";
+import { accessToken, refreshToken } from "../utils/keys";
 
 const RegisterGroup = () => {
   const [students, setStudents] = useState([]);
@@ -74,8 +75,8 @@ const RegisterGroup = () => {
       if (result.data.register) {
         // history.push("/"
         dispatch(logoutUser());
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem(refreshToken);
+        localStorage.removeItem(accessToken);
         history.replace("/group");
       }
     } catch (err) {

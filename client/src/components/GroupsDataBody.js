@@ -22,6 +22,7 @@ import RadioButtonGroup from "./RadioButtonGroup";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import { USER_ROLE } from "../utils/keys";
 
 // const DataItem = props => {
 //   const {
@@ -216,7 +217,7 @@ const GroupsDataBody = ({
   selected,
   setSelected,
 }) => {
-  const roles = localStorage.getItem("USER_ROLE");
+  const roles = localStorage.getItem(USER_ROLE);
   const [open, setOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [gridData, setGridData] = useState(data);
@@ -267,7 +268,7 @@ const GroupsDataBody = ({
               alignItems: "center",
             }}
           >
-            {localStorage.getItem("USER_ROLE").includes("PMO") ? (
+            {localStorage.getItem(USER_ROLE).includes("PMO") ? (
               <Box
                 style={{
                   display: "flex",
