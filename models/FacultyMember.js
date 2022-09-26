@@ -21,9 +21,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       mailPassword: {
         type: DataTypes.STRING,
-        validate: {
-          len: [6, 20],
-        },
       },
       first_login: {
         type: DataTypes.BOOLEAN,
@@ -31,9 +28,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: DataTypes.STRING,
-        validate: {
-          len: [6, 20],
-        },
       },
     },
     {

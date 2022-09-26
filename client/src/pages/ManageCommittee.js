@@ -17,6 +17,7 @@ import DragList from "../components/DnD/DragnDrop";
 import GroupsDataBody from "../components/GroupsDataBody";
 import GroupsDataHead from "../components/GroupsDataHead";
 import Select from "../components/Select";
+import { USER_ID } from "../utils/keys";
 import styles from "./auth.styles";
 
 const DATA = {
@@ -128,7 +129,7 @@ const ManageCommittee = props => {
         const res = await axios.post(
           "http://localhost:5000/api/group/get-groups/",
           {
-            userId: localStorage.getItem("USER_ID"),
+            userId: localStorage.getItem(USER_ID),
           }
         );
         const res2 = await axios.get(

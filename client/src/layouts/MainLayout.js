@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import { Box } from "@mui/material";
 import MainAppbar from "../components/MainAppbar";
 import { BG } from "../utils/Theme";
+import { USER_ROLE } from "../utils/keys";
 
 const MainLayout = props => {
   const { children } = props;
@@ -11,7 +12,7 @@ const MainLayout = props => {
     setShowSidebar(state => !state);
   };
 
-  const roles = localStorage.getItem("USER_ROLE");
+  const roles = localStorage.getItem(USER_ROLE);
   console.log(roles);
   const navLinks = [
     { name: "Dashboard", path: "/", icon: "dashboard" },

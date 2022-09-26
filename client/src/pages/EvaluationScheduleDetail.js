@@ -778,6 +778,7 @@ const DataBody2 = props => {
       deliverableId: deliverableId,
       deliverableData: schedulesData,
       dim: pageDims,
+      userId: localStorage.getItem(USER_ID),
     };
     try {
       const res = await axios.post(

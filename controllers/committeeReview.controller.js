@@ -83,8 +83,15 @@ class CommitteeReviewController {
     }
   };
   static changeEndorsementStatus = async (req, res) => {
-    const { groupId, deliverableId, committeeId, status, versionId, date } =
-      req.body;
+    const {
+      groupId,
+      deliverableId,
+      committeeId,
+      status,
+      versionId,
+      date,
+      userId,
+    } = req.body;
     try {
       const groupDetails = await Group.findOne({
         where: {
@@ -109,6 +116,7 @@ class CommitteeReviewController {
           .push(supervisor ? supervisor.dataValues.email : "");
 
         sendMail(
+          null,
           // [recipiants].map(student => {
           ["18094198-079@uog.edu.pk"].map(student => {
             return {

@@ -28,7 +28,7 @@ import "@inovua/reactdatagrid-community/index.css";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 // import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import DeliverableSubmissionDetail from "./DeliverableSubmissionDetails";
-import { USER_ID, USER_ROLE } from "../utils/keys";
+import { GROUP_NAME, PROJECT_ID, USER_ID, USER_ROLE } from "../utils/keys";
 
 const DataHead = () => null;
 
@@ -281,7 +281,7 @@ const DataBody = () => {
     data.append("file", file);
     data.append("deliverableId", 2);
     data.append("groupId", localStorage.getItem(USER_ID));
-    data.append("projectId", localStorage.getItem("PROJECT_ID"));
+    data.append("projectId", localStorage.getItem(PROJECT_ID));
     console.log(data);
     try {
       const res = await axios.post(
@@ -581,7 +581,7 @@ const DataBody = () => {
 };
 
 const D2SubmissionPage = () => {
-  const groupName = localStorage.getItem("GROUP_NAME");
+  const groupName = localStorage.getItem(GROUP_NAME);
   return (
     <ContainerFluid title={groupName} maxWidth="lg">
       <Main styles={{ padding: "1.5rem" }}>

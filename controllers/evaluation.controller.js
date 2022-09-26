@@ -67,7 +67,7 @@ class EvaluationController {
             name: member.name,
             rollNo: member.rollNo,
             group: group.name,
-            projectTitle: project.title,
+            projectTitle: project ? project.title : "",
             srNo: i + 1,
           };
           data.push(memberData);

@@ -80,6 +80,10 @@ class SemesterController {
       });
       if (mails && mails.length) {
         sendMail(
+          {
+            mail: faculty.email,
+            mailpass: faculty.mailPassword,
+          },
           mails.map(student => {
             return {
               email: student,
@@ -108,6 +112,10 @@ class SemesterController {
         });
 
         sendMail(
+          {
+            mail: faculty.email,
+            mailpass: faculty.mailPassword,
+          },
           students.map(student => {
             return {
               email: student.dataValues.rollNo + "@uog.edu.pk",

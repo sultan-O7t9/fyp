@@ -135,9 +135,15 @@ class VersionController {
   };
 
   static shareSchedule = async (req, res) => {
-    const { tables, deliverableId, deliverableData, dim } = req.body;
+    const { tables, deliverableId, deliverableData, dim, userId } = req.body;
 
     try {
+      const faculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
       const students = deliverableData.map(sch =>
         sch.group.groupMembers.map(student => student.rollNo + "@uog.edu.pk")
       );
@@ -182,6 +188,10 @@ class VersionController {
         if (err) return console.log(err);
         console.log(res); // { filename: '/app/businesscard.pdf' }
         sendMailWithAttachment(
+          {
+            mail: faculty.email,
+            mailpass: faculty.mailPassword,
+          },
           ["18094198-079@uog.edu.pk"].map(student => {
             return {
               email: student,

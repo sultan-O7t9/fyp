@@ -327,6 +327,10 @@ class DeliverableController {
       });
 
       sendMail(
+        {
+          mail: faculty.email,
+          mailpass: faculty.mailPassword,
+        },
         filteredStudents.map(student => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",
@@ -871,6 +875,10 @@ class DeliverableController {
       });
 
       sendMail(
+        {
+          mail: faculty.email,
+          mailpass: faculty.mailPassword,
+        },
         filteredStudents.map(student => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",

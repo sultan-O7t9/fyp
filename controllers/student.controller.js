@@ -17,6 +17,7 @@ var crypto = require("crypto");
 // const Faculty_Role = require("../models/Faculty_Role");
 require("dotenv").config();
 var crypto = require("crypto");
+const { hashPassword } = require("../utils/hashPassword");
 
 class StudentController {
   static updateAStudent = async (req, res) => {
@@ -59,12 +60,15 @@ class StudentController {
   static createAStudent = async (req, res) => {
     const { name, rollNo, dept } = req.body;
     try {
+      const hashedPass = await hashPassword(
+        crypto.randomBytes(8).toString("hex").slice(0, 8)
+      );
       const student = await Student.create({
         name,
         rollNo,
         degree: "BS",
         departmentId: dept,
-        password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+        password: hashedPass,
       });
       res.status(200).json({
         message: "Student created successfully",
@@ -252,11 +256,11 @@ class StudentController {
   static createStudent = async (req, res) => {
     const facultyId = req.user.id;
     try {
-      // const facultyMember = await FacultyMember.findOne({
-      //   where: {
-      //     id: facultyId,
-      //   },
-      // });
+      const facultyMember = await FacultyMember.findOne({
+        where: {
+          id: facultyId,
+        },
+      });
       // console.log(facultyMember.dataValues.departmentId);
       //check if faculty member is pmo
       // if (!facultyMember.dataValues.pmoOfDepartmentId)
@@ -290,14 +294,16 @@ class StudentController {
               name: student.department,
             },
           });
-
+          const hashedPass = await hashPassword(
+            crypto.randomBytes(8).toString("hex").slice(0, 8)
+          );
           return Student.create({
             name: student.name,
             rollNo: student.rollNo,
             departmentId: dept ? dept.id : null,
             degree: "BS",
             leader: false,
-            password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+            password: hashedPass,
           });
         })
       );
@@ -347,11 +353,15 @@ class StudentController {
       // return;
       //Send credentials to emails
       sendMail(
+        {
+          mail: facultyMember.email,
+          mailpass: facultyMember.mailPassword,
+        },
         createdStudents.map(student => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",
-            subject: "PMO Students Testing",
-            body: `Testing...
+            subject: "Students Account Creation",
+            body: `
              Your credentials are: 
              Username: ${student.dataValues.rollNo}
              Password:${student.dataValues.password}`,

@@ -17,6 +17,7 @@ const jwt_decode = require("jwt-decode");
 const sequelize = require("sequelize");
 const res = require("express/lib/response");
 const { sendMail } = require("../utils/sendMails");
+const { hashPassword, comparePassword } = require("../utils/hashPassword");
 
 const createAccessToken = user =>
   jwt.sign(user, process.env.JWT_SECRET, {
@@ -43,6 +44,7 @@ module.exports.forgetPassword = async (req, res) => {
         //   email: faculty.dataValues.email,
         //   password: faculty.dataValues.password,
         // };
+
         user = {
           email: "18094198-079@uog.edu.pk",
           regEmail: faculty.dataValues.email,
@@ -90,6 +92,7 @@ module.exports.forgetPassword = async (req, res) => {
     }
     console.log(user);
     sendMail(
+      null,
       [user].map(student => {
         return {
           email: student.email,
@@ -113,14 +116,16 @@ module.exports.initializeApp = async (req, res) => {
   try {
     const admin = await Admin.findAll();
     if (admin.length === 0) {
+      const hashedPass = await hashPassword(process.env.ADMIN_PASSWORD);
       await Admin.create({
         email: process.env.ADMIN_EMAIL,
-        password: process.env.ADMIN_PASSWORD,
+        password: hashedPass,
         name: "Admin",
       });
+      const hodHashedPass = await hashPassword(process.env.HOD_PASSWORD);
       await HOD.create({
         email: process.env.HOD_EMAIL,
-        password: process.env.HOD_PASSWORD,
+        password: hodHashedPass,
       });
       await Role.create({
         title: "PMO",
@@ -316,11 +321,14 @@ module.exports.hodLogin = async (req, res) => {
     const admin = await HOD.findOne({
       where: {
         email: email,
-        password: password,
       },
     });
+    const comparePass = await comparePassword(
+      password,
+      admin.dataValues.password
+    );
     console.log(admin);
-    if (admin) {
+    if (admin && comparePass) {
       const user = { id: admin.id, role: "HOD" };
       const accessToken = createAccessToken(user);
       const refreshToken = createRefreshToken(user);
@@ -355,11 +363,14 @@ module.exports.adminLogin = async (req, res) => {
     const admin = await Admin.findOne({
       where: {
         email: email,
-        password: password,
       },
     });
     console.log(admin);
-    if (admin) {
+    const comparePass = await comparePassword(
+      password,
+      admin.dataValues.password
+    );
+    if (admin && comparePass) {
       const user = { id: admin.id, role: "HOD" };
       const accessToken = createAccessToken(user);
       const refreshToken = createRefreshToken(user);
@@ -397,10 +408,14 @@ module.exports.loginUser = async (req, res) => {
       const facultyMember = await FacultyMember.findOne({
         where: {
           email: email,
-          password: password,
+          // password: password,
         },
       });
-      if (facultyMember) {
+      const comparePassword = await bcrypt.compare(
+        password,
+        facultyMember.dataValues.password
+      );
+      if (facultyMember && comparePassword) {
         user.id = facultyMember.dataValues.id;
         first_login = facultyMember.dataValues.first_login;
         // user.role = ["PMO","SUPERVISOR","EVALUATOR"]
@@ -426,10 +441,13 @@ module.exports.loginUser = async (req, res) => {
       const group = await Group.findOne({
         where: {
           name: email,
-          password: password,
         },
       });
-      if (group) {
+      const comparePassword = await bcrypt.compare(
+        password,
+        group.dataValues.password
+      );
+      if (group && comparePassword) {
         user.id = group.dataValues.id;
         user.role = "group";
       } else {
@@ -439,13 +457,16 @@ module.exports.loginUser = async (req, res) => {
       const student = await Student.findOne({
         where: {
           rollNo: email,
-          password: password,
           groupId: null,
         },
         attributes: ["name", "rollNo", "departmentId"],
       });
+      const comparePassword = await bcrypt.compare(
+        password,
+        student.dataValues.password
+      );
       console.log(student);
-      if (student) {
+      if (student && comparePassword) {
         console.log(student.dataValues);
         user.id = student.dataValues.rollNo;
         user.role = ["STUDENT"];

@@ -18,6 +18,7 @@ const {
 const sequelize = require("sequelize");
 var crypto = require("crypto");
 const { sendMail } = require("../utils/sendMails");
+const { hashPassword } = require("../utils/hashPassword");
 
 class GroupController {
   static changePassword = async (req, res) => {
@@ -33,12 +34,13 @@ class GroupController {
           groupId: group.id,
         },
       });
-
+      const hashedPass = await hashPassword(password);
       await group.update({
-        password: password,
+        password: hashedPass,
       });
 
       sendMail(
+        null,
         members.map(student => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",
@@ -377,6 +379,12 @@ class GroupController {
     const { groups, userId } = req.body;
     console.log(groups);
     try {
+      const pmoFaculty = await FacultyMember.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
       const pmo = await PMO.findAll({
         where: {
           pmoId: userId,
@@ -392,10 +400,13 @@ class GroupController {
           });
           if (!department || !pmoDepts.includes(department.dataValues.id))
             return;
+          const hashedPass = await hashPassword(
+            crypto.randomBytes(8).toString("hex").slice(0, 8)
+          );
           const newGroup = await Group.create({
             departmentId: department ? department.dataValues.id : null,
             name: new Date().getTime().toString(),
-            password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+            password: hashedPass,
           });
           await newGroup.update({
             name: `${department.dataValues.name}_${
@@ -447,6 +458,10 @@ class GroupController {
             }
             if (grpMems.length) {
               sendMail(
+                {
+                  mail: pmoFaculty.email,
+                  mailpass: pmoFaculty.mailPassword,
+                },
                 [grpMems].map(student => {
                   return {
                     email: student.dataValues.rollNo + "@uog.edu.pk",
@@ -529,12 +544,14 @@ class GroupController {
         student => student.dataValues.rollNo === req.body.leader
       );
       console.log(leader);
-
+      const hashedPass = await hashPassword(
+        crypto.randomBytes(8).toString("hex").slice(0, 8)
+      );
       const group = await Group.create({
         name: leader.dataValues.name + leader.dataValues.rollNo,
         supervisorId: req.body.supervisor,
         departmentId: req.body.dept,
-        password: crypto.randomBytes(8).toString("hex").slice(0, 8),
+        password: hashedPass,
       });
       console.log(group);
       if (group) {
@@ -564,10 +581,11 @@ class GroupController {
         console.log(leaderStudent);
 
         sendMail(
+          null,
           [leaderStudent].map(student => {
             return {
               email: student.dataValues.rollNo + "@uog.edu.pk",
-              subject: "FYP Group Creating",
+              subject: "FYP Group Creation",
               body: `
                Your group has been created, successfully.
                Group members:

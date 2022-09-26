@@ -428,6 +428,7 @@ const DataBody = props => {
         "http://localhost:5000/api/evaluation/update-review-status",
         {
           groupId,
+          userId: localStorage.getItem(USER_ID),
           versionId: currVersion.id,
           deliverableId,
           committeeId,

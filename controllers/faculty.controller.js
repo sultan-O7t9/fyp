@@ -10,6 +10,7 @@ const {
 } = require("../models");
 const sequelize = require("sequelize");
 const { sendMail } = require("../utils/sendMails");
+const { hashPassword } = require("../utils/hashPassword");
 
 class FacultyController {
   static getAllSupervisorById = async (req, res) => {
@@ -338,6 +339,7 @@ class FacultyController {
       //   },
       // });
       // if (admin)
+      const hashedPass = await hashPassword(password);
       if (true) {
         // if (id != admin.id) {
         //   throw new Error("Invalid Admin Id");
@@ -360,7 +362,7 @@ class FacultyController {
         if (!dept) throw new Error("Invalid Department Id");
         const facultyMember = await FacultyMember.create({
           email,
-          password,
+          password: hashedPass,
           name,
           designation,
           departmentId: dept.id,
@@ -376,23 +378,26 @@ class FacultyController {
         //   });
         // });
 
-        sendMail(
-          [facultyMember].map(faculty => {
-            return {
-              // email: faculty.dataValues.email,
-              email: "18094198-079@uog.edu.pk",
-              subject: "Faculty Member Registration",
-              body: `
-              
-               Your account has been created, successfully.
-                  
-               Your credentials are: 
-                  Email: ${faculty.dataValues.email}
-                  Password:${faculty.dataValues.password}
-               `,
-            };
-          })
-        );
+        if (facultyMember) {
+          sendMail(
+            null,
+            [facultyMember].map(faculty => {
+              return {
+                // email: faculty.dataValues.email,
+                email: "18094198-079@uog.edu.pk",
+                subject: "Faculty Member Registration",
+                body: `
+                
+                 Your account has been created, successfully.
+                    
+                 Your credentials are: 
+                    Email: ${faculty.dataValues.email}
+                    Password:${hashedPass}
+                 `,
+              };
+            })
+          );
+        }
 
         res.json({
           message: "Faculty Member registered successfully",
@@ -549,10 +554,11 @@ class FacultyController {
           id: id,
         },
       });
+      const hashedPass = await hashPassword(password);
       if (faculty) {
         await faculty.update({
           name: name ? name : faculty.dataValues.name,
-          password: password ? password : faculty.dataValues.password,
+          password: password ? hashedPass : faculty.dataValues.password,
           designation: designation
             ? designation
             : faculty.dataValues.designation,
@@ -565,6 +571,7 @@ class FacultyController {
         });
 
         sendMail(
+          null,
           [faculty].map(faculty => {
             return {
               // email: faculty.dataValues.email,
@@ -605,9 +612,12 @@ class FacultyController {
           id: userId,
         },
       });
+      const hashedPass = await hashPassword(mailPassword);
       if (faculty) {
         await faculty.update({
-          mailPassword: mailPassword,
+          mailPassword: mailPassword
+            ? hashedPass
+            : faculty.dataValues.mailPassword,
         });
 
         // sendMail(
@@ -652,9 +662,10 @@ class FacultyController {
           id: userId,
         },
       });
+      const hashedPass = await hashPassword(password);
       if (faculty) {
         await faculty.update({
-          password: password,
+          password: password ? hashedPass : faculty.dataValues.password,
           first_login: false,
         });
 

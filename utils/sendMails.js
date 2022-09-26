@@ -85,15 +85,24 @@ require("dotenv").config();
 
 const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.SENDER_EMAIL,
-    pass: process.env.SENDER_PASSWORD,
-  },
-});
-
-module.exports.sendMail = recipiants => {
+module.exports.sendMail = (
+  sender = { mail: null, mailpass: null },
+  recipiants
+) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user:
+        sender && sender.mail && sender.mailpass
+          ? sender.mail
+          : process.env.SENDER_EMAIL,
+      pass:
+        sender && sender.mail && sender.mailpass
+          ? sender.mailpass
+          : process.env.SENDER_PASSWORD,
+    },
+  });
+  console.log("recipiant", recipiants);
   Promise.all(
     recipiants.map(recipiant => {
       return new Promise((resolve, reject) => {
@@ -129,7 +138,20 @@ module.exports.sendMail = recipiants => {
   //   }
   // });
 };
-module.exports.sendMailWithAttachment = recipiants => {
+module.exports.sendMailWithAttachment = (sender, recipiants) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user:
+        sender && sender.mail && sender.mailpass
+          ? sender.mail
+          : process.env.SENDER_EMAIL,
+      pass:
+        sender && sender.mail && sender.mailpass
+          ? sender.mailpass
+          : process.env.SENDER_PASSWORD,
+    },
+  });
   Promise.all(
     recipiants.map(recipiant => {
       return new Promise((resolve, reject) => {
