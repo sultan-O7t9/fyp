@@ -60,9 +60,8 @@ class StudentController {
   static createAStudent = async (req, res) => {
     const { name, rollNo, dept } = req.body;
     try {
-      const hashedPass = await hashPassword(
-        crypto.randomBytes(8).toString("hex").slice(0, 8)
-      );
+      const hashedPass = crypto.randomBytes(8).toString("hex").slice(0, 8);
+
       const student = await Student.create({
         name,
         rollNo,
@@ -234,7 +233,9 @@ class StudentController {
           return {
             ...student.dataValues,
             dept: depts.find(dept => dept.id == student.dataValues.departmentId)
-              .name,
+              ? depts.find(dept => dept.id == student.dataValues.departmentId)
+                  .name
+              : "",
             deptId: student.dataValues.departmentId,
             group: student.dataValues.groupId
               ? groups.find(
@@ -255,6 +256,7 @@ class StudentController {
 
   static createStudent = async (req, res) => {
     const facultyId = req.user.id;
+
     try {
       const facultyMember = await FacultyMember.findOne({
         where: {
@@ -294,16 +296,14 @@ class StudentController {
               name: student.department,
             },
           });
-          const hashedPass = await hashPassword(
-            crypto.randomBytes(8).toString("hex").slice(0, 8)
-          );
+          const pp = crypto.randomBytes(8).toString("hex").slice(0, 8);
           return Student.create({
             name: student.name,
             rollNo: student.rollNo,
             departmentId: dept ? dept.id : null,
             degree: "BS",
             leader: false,
-            password: hashedPass,
+            password: pp,
           });
         })
       );
@@ -339,14 +339,15 @@ class StudentController {
       // );
       console.log("student", createdStudents);
       console.log(
-        createdStudents.map(student => {
+        createdStudents.map((student, index) => {
           return {
             email: student.dataValues.rollNo + "@uog.edu.pk",
             subject: "Ignore FYP Students Testing",
             body: `Testing...
              Your credentials are for: 
              Username: ${student.dataValues.rollNo}
-             Password:${student.dataValues.password}`,
+             Password: ${student.dataValues.password}
+             `,
           };
         })
       );

@@ -93,10 +93,36 @@ const PmoSettings = () => {
               flexDirection: "column",
             }}
           >
-            <Inputs
+            {/* <Inputs
               mailPassword={mailPassword}
               setMailPassword={setMailPassword}
-            />
+            /> */}
+            <Box
+              style={{
+                marginBottom: "1rem",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography style={{ marginBottom: "0.8rem" }}>
+                Mail Password
+              </Typography>
+              <PasswordField
+                onChange={e => {
+                  console.log(e.target.value);
+                  setMailPassword(e.target.value);
+                }}
+                defaultValue={mailPassword}
+                style={{
+                  width: "50%",
+                  minWidth: "200px",
+                  marginBottom: "0.8rem",
+                }}
+                size="small"
+                label="Mail Password"
+                placeholder="Mail Passowrd"
+              />
+            </Box>
 
             <Box style={{ marginBottom: "2rem" }}>
               <Button

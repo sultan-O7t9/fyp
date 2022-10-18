@@ -61,6 +61,7 @@ const ForgetPassword = () => {
 
         // history.replace("/");
       } catch (error) {
+        console.log(error);
         //  Generate an alert here.
         console.log(error.response?.data?.message);
         // setError(error.response?.data?.message);
@@ -101,12 +102,12 @@ const ForgetPassword = () => {
             Forget Password
           </Typography>
           <Typography variant="body1" style={{ marginBottom: "0.5rem" }}>
-            Enter your Faculty Email or Group ID
+            Enter your UOG Email
           </Typography>
           <TextField
             style={Styles.input}
             type="email"
-            placeholder="Email or Group ID"
+            placeholder="Email"
             onChange={e => setEmail(e.target.value)}
           />
           {/* <PasswordField

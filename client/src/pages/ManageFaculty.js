@@ -151,13 +151,14 @@ const ManageFaculty = props => {
             // disabled={faculty.hasOwnProperty("email")}
             onChange={e => setEmail(e.target.value)}
           />
-
-          <PasswordField
-            style={Styles.input}
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          {faculty.hasOwnProperty("email") ? null : (
+            <PasswordField
+              style={Styles.input}
+              placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          )}
 
           <Select
             label="Designation"
@@ -183,7 +184,7 @@ const ManageFaculty = props => {
           />
           <Button
             style={Styles.input}
-            disabled={!name || !department || !email || password.length < 6}
+            disabled={!name || !department || !email}
             size="large"
             variant="contained"
             onClick={registerHandler}

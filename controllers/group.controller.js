@@ -400,9 +400,8 @@ class GroupController {
           });
           if (!department || !pmoDepts.includes(department.dataValues.id))
             return;
-          const hashedPass = await hashPassword(
-            crypto.randomBytes(8).toString("hex").slice(0, 8)
-          );
+          const hashedPass = crypto.randomBytes(8).toString("hex").slice(0, 8);
+
           const newGroup = await Group.create({
             departmentId: department ? department.dataValues.id : null,
             name: new Date().getTime().toString(),
@@ -544,9 +543,8 @@ class GroupController {
         student => student.dataValues.rollNo === req.body.leader
       );
       console.log(leader);
-      const hashedPass = await hashPassword(
-        crypto.randomBytes(8).toString("hex").slice(0, 8)
-      );
+      const hashedPass = crypto.randomBytes(8).toString("hex").slice(0, 8);
+
       const group = await Group.create({
         name: leader.dataValues.name + leader.dataValues.rollNo,
         supervisorId: req.body.supervisor,

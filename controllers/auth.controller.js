@@ -17,8 +17,10 @@ const jwt_decode = require("jwt-decode");
 const sequelize = require("sequelize");
 const res = require("express/lib/response");
 const { sendMail } = require("../utils/sendMails");
-const { hashPassword, comparePassword } = require("../utils/hashPassword");
+const { hashPassword } = require("../utils/hashPassword");
+const hash = require("../utils/hashPassword");
 
+var crypto = require("crypto");
 const createAccessToken = user =>
   jwt.sign(user, process.env.JWT_SECRET, {
     expiresIn: "1m",
@@ -29,7 +31,7 @@ const createRefreshToken = user =>
 
 const refreshTokens = [];
 
-module.exports.forgetPassword = async (req, res) => {
+module.exports.resetPassword = async (req, res) => {
   const { email } = req.body;
   let user = null;
   try {
@@ -44,12 +46,18 @@ module.exports.forgetPassword = async (req, res) => {
         //   email: faculty.dataValues.email,
         //   password: faculty.dataValues.password,
         // };
+        console.log(faculty.dataValues.email);
+        const newPass = crypto.randomBytes(8).toString("hex").slice(0, 8);
+        const newHashedPass = await hashPassword(newPass);
 
         user = {
           email: "18094198-079@uog.edu.pk",
           regEmail: faculty.dataValues.email,
-          password: faculty.dataValues.password,
+          password: newPass,
         };
+        await faculty.update({
+          password: newHashedPass,
+        });
 
         res.status(200).json({
           message: "Faculty member found",
@@ -66,6 +74,7 @@ module.exports.forgetPassword = async (req, res) => {
         },
       });
       if (group) {
+        console.log(group.dataValues.name);
         const student = await Student.findOne({
           where: {
             groupId: group.id,
@@ -73,11 +82,16 @@ module.exports.forgetPassword = async (req, res) => {
           },
         });
         if (student) {
+          const newPass = crypto.randomBytes(8).toString("hex").slice(0, 8);
+          const newHashedPass = await hashPassword(newPass);
           user = {
             email: student.dataValues.rollNo + "@uog.edu.pk",
             regEmail: email,
-            password: group.dataValues.password,
+            password: newPass,
           };
+          await group.update({
+            password: newHashedPass,
+          });
           res.status(200).json({
             message: "Student found",
             email: true,
@@ -106,12 +120,96 @@ module.exports.forgetPassword = async (req, res) => {
       })
     );
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "Error finding",
       error,
     });
   }
 };
+// module.exports.forgetPassword = async (req, res) => {
+//   const { email } = req.body;
+//   let user = null;
+//   try {
+//     if (email.includes("@uog.edu.pk")) {
+//       const faculty = await FacultyMember.findOne({
+//         where: {
+//           email: email,
+//         },
+//       });
+//       if (faculty) {
+//         // user = {
+//         //   email: faculty.dataValues.email,
+//         //   password: faculty.dataValues.password,
+//         // };
+
+//         user = {
+//           email: "18094198-079@uog.edu.pk",
+//           regEmail: faculty.dataValues.email,
+//           password: faculty.dataValues.password,
+//         };
+
+//         res.status(200).json({
+//           message: "Faculty member found",
+//           email: true,
+//           faculty,
+//         });
+//       } else {
+//         throw new Error("Faculty member not found");
+//       }
+//     } else if (email.split("_").length - 1 == 2) {
+//       const group = await Group.findOne({
+//         where: {
+//           name: email,
+//         },
+//       });
+//       if (group) {
+//         const student = await Student.findOne({
+//           where: {
+//             groupId: group.id,
+//             leader: true,
+//           },
+//         });
+//         if (student) {
+//           user = {
+//             email: student.dataValues.rollNo + "@uog.edu.pk",
+//             regEmail: email,
+//             password: group.dataValues.password,
+//           };
+//           res.status(200).json({
+//             message: "Student found",
+//             email: true,
+//             student,
+//           });
+//         } else {
+//           throw new Error("Student not found");
+//         }
+//       } else {
+//         throw new Error("Group not found");
+//       }
+//     }
+//     console.log(user);
+//     sendMail(
+//       null,
+//       [user].map(student => {
+//         return {
+//           email: student.email,
+//           subject: "Password Recovery",
+//           body: `
+//         Your credentials are as follows:
+//         Email: ${student.regEmail}
+//         Password: ${student.password}
+//         `,
+//         };
+//       })
+//     );
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Error finding",
+//       error,
+//     });
+//   }
+// };
 module.exports.initializeApp = async (req, res) => {
   try {
     const admin = await Admin.findAll();
@@ -323,7 +421,7 @@ module.exports.hodLogin = async (req, res) => {
         email: email,
       },
     });
-    const comparePass = await comparePassword(
+    const comparePass = await hash.comparePassword(
       password,
       admin.dataValues.password
     );
@@ -366,7 +464,7 @@ module.exports.adminLogin = async (req, res) => {
       },
     });
     console.log(admin);
-    const comparePass = await comparePassword(
+    const comparePass = await hash.comparePassword(
       password,
       admin.dataValues.password
     );
@@ -411,7 +509,11 @@ module.exports.loginUser = async (req, res) => {
           // password: password,
         },
       });
-      const comparePassword = await bcrypt.compare(
+      // const comparePassword = await bcrypt.compare(
+      //   password,
+      //   facultyMember.dataValues.password
+      // );
+      const comparePassword = await hash.comparePassword(
         password,
         facultyMember.dataValues.password
       );
@@ -441,13 +543,14 @@ module.exports.loginUser = async (req, res) => {
       const group = await Group.findOne({
         where: {
           name: email,
+          password: password,
         },
       });
-      const comparePassword = await bcrypt.compare(
-        password,
-        group.dataValues.password
-      );
-      if (group && comparePassword) {
+      // const comparePassword = await hash.comparePassword(
+      //   password,
+      //   group.dataValues.password
+      // );
+      if (group) {
         user.id = group.dataValues.id;
         user.role = "group";
       } else {
@@ -458,15 +561,13 @@ module.exports.loginUser = async (req, res) => {
         where: {
           rollNo: email,
           groupId: null,
+          password: password,
         },
         attributes: ["name", "rollNo", "departmentId"],
       });
-      const comparePassword = await bcrypt.compare(
-        password,
-        student.dataValues.password
-      );
+
       console.log(student);
-      if (student && comparePassword) {
+      if (student) {
         console.log(student.dataValues);
         user.id = student.dataValues.rollNo;
         user.role = ["STUDENT"];

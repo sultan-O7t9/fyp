@@ -25,8 +25,8 @@ const Login = () => {
 
   const loginHandler = async () => {
     setError(null);
-    if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
-      return setError("Please enter a valid UOG email address");
+    // if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
+    //   return setError("Please enter a valid UOG email address");
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -65,7 +65,7 @@ const Login = () => {
         <Button
           size="large"
           style={Styles.input}
-          disabled={!email || password.length < 6}
+          disabled={!email || password.length < 5}
           variant="contained"
           onClick={loginHandler}
         >

@@ -8,13 +8,15 @@ const {
   initializeApp,
   forgetPassword,
   hodLogin,
+  resetPassword,
 } = require("../controllers/auth.controller");
 const verifyToken = require("../utils/verifyToken");
 
 const Router = require("express").Router();
 
 Router.post("/login", loginUser);
-Router.post("/forget", forgetPassword);
+// Router.post("/reset", resetPassword);
+Router.post("/forget", resetPassword);
 Router.post("/admin", adminLogin);
 Router.post("/hod", hodLogin);
 Router.post("/logout", verifyToken, logoutUser);

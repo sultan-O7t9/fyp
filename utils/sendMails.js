@@ -89,6 +89,8 @@ module.exports.sendMail = (
   sender = { mail: null, mailpass: null },
   recipiants
 ) => {
+  console.log("_______________________________________________");
+  console.log(sender);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

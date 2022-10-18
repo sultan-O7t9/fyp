@@ -331,7 +331,7 @@ class FacultyController {
       designation,
     } = req.body;
 
-    console.log(req.body);
+    console.log(req.body, "REGISTER");
     try {
       // const admin = await Admin.findOne({
       //   where: {
@@ -616,7 +616,7 @@ class FacultyController {
       if (faculty) {
         await faculty.update({
           mailPassword: mailPassword
-            ? hashedPass
+            ? mailPassword
             : faculty.dataValues.mailPassword,
         });
 

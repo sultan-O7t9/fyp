@@ -70,7 +70,7 @@ const Dashboard = () => {
     getDeliverables();
   }, []);
 
-  if (fl === "true") {
+  if (fl === "true" && localStorage.getItem(USER_ROLE).includes("PMO")) {
     return <Redirect to="/reset-pass" />;
   }
 
