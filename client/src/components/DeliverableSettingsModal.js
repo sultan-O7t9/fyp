@@ -95,7 +95,7 @@ const DeliverableSettingsModal = props => {
     };
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/deliverable/update-deliverable`,
+        ` /api/deliverable/update-deliverable`,
         data
       );
       console.log(res.data);
@@ -118,10 +118,7 @@ const DeliverableSettingsModal = props => {
     console.log(file);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/template-file",
-        data
-      );
+      const res = await axios.post("/api/deliverable/template-file", data);
       console.log(res.data);
       if (res.data.upload) {
         setShowUploadModal(false);
@@ -137,12 +134,11 @@ const DeliverableSettingsModal = props => {
   const downloadTemplateFile = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/get-template-file",
-        { deliverableId: deliverable.id }
-      );
+      const res = await axios.post("/api/deliverable/get-template-file", {
+        deliverableId: deliverable.id,
+      });
       console.log(res.data);
-      let url = "http://localhost:5000/" + res.data.file;
+      let url = " /" + res.data.file;
       console.log(url);
       let win = window.open(url, "_blank");
       win.focus();

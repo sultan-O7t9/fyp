@@ -141,7 +141,7 @@ const DataHead = () => {
 //         let newData = [];
 //         if (roles.includes("PMO")) {
 //           const res = await axios.post(
-//             "http://localhost:5000/api/deliverable/get-grp-submission-sem",
+//              "/api/deliverable/get-grp-submission-sem",
 //             {
 //               deliverableId,
 //             }
@@ -157,7 +157,7 @@ const DataHead = () => {
 //         }
 //         if (roles.includes("SUPERVISOR")) {
 //           const res = await axios.post(
-//             "http://localhost:5000/api/deliverable/get-grp-submission-sem",
+//              "/api/deliverable/get-grp-submission-sem",
 //             {
 //               deliverableId,
 //             }
@@ -185,7 +185,7 @@ const DataHead = () => {
 //   const downloadSubmission = async (e, file) => {
 //     e.preventDefault();
 //     try {
-//       let url = "http://localhost:5000/" + file;
+//       let url = " /" + file;
 //       console.log(url);
 //       let win = window.open(url, "_blank");
 //       win.focus();
@@ -260,7 +260,7 @@ const DataHead = () => {
 //           return value ? (
 //             <Button
 //               onClick={() => {
-//                 let url = "http://localhost:5000/" + value;
+//                 let url = " /" + value;
 //                 let win = window.open(url, "_blank");
 //                 win.focus();
 //               }}
@@ -328,7 +328,7 @@ const DataHead = () => {
 //   const sendMailToStudents = async () => {
 //     try {
 //       const res = await axios.post(
-//         "http://localhost:5000/api/deliverable/send-mail",
+//          "/api/deliverable/send-mail",
 //         { deliverableId, userId, groups: toArray(selectedGroups) }
 //       );
 //       console.log(res.data.get);
@@ -479,7 +479,7 @@ const DataBody2 = props => {
       };
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/evaluation/get-schedule-deliverable",
+          "/api/evaluation/get-schedule-deliverable",
           data
         );
         console.log(res.data);
@@ -753,9 +753,7 @@ const DataBody2 = props => {
   const handleDeleteSchedule = async id => {
     console.log("DEL", id);
     try {
-      const res = await axios.delete(
-        "http://localhost:5000/api/evaluation/del-schedule/" + id
-      );
+      const res = await axios.delete("/api/evaluation/del-schedule/" + id);
       console.log(res.data);
       setShowDeleteModal(false);
 
@@ -781,10 +779,7 @@ const DataBody2 = props => {
       userId: localStorage.getItem(USER_ID),
     };
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/share-sched",
-        data
-      );
+      const res = await axios.post("/api/deliverable/share-sched", data);
       console.log(res.data);
       setToastMessage("Schedule shared successfully");
       setOpen(true);
@@ -999,7 +994,7 @@ const EvaluationScheduleDetail = props => {
   useEffect(() => {
     const getDeliverableData = async () => {
       const response = await axios.get(
-        `http://localhost:5000/api/deliverable/get/${deliverableId}`
+        ` /api/deliverable/get/${deliverableId}`
       );
       console.log(response.data);
       setDeliverableData(response.data.deliverable);
@@ -1014,10 +1009,7 @@ const EvaluationScheduleDetail = props => {
     data.append("deliverableId", deliverableId);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/template-file",
-        data
-      );
+      const res = await axios.post("/api/deliverable/template-file", data);
       console.log(res.data);
       if (res.data.upload) {
         setShowUploadModal(false);
@@ -1033,12 +1025,11 @@ const EvaluationScheduleDetail = props => {
   const downloadTemplateFile = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/get-template-file",
-        { deliverableId: deliverableId }
-      );
+      const res = await axios.post("/api/deliverable/get-template-file", {
+        deliverableId: deliverableId,
+      });
       console.log(res.data);
-      let url = "http://localhost:5000/" + res.data.file;
+      let url = " /" + res.data.file;
       console.log(url);
       let win = window.open(url, "_blank");
       win.focus();

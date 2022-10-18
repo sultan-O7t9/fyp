@@ -113,7 +113,7 @@ const DataBody = props => {
     const getDeliverableData = async () => {
       try {
         const response = await axios.post(
-          `http://localhost:5000/api/deliverable/get-grp-submission`,
+          ` /api/deliverable/get-grp-submission`,
           { groupId: groupId, deliverableId: 1 }
         );
         // setSubFile(response.data.versions.pop().name);
@@ -159,14 +159,11 @@ const DataBody = props => {
   useEffect(() => {
     const getReviewData = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/evaluation/get-review-status",
-          {
-            groupId,
-            deliverableId,
-            committeeId,
-          }
-        );
+        const res = await axios.post("/api/evaluation/get-review-status", {
+          groupId,
+          deliverableId,
+          committeeId,
+        });
         console.log("REVIEW", res.data);
         setReviewInfo(res.data.review);
         // setReview(res.data.review);
@@ -207,7 +204,7 @@ const DataBody = props => {
     const getEvaluationData = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/evaluation/proposal-evaluation",
+          "/api/evaluation/proposal-evaluation",
           { groupId: groupId }
         );
         console.log(response.data);
@@ -271,12 +268,9 @@ const DataBody = props => {
   };
 
   const handleSubmit = async () => {
-    const facultyRes = await axios.post(
-      "http://localhost:5000/api/faculty/get-sup-id",
-      {
-        id: localStorage.getItem(USER_ID),
-      }
-    );
+    const facultyRes = await axios.post("/api/faculty/get-sup-id", {
+      id: localStorage.getItem(USER_ID),
+    });
     console.log(facultyRes.data.faculty);
     const LOGS = [];
     const students = evalData.students;
@@ -366,7 +360,7 @@ const DataBody = props => {
     console.log(data);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/evaluation/add-proposal-evaluation",
+        "/api/evaluation/add-proposal-evaluation",
         data
       );
       console.log(res.data);
@@ -384,10 +378,9 @@ const DataBody = props => {
       // };
       // console.log(log);
 
-      const res2 = await axios.post(
-        `http://localhost:5000/api/deliverable/set-logs`,
-        { logs: LOGS }
-      );
+      const res2 = await axios.post(` /api/deliverable/set-logs`, {
+        logs: LOGS,
+      });
       console.log(res2.data);
       setRefresh(refresh => !refresh);
     } catch (err) {
@@ -407,10 +400,7 @@ const DataBody = props => {
     console.log(reviewInfo.id);
     // return;
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/evaluation/add-commented-doc",
-        data
-      );
+      const res = await axios.post("/api/evaluation/add-commented-doc", data);
       console.log("file:", res.data);
       if (res.data.upload) setShowUploadModal(false);
       setFile({ name: "" });
@@ -424,18 +414,15 @@ const DataBody = props => {
   const handleUpdateReview = async () => {
     console.log(committeeReview, revisionDate);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/evaluation/update-review-status",
-        {
-          groupId,
-          userId: localStorage.getItem(USER_ID),
-          versionId: currVersion.id,
-          deliverableId,
-          committeeId,
-          status: committeeReview,
-          date: revisionDate,
-        }
-      );
+      const res = await axios.post("/api/evaluation/update-review-status", {
+        groupId,
+        userId: localStorage.getItem(USER_ID),
+        versionId: currVersion.id,
+        deliverableId,
+        committeeId,
+        status: committeeReview,
+        date: revisionDate,
+      });
       console.log(res.data);
       setToast(true);
       setTMsg("Review Updated Successfully");
@@ -532,7 +519,7 @@ const DataBody = props => {
           {currVersion.eval_commented_doc ? (
             <Button
               onClick={() => {
-                let url = "http://localhost:5000/" + reviewInfo.commented_doc;
+                let url = " /" + reviewInfo.commented_doc;
                 let win = window.open(url, "_blank");
                 win.focus();
               }}
@@ -819,7 +806,7 @@ const ProposalEvaluationPage = props => {
   useEffect(() => {
     const getDeliverableData = async () => {
       const response = await axios.post(
-        `http://localhost:5000/api/deliverable/get-grp-submission`,
+        ` /api/deliverable/get-grp-submission`,
         { groupId: groupId, deliverableId: 1 }
       );
       setSubFile(response.data.versions.pop().name);
@@ -836,10 +823,7 @@ const ProposalEvaluationPage = props => {
     const getLogsData = async () => {
       const data = { deliverableId: deliverableId, groupId: groupId };
       try {
-        const res = await axios.post(
-          `http://localhost:5000/api/deliverable/get-logs`,
-          data
-        );
+        const res = await axios.post(` /api/deliverable/get-logs`, data);
         console.log(res.data);
         setLogsData(res.data);
       } catch (error) {
@@ -851,7 +835,7 @@ const ProposalEvaluationPage = props => {
 
   const downloadTemplateFile = async e => {
     e.preventDefault();
-    let url = "http://localhost:5000/" + subFile;
+    let url = " /" + subFile;
     console.log(url);
     let win = window.open(url, "_blank");
     win.focus();

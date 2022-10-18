@@ -48,9 +48,7 @@ export default function AppBarMenu(props) {
         return;
       }
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/role/faculty-all"
-        );
+        const response = await axios.get("/api/role/faculty-all");
         setRoles(response.data.roles);
         console.log(response.data.roles);
       } catch (error) {
@@ -62,10 +60,9 @@ export default function AppBarMenu(props) {
 
   const logoutHandler = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/logout",
-        { token: localStorage.getItem(refreshToken) }
-      );
+      const response = await axios.post("/api/auth/logout", {
+        token: localStorage.getItem(refreshToken),
+      });
       if (response.data.logout) {
         localStorage.clear();
         dispatch(logoutUser());

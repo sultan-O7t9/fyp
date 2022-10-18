@@ -48,9 +48,7 @@ const EditStudent = props => {
   useEffect(() => {
     const getDept = async () => {
       try {
-        const resDept = await axios.get(
-          "http://localhost:5000/api/dept/get-all"
-        );
+        const resDept = await axios.get("/api/dept/get-all");
         console.log(resDept.data);
         const dts = resDept.data.departments;
         setDepts(
@@ -91,7 +89,7 @@ const EditStudent = props => {
       return;
     }
     try {
-      const res = await axios.post("http://localhost:5000/api/student/update", {
+      const res = await axios.post("/api/student/update", {
         name,
         rollNo,
         dept,

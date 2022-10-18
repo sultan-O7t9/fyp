@@ -130,9 +130,7 @@ const DataBody = ({ data, editCommittee, setData }) => {
 
   const deleteCommittee = async id => {
     console.log("ID", id);
-    const response = await axios.delete(
-      `http://localhost:5000/api/faculty/delete/${id}`
-    );
+    const response = await axios.delete(` /api/faculty/delete/${id}`);
     if (response.data.delete) {
       setShowDeleteModal(false);
       setData(data => data.filter(committee => committee.id !== id));
@@ -241,7 +239,7 @@ const AdminManageFaculty = () => {
     setIsLoading(true);
 
     axios
-      .get("http://localhost:5000/api/faculty/get-supervisors")
+      .get("/api/faculty/get-supervisors")
       .then(res => {
         console.log(res.data);
         setBody(res.data.supervisors);

@@ -79,7 +79,7 @@ const AdminRoutes = () => {
 const App = () => {
   useEffect(() => {
     const init = async () => {
-      const res = await axios.get("http://localhost:5000/api/auth/init");
+      const res = await axios.get("/api/auth/init");
       console.log(res.data);
     };
     init();
@@ -92,7 +92,7 @@ const App = () => {
   //request interceptor to add the auth token header to requests
   axios.interceptors.request.use(
     config => {
-      if (config.url === "http://localhost:5000/api/auth/login") return config;
+      if (config.url === "/api/auth/login") return config;
       const accessToken = localStorage.getItem(keyAccessToken);
       if (accessToken) {
         config.headers["x-auth-token"] = accessToken;
@@ -114,7 +114,7 @@ const App = () => {
       let refreshToken = localStorage.getItem(keyRefreshToken);
       if (refreshToken && error.response.status === 401) {
         return axios
-          .post("http://localhost:5000/api/auth/refresh", {
+          .post("/api/auth/refresh", {
             token: refreshToken,
           })
           .then(res => {

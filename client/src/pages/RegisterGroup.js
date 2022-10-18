@@ -20,7 +20,7 @@ const RegisterGroup = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/student/get-students")
+      .get("/api/student/get-students")
       .then(res => {
         console.log(res.data.students);
         setStudents(res.data.students);
@@ -31,7 +31,7 @@ const RegisterGroup = () => {
   }, []);
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/faculty/get-supervisors")
+      .get("/api/faculty/get-supervisors")
       .then(res => {
         console.log(res.data.supervisors);
         setSupervisors(res.data.supervisors);
@@ -63,14 +63,11 @@ const RegisterGroup = () => {
 
   const registerGroupHandler = async () => {
     try {
-      const result = await axios.post(
-        "http://localhost:5000/api/group/create",
-        {
-          members: members,
-          leader: leader,
-          supervisor: supervisor,
-        }
-      );
+      const result = await axios.post("/api/group/create", {
+        members: members,
+        leader: leader,
+        supervisor: supervisor,
+      });
       console.log(result);
       if (result.data.register) {
         // history.push("/"

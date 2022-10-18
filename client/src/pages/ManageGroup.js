@@ -126,7 +126,7 @@ const ManageGroup = props => {
   useEffect(() => {
     const getDepts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/dept/get-all");
+        const res = await axios.get("/api/dept/get-all");
         setDepts(
           res.data.departments.map(dept => ({
             value: dept.id,
@@ -153,7 +153,7 @@ const ManageGroup = props => {
     //   }
     // return;
     axios
-      .get("http://localhost:5000/api/student/get-students")
+      .get("/api/student/get-students")
       .then(res => {
         console.log(res.data.students);
         const sts = group.hasOwnProperty("members")
@@ -176,7 +176,7 @@ const ManageGroup = props => {
   }, [group.members, group]);
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/faculty/get-supervisors")
+      .get("/api/faculty/get-supervisors")
       .then(res => {
         console.log(res.data.supervisors);
         setSupervisors(res.data.supervisors);
@@ -222,27 +222,21 @@ const ManageGroup = props => {
     console.log(data);
     try {
       if (group.hasOwnProperty("id")) {
-        const result = await axios.put(
-          "http://localhost:5000/api/group/update",
-          {
-            members: members,
-            leader: leader,
-            supervisor: supervisor,
-            id: group.id,
-            dept: dept,
-          }
-        );
+        const result = await axios.put("/api/group/update", {
+          members: members,
+          leader: leader,
+          supervisor: supervisor,
+          id: group.id,
+          dept: dept,
+        });
         console.log(result);
       } else {
-        const result = await axios.post(
-          "http://localhost:5000/api/group/create",
-          {
-            members: members,
-            leader: leader,
-            supervisor: supervisor,
-            dept: dept,
-          }
-        );
+        const result = await axios.post("/api/group/create", {
+          members: members,
+          leader: leader,
+          supervisor: supervisor,
+          dept: dept,
+        });
         console.log(result);
       }
     } catch (err) {

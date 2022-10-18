@@ -38,14 +38,12 @@ const DataBody = props => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/group/get/" + groupId
-        );
+        const res = await axios.get("/api/group/get/" + groupId);
         console.log(res.data);
         setGroupInfo(res.data.group);
 
         // const pmoRes = await axios.post(
-        //   "http://localhost:5000/api/evaluation/get-pmo-evaluation",
+        //    "/api/evaluation/get-pmo-evaluation",
         //   {
         //     groupId: groupId,
         //     projectId: res.data.group.project.id,
@@ -54,7 +52,7 @@ const DataBody = props => {
         // console.log(pmoRes.data);
 
         // const supRes = await axios.post(
-        //   "http://localhost:5000/api/evaluation/get-supervisor-evaluation",
+        //    "/api/evaluation/get-supervisor-evaluation",
         //   {
         //     groupId: groupId,
         //     projectId: res.data.group.project.id,
@@ -75,13 +73,10 @@ const DataBody = props => {
   const verifyGroup = async () => {
     console.log("verify group");
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/group/change/password",
-        {
-          groupId: groupId,
-          password: password,
-        }
-      );
+      const res = await axios.post("/api/group/change/password", {
+        groupId: groupId,
+        password: password,
+      });
       console.log(res.data);
       history.push("/register-project");
     } catch (err) {
@@ -221,9 +216,7 @@ const ViewGroup = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/group/get/" + groupId
-        );
+        const res = await axios.get("/api/group/get/" + groupId);
         console.log(res.data);
         setGroupInfo(res.data.group);
       } catch (error) {

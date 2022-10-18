@@ -25,7 +25,7 @@ const UploadFileInput = props => {
   //   e.preventDefault();
   //   try {
   //     const res = await axios.post(
-  //       "http://localhost:5000/api/group/download-file/",
+  //        "/api/group/download-file/",
   //       { name: name }
   //     );
   //     console.log(res.data);

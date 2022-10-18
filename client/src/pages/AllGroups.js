@@ -69,9 +69,7 @@ const AllGroups = () => {
   useEffect(() => {
     const getCurrSemData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/sem/get-current"
-        );
+        const res = await axios.get("/api/sem/get-current");
         const cs = res.data.semester;
         setCurrentSemester(cs.id);
       } catch (err) {
@@ -83,7 +81,7 @@ const AllGroups = () => {
   useEffect(() => {
     const getAllSemData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/sem/get-all");
+        const res = await axios.get("/api/sem/get-all");
         const cs = res.data.semesters;
         setSemesters(
           cs.length
@@ -128,10 +126,9 @@ const AllGroups = () => {
       try {
         let filteredGroups = [];
         if (localStorage.getItem(USER_ROLE).includes("PMO")) {
-          const res = await axios.post(
-            "http://localhost:5000/api/group/get-groups/",
-            { userId: localStorage.getItem(USER_ID) }
-          );
+          const res = await axios.post("/api/group/get-groups/", {
+            userId: localStorage.getItem(USER_ID),
+          });
           console.log(res.data.groups);
           filteredGroups = currentSemester
             ? res.data.groups.filter(g => g.semesterId === currentSemester)
@@ -139,12 +136,9 @@ const AllGroups = () => {
         } else if (localStorage.getItem(USER_ROLE).includes("SUPERVISOR")) {
           const userId = localStorage.getItem(USER_ID);
           console.log("USER_ID", userId);
-          const res2 = await axios.post(
-            "http://localhost:5000/api/group/get-groups-sup/",
-            {
-              userId,
-            }
-          );
+          const res2 = await axios.post("/api/group/get-groups-sup/", {
+            userId,
+          });
           console.log(res2.data);
           filteredGroups = currentSemester
             ? res2.data.groups.filter(g => g.semesterId === currentSemester)
@@ -160,7 +154,7 @@ const AllGroups = () => {
     getGroups();
 
     // axios
-    //   .get("http://localhost:5000/api/group/get-groups/")
+    //   .get( "/api/group/get-groups/")
     //   .then(res => {
     //     console.log(res.data.groups);
     //     let filteredGroups = currentSemester
@@ -274,10 +268,10 @@ const AllGroups = () => {
     // return;
     //Now send request to server and create studetns there, render the response array in table
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/group/create-many",
-        { groups, userId: localStorage.getItem(USER_ID) }
-      );
+      const response = await axios.post("/api/group/create-many", {
+        groups,
+        userId: localStorage.getItem(USER_ID),
+      });
       console.log(response.data);
       if (response.status === 200) {
         setIsLoading(false);
@@ -299,7 +293,7 @@ const AllGroups = () => {
   const selectCurrentSemesterHandler = async sem => {
     setCurrentSemester(sem);
     try {
-      const res = axios.post("http://localhost:5000/api/sem/current", {
+      const res = axios.post("/api/sem/current", {
         semesterId: sem,
       });
       console.log(res.data);
@@ -319,10 +313,7 @@ const AllGroups = () => {
       semesterId: sem,
     };
     try {
-      const res = axios.post(
-        "http://localhost:5000/api/sem/update-grp-sem",
-        data
-      );
+      const res = axios.post("/api/sem/update-grp-sem", data);
       console.log(res.data);
       // setCurrentSemester(sem);
       setToastMessage("Semester of selected groups changed successfully");

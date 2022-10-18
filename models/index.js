@@ -5,6 +5,14 @@ const { Sequelize, DataTypes } = require("sequelize");
 
 // //Create a new instance of Sequelize
 const sequelize = new Sequelize(process.env.DATABASE_URL);
+// PG_USER=postgres
+// PG_PASSWORD=postgres
+// PG_HOST=localhost
+// PG_PORT=5432
+// PG_DATABASE=yelp
+// const sequelize = new Sequelize(
+//   `postgres://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_DATABASE}`
+// );
 // //Verify connection
 sequelize
   .authenticate()

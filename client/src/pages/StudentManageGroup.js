@@ -127,7 +127,7 @@ const StudentManageGroup = props => {
     //   }
     // return;
     axios
-      .post("http://localhost:5000/api/student/get-students-by-student", {
+      .post("/api/student/get-students-by-student", {
         rollNo: group.leader,
       })
       .then(res => {
@@ -145,7 +145,7 @@ const StudentManageGroup = props => {
   }, [group.members, group]);
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/faculty/get-supervisors")
+      .get("/api/faculty/get-supervisors")
       .then(res => {
         console.log(res.data.supervisors);
         setSupervisors(res.data.supervisors);
@@ -201,7 +201,7 @@ const StudentManageGroup = props => {
 
   const editGroupHandler = async () => {
     try {
-      const result = await axios.put("http://localhost:5000/api/group/update", {
+      const result = await axios.put("/api/group/update", {
         members: members,
         leader: group.leader,
         supervisor: supervisor,

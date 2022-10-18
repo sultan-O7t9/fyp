@@ -33,8 +33,8 @@ const AddSchedule = props => {
     const getData = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/committee/get-all"
-          //   "http://localhost:5000/api/group/get-all/" +
+          "/api/committee/get-all"
+          //    "/api/group/get-all/" +
           //     localStorage.getItem(USER_ID)
         );
         console.log("DETAILED GROUPS", res.data);
@@ -118,10 +118,7 @@ const AddSchedule = props => {
     };
     console.log(data);
     try {
-      const result = await axios.post(
-        "http://localhost:5000/api/evaluation/schedule",
-        data
-      );
+      const result = await axios.post("/api/evaluation/schedule", data);
       console.log(result.data);
       if (result.data.create) {
         setToastMessage("Schedule added successfully.");

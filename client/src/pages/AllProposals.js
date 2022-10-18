@@ -68,10 +68,7 @@ const AllProposals = () => {
     setIsLoading(true);
 
     axios
-      .get(
-        "http://localhost:5000/api/group/get-all/" +
-          localStorage.getItem(USER_ID)
-      )
+      .get("/api/group/get-all/" + localStorage.getItem(USER_ID))
       .then(res => {
         setBody(res.data.groups);
       })

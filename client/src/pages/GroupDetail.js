@@ -68,9 +68,7 @@ const DataBody = props => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/group/get/" + groupId
-        );
+        const res = await axios.get("/api/group/get/" + groupId);
         console.log(res.data);
         setGroupInfo(res.data.group);
       } catch (error) {
@@ -115,10 +113,9 @@ const DataBody = props => {
   useEffect(() => {
     const getEvaluationData = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/evaluation/sup-evaluation",
-          { groupId: groupId }
-        );
+        const response = await axios.post("/api/evaluation/sup-evaluation", {
+          groupId: groupId,
+        });
         console.log(response.data);
         setSupEvaluationData(response.data.group);
         // console.log(DATA.group);
@@ -134,9 +131,7 @@ const DataBody = props => {
     //get project Data,
     const getProjectDetails = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/project/get-grp/" + groupId
-        );
+        const res = await axios.get("/api/project/get-grp/" + groupId);
         console.log(res.data);
         setProjectDetails(res.data.project);
       } catch (err) {
@@ -150,10 +145,9 @@ const DataBody = props => {
   useEffect(() => {
     const getEvaluationData = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/evaluation/pmo-evaluation",
-          { groupId: groupId }
-        );
+        const response = await axios.post("/api/evaluation/pmo-evaluation", {
+          groupId: groupId,
+        });
         console.log(response.data);
         setPmoEvaluationData(response.data.group);
         // console.log(DATA.group);
@@ -221,10 +215,7 @@ const DataBody = props => {
     };
     console.log(data);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/evaluation/add-sup-evaluation",
-        data
-      );
+      const res = await axios.post("/api/evaluation/add-sup-evaluation", data);
       console.log(res.data);
       setTMsg("Marks updated successfully");
       setToast(true);
@@ -248,10 +239,7 @@ const DataBody = props => {
     };
     console.log(data);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/evaluation/add-pmo-evaluation",
-        data
-      );
+      const res = await axios.post("/api/evaluation/add-pmo-evaluation", data);
       console.log(res.data);
       setTMsg("Marks updated successfully");
       setToast(true);
@@ -280,7 +268,7 @@ const DataBody = props => {
     // console.log(data);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/group/change-booklet-status",
+        "/api/group/change-booklet-status",
         data
       );
       // console.log("STATUS", response.data.group.bookletsStatus);
@@ -301,10 +289,7 @@ const DataBody = props => {
 
     console.log(data);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/group/change-booklet-comment",
-        data
-      );
+      const res = await axios.post("/api/group/change-booklet-comment", data);
       if (res.data.comment === true) {
         setTMsg("Comment Added Successfully");
         setToast(true);
@@ -317,7 +302,7 @@ const DataBody = props => {
 
     // try {
     //   const response = await axios.post(
-    //     "http://localhost:5000/api/group/change-booklet-status",
+    //      "/api/group/change-booklet-status",
     //     data
     //   );
     //   setBookletStatus(response.data.group.bookletsStatus === "Approved");
@@ -1085,9 +1070,7 @@ const GroupDetail = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/group/get/" + groupId
-        );
+        const res = await axios.get("/api/group/get/" + groupId);
         console.log(res.data);
         setGroupInfo(res.data.group);
       } catch (error) {

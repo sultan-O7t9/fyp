@@ -27,7 +27,7 @@ const HODLogin = () => {
     if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
       return setError("Please enter a valid UOG email address");
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/hod", {
+      const response = await axios.post("/api/auth/hod", {
         email,
         password,
       });

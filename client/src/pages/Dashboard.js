@@ -61,9 +61,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const getDeliverables = async () => {
-      const res = await axios.get(
-        "http://localhost:5000/api/deliverable/get-all"
-      );
+      const res = await axios.get("/api/deliverable/get-all");
       console.log(res.data);
       setDeliverables(res.data.deliverables);
     };

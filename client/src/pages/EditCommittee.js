@@ -125,7 +125,7 @@ const EditCommittee = props => {
     const getData = async () => {
       setGroups(committee.Groups.map(group => group.name));
       try {
-        const res = axios.post("http://localhost:5000/api/group/get-groups/", {
+        const res = axios.post("/api/group/get-groups/", {
           userId: localStorage.getItem(USER_ID),
         });
         console.log(res.data);
@@ -134,9 +134,7 @@ const EditCommittee = props => {
         // setGroups([]);
         console.log(evaluators);
 
-        const res2 = await axios.get(
-          "http://localhost:5000/api/sem/get-current"
-        );
+        const res2 = await axios.get("/api/sem/get-current");
         console.log(res2.data);
         const currSem = res2.data.semester ? res2.data.semester.id : null;
 
@@ -175,7 +173,7 @@ const EditCommittee = props => {
     setEvaluators(committee.members.map(member => member.id));
 
     axios
-      .get("http://localhost:5000/api/faculty/get-supervisors")
+      .get("/api/faculty/get-supervisors")
       .then(res => {
         console.log(res.data);
         setEvaluatorItems(
@@ -208,14 +206,11 @@ const EditCommittee = props => {
     // return;
 
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/committee/update",
-        {
-          committeeId: committee.id,
-          groups: groups,
-          members: evaluators,
-        }
-      );
+      const res = await axios.put("/api/committee/update", {
+        committeeId: committee.id,
+        groups: groups,
+        members: evaluators,
+      });
       console.log(res);
 
       setDisplay(false);

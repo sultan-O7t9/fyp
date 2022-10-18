@@ -31,10 +31,9 @@ const ExtensionModal = props => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/deliverable/ex-get",
-          { deliverableId }
-        );
+        const res = await axios.post("/api/deliverable/ex-get", {
+          deliverableId,
+        });
         console.log(res.data);
         setRequestedExtensions(res.data.extensions);
         setTotal(res.data.extensions.length);
@@ -47,10 +46,10 @@ const ExtensionModal = props => {
 
   const handleExtensionStatus = async (extensionId, status) => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/ex-status",
-        { id: extensionId, status }
-      );
+      const res = await axios.post("/api/deliverable/ex-status", {
+        id: extensionId,
+        status,
+      });
       console.log(res.data);
       setToastMessage("Extension status updated successfully");
       setShowToast(true);

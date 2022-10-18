@@ -54,9 +54,7 @@ const DataHead = ({ heads }) => {
 
 const DataBody = ({ data, editCommittee, setData }) => {
   const deleteCommittee = async id => {
-    const response = await axios.delete(
-      `http://localhost:5000/api/committee/delete/${id}`
-    );
+    const response = await axios.delete(` /api/committee/delete/${id}`);
     if (response.data.delete) {
       setData(data => data.filter(committee => committee.id !== id));
     }
@@ -163,7 +161,7 @@ const AllCommittees = () => {
     setIsLoading(true);
 
     axios
-      .get("http://localhost:5000/api/committee/get-all")
+      .get("/api/committee/get-all")
       .then(res => {
         console.log(res.data);
         setBody(res.data.committees);

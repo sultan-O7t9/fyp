@@ -28,10 +28,10 @@ const Login = () => {
     // if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
     //   return setError("Please enter a valid UOG email address");
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        { email, password }
-      );
+      const response = await axios.post("/api/auth/login", {
+        email,
+        password,
+      });
       console.log(response.data);
       localStorage.setItem(first_login, response.data.first_login);
       dispatch(loginUser(response.data));

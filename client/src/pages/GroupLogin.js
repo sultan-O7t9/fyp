@@ -29,13 +29,10 @@ const GroupLogin = () => {
       return setError("Please enter a valid Group ID");
     }
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post("/api/auth/login", {
+        email,
+        password,
+      });
       // dispatch(loginUser(response.data));
       console.log(response.data);
       //   const { accessToken } = response.data;
@@ -44,7 +41,7 @@ const GroupLogin = () => {
       const groupID = localStorage.getItem(USER_ID);
 
       axios
-        .get(`http://localhost:5000/api/project/get-grp/${groupID}`)
+        .get(` /api/project/get-grp/${groupID}`)
         .then(res => {
           console.log(res.data);
         })

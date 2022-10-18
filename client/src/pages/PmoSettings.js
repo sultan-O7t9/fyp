@@ -63,10 +63,7 @@ const PmoSettings = () => {
     };
     console.log(data);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/faculty/email-pass",
-        data
-      );
+      const res = await axios.post("/api/faculty/email-pass", data);
       console.log(res.data.mail);
       if (res.data.mail) {
         setToast(true);

@@ -97,7 +97,7 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
   ];
   useEffect(() => {
     const getDepts = async () => {
-      const res = await axios.get("http://localhost:5000/api/dept/get-all");
+      const res = await axios.get("/api/dept/get-all");
       console.log(res.data);
       setDepts(
         res.data.departments.map(dept => ({
@@ -197,9 +197,7 @@ const DataBody = ({ data, setRefresh, setShowEditStudent, setToEdit }) => {
 
   const handleDeleteStudent = async id => {
     try {
-      const res = await axios.delete(
-        `http://localhost:5000/api/student/delete/${id}`
-      );
+      const res = await axios.delete(` /api/student/delete/${id}`);
       if (res.data.delete) {
         setRefresh(refresh => !refresh);
       } else {
@@ -299,7 +297,7 @@ const AllStudents = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://localhost:5000/api/student/get-all")
+      .get("/api/student/get-all")
       .then(res => {
         console.log(res.data);
         setBody(res.data.students);
@@ -356,10 +354,9 @@ const AllStudents = () => {
     // return;
     //Now send request to server and create studetns there, render the response array in table
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/student/create-all",
-        { students: studentsToCreate }
-      );
+      const response = await axios.post("/api/student/create-all", {
+        students: studentsToCreate,
+      });
 
       if (response.status === 200) {
         setIsLoading(false);

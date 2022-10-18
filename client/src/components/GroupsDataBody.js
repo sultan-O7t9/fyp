@@ -53,7 +53,7 @@ import { USER_ROLE } from "../utils/keys";
 //     console.log(data);
 //     try {
 //       const response = await axios.post(
-//         "http://localhost:5000/api/group/change-booklet-status",
+//          "/api/group/change-booklet-status",
 //         data
 //       );
 //       setBookletStatus(response.data.group.bookletsStatus === "Approved");
@@ -74,7 +74,7 @@ import { USER_ROLE } from "../utils/keys";
 //     console.log(data);
 //     try {
 //       const res = await axios.post(
-//         "http://localhost:5000/api/group/change-booklet-comment",
+//          "/api/group/change-booklet-comment",
 //         data
 //       );
 //       if (res.data.comment === true) {
@@ -89,7 +89,7 @@ import { USER_ROLE } from "../utils/keys";
 
 //     // try {
 //     //   const response = await axios.post(
-//     //     "http://localhost:5000/api/group/change-booklet-status",
+//     //      "/api/group/change-booklet-status",
 //     //     data
 //     //   );
 //     //   setBookletStatus(response.data.group.bookletsStatus === "Approved");
@@ -242,9 +242,7 @@ const GroupsDataBody = ({
   }, [selectedGroups, setSelected]);
 
   const deleteGroup = async id => {
-    const response = await axios.delete(
-      `http://localhost:5000/api/group/delete/${id}`
-    );
+    const response = await axios.delete(` /api/group/delete/${id}`);
     if (response.data.delete) {
       setData(data => data.filter(group => group.id !== id));
       setShowDeleteModal(false);

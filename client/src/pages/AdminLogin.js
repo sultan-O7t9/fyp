@@ -27,13 +27,10 @@ const AdminLogin = () => {
     if (!email.includes("@uog.edu.pk") || email.indexOf("@uog.edu.pk") === 0)
       return setError("Please enter a valid UOG email address");
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/admin",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post("/api/auth/admin", {
+        email,
+        password,
+      });
       // console.log(response.data);
       localStorage.setItem(ADMIN_ID, response.data.id);
       localStorage.setItem(USER_ROLE, ["HOD"]);

@@ -86,7 +86,7 @@ const EditDeptPMO = props => {
   useEffect(() => {
     // setDeptPMO(pmo);
     axios
-      .get(`http://localhost:5000/api/faculty/get-supervisor-all`)
+      .get(` /api/faculty/get-supervisor-all`)
       .then(res => {
         setFaculty(res.data.faculty);
       })
@@ -111,12 +111,12 @@ const EditDeptPMO = props => {
 
   const submitPMOHandler = async () => {
     // const res = await axios.patch(
-    //   "http://localhost:5000/api/faculty/pmo/assign",
+    //    "/api/faculty/pmo/assign",
     //   { deptId: dept.id, facultyId: deptPMO }
     // );
     // console.log(res.data.assign);
     // setDisplay(false);
-    const result = await axios.post("http://localhost:5000/api/dept/create", {
+    const result = await axios.post("/api/dept/create", {
       name: dept,
     });
     console.log(result.data.dept);

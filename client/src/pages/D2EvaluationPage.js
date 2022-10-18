@@ -122,7 +122,7 @@ const DataBody = props => {
     const getDeliverableData = async () => {
       try {
         const response = await axios.post(
-          `http://localhost:5000/api/deliverable/get-grp-submission`,
+          ` /api/deliverable/get-grp-submission`,
           { groupId: groupId, deliverableId: 2 }
         );
         // setSubFile(response.data.versions.pop().name);
@@ -142,9 +142,7 @@ const DataBody = props => {
   useEffect(() => {
     const getProjectInfo = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/project/get-grp/${groupId}`
-        );
+        const res = await axios.get(` /api/project/get-grp/${groupId}`);
         // setProjectInfo(res.data);
         setProjectInfo(res.data.project);
       } catch (err) {
@@ -164,14 +162,11 @@ const DataBody = props => {
   useEffect(() => {
     const getReviewData = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/evaluation/get-review-status",
-          {
-            groupId,
-            deliverableId,
-            committeeId,
-          }
-        );
+        const res = await axios.post("/api/evaluation/get-review-status", {
+          groupId,
+          deliverableId,
+          committeeId,
+        });
         console.log("REVIEW", res.data);
         setReviewInfo(res.data.review);
         // setReview(res.data.review);
@@ -249,10 +244,9 @@ const DataBody = props => {
   useEffect(() => {
     const getEvaluationData = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/evaluation/d2-evaluation",
-          { groupId: groupId }
-        );
+        const response = await axios.post("/api/evaluation/d2-evaluation", {
+          groupId: groupId,
+        });
         console.log(response.data);
         setEvalData(response.data.group);
         // console.log(DATA.group);
@@ -393,12 +387,9 @@ const DataBody = props => {
   };
 
   const handleSubmit = async () => {
-    const facultyRes = await axios.post(
-      "http://localhost:5000/api/faculty/get-sup-id",
-      {
-        id: localStorage.getItem(USER_ID),
-      }
-    );
+    const facultyRes = await axios.post("/api/faculty/get-sup-id", {
+      id: localStorage.getItem(USER_ID),
+    });
     console.log(facultyRes.data.faculty);
 
     const LOGS = [];
@@ -653,10 +644,7 @@ const DataBody = props => {
     };
     console.log(data);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/evaluation/add-d2-evaluation",
-        data
-      );
+      const res = await axios.post("/api/evaluation/add-d2-evaluation", data);
       console.log(res.data);
       setTMsg("Marks has been updated successfully");
       setToast(true);
@@ -672,10 +660,9 @@ const DataBody = props => {
       // };
       // console.log(log);
 
-      const res2 = await axios.post(
-        `http://localhost:5000/api/deliverable/set-logs`,
-        { logs: LOGS }
-      );
+      const res2 = await axios.post(` /api/deliverable/set-logs`, {
+        logs: LOGS,
+      });
       console.log(res2.data);
       setRefresh(refresh => !refresh);
     } catch (err) {
@@ -691,10 +678,7 @@ const DataBody = props => {
     console.log(reviewInfo.id);
     // return;
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/evaluation/add-commented-doc",
-        data
-      );
+      const res = await axios.post("/api/evaluation/add-commented-doc", data);
       console.log("file:", res.data);
       if (res.data.upload) setShowUploadModal(false);
       setFile({ name: "" });
@@ -708,18 +692,15 @@ const DataBody = props => {
   const handleUpdateReview = async () => {
     console.log(committeeReview, revisionDate);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/evaluation//update-review-status",
-        {
-          groupId,
-          userId: localStorage.getItem(USER_ID),
-          deliverableId,
-          committeeId,
-          status: committeeReview,
-          date: revisionDate,
-          versionId: currVersion.id,
-        }
-      );
+      const res = await axios.post("/api/evaluation//update-review-status", {
+        groupId,
+        userId: localStorage.getItem(USER_ID),
+        deliverableId,
+        committeeId,
+        status: committeeReview,
+        date: revisionDate,
+        versionId: currVersion.id,
+      });
       console.log(res.data);
       setToast(true);
       setTMsg("Review Updated Successfully");
@@ -812,7 +793,7 @@ const DataBody = props => {
           {currVersion.eval_commented_doc ? (
             <Button
               onClick={() => {
-                let url = "http://localhost:5000/" + reviewInfo.commented_doc;
+                let url = " /" + reviewInfo.commented_doc;
                 let win = window.open(url, "_blank");
                 win.focus();
               }}
@@ -1378,7 +1359,7 @@ const D2EvaluationPage = props => {
   useEffect(() => {
     const getDeliverableData = async () => {
       const response = await axios.post(
-        `http://localhost:5000/api/deliverable/get-grp-submission`,
+        ` /api/deliverable/get-grp-submission`,
         { groupId: groupId, deliverableId: 2 }
       );
       setSubFile(response.data.versions.pop().name);
@@ -1395,10 +1376,7 @@ const D2EvaluationPage = props => {
     const getLogsData = async () => {
       const data = { deliverableId: deliverableId, groupId: groupId };
       try {
-        const res = await axios.post(
-          `http://localhost:5000/api/deliverable/get-logs`,
-          data
-        );
+        const res = await axios.post(` /api/deliverable/get-logs`, data);
         console.log(res.data);
         setLogsData(res.data);
       } catch (error) {
@@ -1410,7 +1388,7 @@ const D2EvaluationPage = props => {
 
   const downloadTemplateFile = async e => {
     e.preventDefault();
-    let url = "http://localhost:5000/" + subFile;
+    let url = " /" + subFile;
     console.log(url);
     let win = window.open(url, "_blank");
     win.focus();

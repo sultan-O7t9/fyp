@@ -43,10 +43,7 @@ const ForgetPassword = () => {
       email.split("_").length - 1 == 2
     ) {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/auth/forget",
-          { email }
-        );
+        const response = await axios.post("/api/auth/forget", { email });
         console.log(response.data);
         if (response.data.email) {
           setToast(true);

@@ -126,15 +126,10 @@ const ManageCommittee = props => {
     }
     const getData = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/group/get-groups/",
-          {
-            userId: localStorage.getItem(USER_ID),
-          }
-        );
-        const res2 = await axios.get(
-          "http://localhost:5000/api/sem/get-current"
-        );
+        const res = await axios.post("/api/group/get-groups/", {
+          userId: localStorage.getItem(USER_ID),
+        });
+        const res2 = await axios.get("/api/sem/get-current");
         console.log(res2.data);
         const currSem = res2.data.semester ? res2.data.semester.id : null;
         console.log(res.data);
@@ -172,7 +167,7 @@ const ManageCommittee = props => {
       setEvaluators(committee.FacultyMembers.map(member => member.id));
     }
     axios
-      .get("http://localhost:5000/api/faculty/get-supervisors")
+      .get("/api/faculty/get-supervisors")
       .then(res => {
         console.log(res.data);
         setEvaluatorItems(
@@ -204,23 +199,20 @@ const ManageCommittee = props => {
         committee.hasOwnProperty("Groups") &&
         committee.hasOwnProperty("FacultyMembers")
       ) {
-        const res = await axios.put(
-          "http://localhost:5000/api/committee/update",
-          {
-            committeeId: committee.id,
-            groups: groups,
-            members: evaluators,
-          }
-        );
+        const res = await axios.put("/api/committee/update", {
+          committeeId: committee.id,
+          groups: groups,
+          members: evaluators,
+        });
         console.log(res);
 
         setDisplay(false);
         return;
       }
-      const result = await axios.post(
-        "http://localhost:5000/api/committee/create",
-        { members: [...evaluators], groups: [...groups] }
-      );
+      const result = await axios.post("/api/committee/create", {
+        members: [...evaluators],
+        groups: [...groups],
+      });
       console.log(result);
     } catch (err) {
       console.log(err);

@@ -67,9 +67,7 @@ const DataBody = ({ data, editFaculty, setData, setRefresh }) => {
   const deleteDept = async deptId => {
     console.log(deptId);
     try {
-      const res = await axios.delete(
-        "http://localhost:5000/api/dept/delete/" + deptId
-      );
+      const res = await axios.delete("/api/dept/delete/" + deptId);
       console.log(res);
       if (res.data.remove) {
         setTMsg("Department Deleted Successfully");
@@ -157,7 +155,7 @@ const DataBody = ({ data, editFaculty, setData, setRefresh }) => {
   // const deleteCommittee = async id => {
   //   console.log("ID", id);
   //   const response = await axios.delete(
-  //     `http://localhost:5000/api/faculty/delete/${id}`
+  //     ` /api/faculty/delete/${id}`
   //   );
   //   if (response.data.delete) {
   //     setData(data => data.filter(committee => committee.id !== id));
@@ -275,9 +273,7 @@ const AdminManageDept = () => {
     const getData = async () => {
       setIsLoading(false);
       try {
-        const resDept = await axios.get(
-          "http://localhost:5000/api/dept/get-all"
-        );
+        const resDept = await axios.get("/api/dept/get-all");
         console.log(resDept.data);
         setBody(resDept.data.departments);
         // setDepts(resDept.data.departments);
@@ -290,7 +286,7 @@ const AdminManageDept = () => {
     getData();
 
     // axios
-    //   .get("http://localhost:5000/api/faculty/get-supervisors")
+    //   .get( "/api/faculty/get-supervisors")
     //   .then(res => {
     //     console.log(res.data);
     //     setBody(res.data.supervisors);

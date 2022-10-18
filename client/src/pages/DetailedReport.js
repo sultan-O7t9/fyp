@@ -138,9 +138,7 @@ const DataBody = props => {
   useEffect(() => {
     const getProjectInfo = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/project/get-grp/${groupId}`
-        );
+        const res = await axios.get(` /api/project/get-grp/${groupId}`);
         // setProjectInfo(res.data);
         setProjectInfo(res.data.project);
       } catch (err) {
@@ -187,7 +185,7 @@ const DataBody = props => {
     const getEvaluationData = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/evaluation/proposal-evaluation",
+          "/api/evaluation/proposal-evaluation",
           { groupId: groupId }
         );
         console.log(response.data);
@@ -250,10 +248,9 @@ const DataBody = props => {
   useEffect(() => {
     const getEvaluationData = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/evaluation/d2-evaluation",
-          { groupId: groupId }
-        );
+        const response = await axios.post("/api/evaluation/d2-evaluation", {
+          groupId: groupId,
+        });
         console.log(response.data);
         setEvalData(response.data.group);
         // console.log(DATA.group);
@@ -310,10 +307,9 @@ const DataBody = props => {
   useEffect(() => {
     const getEvaluationData = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/evaluation/d3-evaluation",
-          { groupId: groupId }
-        );
+        const response = await axios.post("/api/evaluation/d3-evaluation", {
+          groupId: groupId,
+        });
         console.log(response.data);
         setD3EvalData(response.data.group);
         // console.log(DATA.group);
@@ -357,10 +353,9 @@ const DataBody = props => {
   useEffect(() => {
     const getEvaluationData = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/evaluation/sup-evaluation",
-          { groupId: groupId }
-        );
+        const response = await axios.post("/api/evaluation/sup-evaluation", {
+          groupId: groupId,
+        });
         console.log(response.data);
         setSupEvaluationData(response.data.group);
         // console.log(DATA.group);
@@ -375,10 +370,9 @@ const DataBody = props => {
   useEffect(() => {
     const getEvaluationData = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/evaluation/pmo-evaluation",
-          { groupId: groupId }
-        );
+        const response = await axios.post("/api/evaluation/pmo-evaluation", {
+          groupId: groupId,
+        });
         console.log(response.data);
         setPmoEvaluationData(response.data.group);
         // console.log(DATA.group);
@@ -1719,7 +1713,7 @@ const DetailedReport = props => {
   //   useEffect(() => {
   //     const getDeliverableData = async () => {
   //       const response = await axios.post(
-  //         `http://localhost:5000/api/deliverable/get-grp-submission`,
+  //         ` /api/deliverable/get-grp-submission`,
   //         { groupId: data.id, deliverableId: 2 }
   //       );
   //       console.log(response.data.versions.pop());
@@ -1731,7 +1725,7 @@ const DetailedReport = props => {
 
   //   const downloadTemplateFile = async e => {
   //     e.preventDefault();
-  //     let url = "http://localhost:5000/" + deliverableData.template;
+  //     let url = " /" + deliverableData.template;
   //     console.log(url);
   //     let win = window.open(url, "_blank");
   //     win.focus();

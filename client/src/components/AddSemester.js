@@ -54,7 +54,7 @@ const AddSemester = props => {
       endYear
     );
     try {
-      const res = await axios.post("http://localhost:5000/api/sem/create", {
+      const res = await axios.post("/api/sem/create", {
         title: `${semester}-${year - 2000}`,
         session: `${startYear}-${endYear}`,
       });

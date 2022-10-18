@@ -218,9 +218,7 @@ const CommunicationPage = () => {
   useEffect(() => {
     const getSemesters = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/sem/get-all-grp"
-        );
+        const res = await axios.get("/api/sem/get-all-grp");
         setSemesters(res.data.semesters);
         setSelectedSemester(res.data.semesters.find(s => s.current).id);
       } catch (err) {
@@ -242,10 +240,9 @@ const CommunicationPage = () => {
   useEffect(() => {
     const getMails = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/sem/get-mails",
-          { userId: localStorage.getItem(USER_ID) }
-        );
+        const res = await axios.post("/api/sem/get-mails", {
+          userId: localStorage.getItem(USER_ID),
+        });
         console.log(res.data);
         setMails(res.data.mails);
       } catch (err) {
@@ -291,10 +288,7 @@ const CommunicationPage = () => {
     };
     console.log(data);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/sem/send-mail",
-        data
-      );
+      const res = await axios.post("/api/sem/send-mail", data);
       console.log(res.data.mail);
       if (res.data.mail) {
         setToast(true);
@@ -307,7 +301,7 @@ const CommunicationPage = () => {
   };
   const handleDeleteMails = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/sem/send-mail", {
+      const res = await axios.post("/api/sem/send-mail", {
         userId: localStorage.getItem(USER_ID),
       });
       console.log(res.data.delete);

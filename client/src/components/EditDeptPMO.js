@@ -87,7 +87,7 @@ const EditDeptPMO = props => {
   useEffect(() => {
     // setDeptPMO(pmo);
     axios
-      .get("http://localhost:5000/api/faculty/get-supervisors")
+      .get("/api/faculty/get-supervisors")
       .then(res => {
         let facultyData;
         if (pmo) {
@@ -118,7 +118,7 @@ const EditDeptPMO = props => {
   //     }
   //     // return;
   //     axios
-  //       .get("http://localhost:5000/api/group/get-all")
+  //       .get( "/api/group/get-all")
   //       .then(res => {
   //         console.log(res.data);
   //         setGroupItems(
@@ -138,7 +138,7 @@ const EditDeptPMO = props => {
   //       setEvaluators(committee.FacultyMembers.map(member => member.id));
   //     }
   //     axios
-  //       .get("http://localhost:5000/api/faculty/get-supervisors")
+  //       .get( "/api/faculty/get-supervisors")
   //       .then(res => {
   //         console.log(res.data);
   //         setEvaluatorItems(
@@ -171,7 +171,7 @@ const EditDeptPMO = props => {
   //         committee.hasOwnProperty("FacultyMembers")
   //       ) {
   //         const res = await axios.put(
-  //           "http://localhost:5000/api/committee/update",
+  //            "/api/committee/update",
   //           {
   //             committeeId: committee.id,
   //             groups: groups,
@@ -184,7 +184,7 @@ const EditDeptPMO = props => {
   //         return;
   //       }
   //       const result = await axios.post(
-  //         "http://localhost:5000/api/committee/create",
+  //          "/api/committee/create",
   //         { members: [...evaluators], groups: [...groups] }
   //       );
   //       console.log(result);
@@ -245,17 +245,14 @@ const EditDeptPMO = props => {
 
   const submitPMOHandler = async () => {
     try {
-      const deptRes = await axios.post(
-        "http://localhost:5000/api/dept/update",
-        {
-          id: dept.id,
-          title: deptTitle,
-        }
-      );
-      const pmoRes = await axios.patch(
-        "http://localhost:5000/api/faculty/pmo/assign",
-        { deptId: dept.id, facultyId: deptPMO }
-      );
+      const deptRes = await axios.post("/api/dept/update", {
+        id: dept.id,
+        title: deptTitle,
+      });
+      const pmoRes = await axios.patch("/api/faculty/pmo/assign", {
+        deptId: dept.id,
+        facultyId: deptPMO,
+      });
       if (deptRes.data.update && pmoRes.data.assign) {
         console.log("Updated");
       }

@@ -55,7 +55,7 @@ const DataBody = ({ versionData }) => {
     const getData = async () => {
       try {
         const deliverableRes = await axios.post(
-          "http://localhost:5000/api/deliverable/get-grp-submission",
+          "/api/deliverable/get-grp-submission",
           {
             deliverableId: 1,
             groupId: localStorage.getItem(USER_ID),
@@ -74,9 +74,7 @@ const DataBody = ({ versionData }) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/deliverable/get/1"
-        );
+        const res = await axios.get("/api/deliverable/get/1");
         console.log(res.data.deliverable);
         setDeliverableData(res.data.deliverable);
       } catch (err) {
@@ -89,13 +87,10 @@ const DataBody = ({ versionData }) => {
   useEffect(() => {
     const getExtensionInfo = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/deliverable/ex-get-grp",
-          {
-            deliverableId: 1,
-            groupId: localStorage.getItem(USER_ID),
-          }
-        );
+        const res = await axios.post("/api/deliverable/ex-get-grp", {
+          deliverableId: 1,
+          groupId: localStorage.getItem(USER_ID),
+        });
         let ex = {};
         console.log(res.data);
         if (res.data.hasOwnProperty("extension")) ex = res.data.extension;
@@ -111,12 +106,11 @@ const DataBody = ({ versionData }) => {
   const downloadTemplateFile = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/get-template-file",
-        { deliverableId: 1 }
-      );
+      const res = await axios.post("/api/deliverable/get-template-file", {
+        deliverableId: 1,
+      });
       console.log(res.data);
-      let url = "http://localhost:5000/" + res.data.file;
+      let url = " /" + res.data.file;
       console.log(url);
       let win = window.open(url, "_blank");
       win.focus();
@@ -176,7 +170,7 @@ const DataBody = ({ versionData }) => {
           return (
             <Button
               onClick={() => {
-                let url = "http://localhost:5000/" + value;
+                let url = " /" + value;
                 let win = window.open(url, "_blank");
                 win.focus();
               }}
@@ -242,7 +236,7 @@ const DataBody = ({ versionData }) => {
       //     return value ? (
       //       <Button
       //         onClick={() => {
-      //           let url = "http://localhost:5000/" + value;
+      //           let url = " /" + value;
       //           let win = window.open(url, "_blank");
       //           win.focus();
       //         }}
@@ -279,7 +273,7 @@ const DataBody = ({ versionData }) => {
     console.log(data);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/deliverable/submit-grp-submission",
+        "/api/deliverable/submit-grp-submission",
         data
       );
       console.log("file:", res.data);
@@ -294,7 +288,7 @@ const DataBody = ({ versionData }) => {
   const downloadVersionFile = async (e, file) => {
     e.preventDefault();
     try {
-      let url = "http://localhost:5000/" + file;
+      let url = " /" + file;
       console.log(url);
       let win = window.open(url, "_blank");
       win.focus();
@@ -306,7 +300,7 @@ const DataBody = ({ versionData }) => {
   const deleteVersion = async file => {
     try {
       const res = await axios.delete(
-        "http://localhost:5000/api/deliverable/del-grp-submission/" + file
+        "/api/deliverable/del-grp-submission/" + file
       );
       if (res.data.delete) {
         setShowToast(true);
@@ -562,7 +556,7 @@ const DataBody = ({ versionData }) => {
             <Button
               onClick={() => {
                 const win = window.open(
-                  "http://localhost:5000/" +
+                  " /" +
                     submissionData[0].eval_commented_doc,
                   "_blank"
                 );

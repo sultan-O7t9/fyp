@@ -45,7 +45,7 @@ const AddProject = props => {
   // const params=useParams();
   // useEffect(() => {
   //   axios
-  //     .get("http://localhost:5000/api/group/get-student-group")
+  //     .get( "/api/group/get-student-group")
   //     .then(res => {
   //       setGroupId(res.data.group.id);
   //     })
@@ -76,17 +76,14 @@ const AddProject = props => {
 
   const submitTitleHandler = async () => {
     try {
-      const result = await axios.post(
-        "http://localhost:5000/api/project/create",
-        {
-          title: title,
-          groupId: groupId,
-          description: description,
-          type: type,
-          dev_tech: tech,
-          platform: platform,
-        }
-      );
+      const result = await axios.post("/api/project/create", {
+        title: title,
+        groupId: groupId,
+        description: description,
+        type: type,
+        dev_tech: tech,
+        platform: platform,
+      });
       console.log(result.data);
       if (result.data.project) {
         setDisplay(false);

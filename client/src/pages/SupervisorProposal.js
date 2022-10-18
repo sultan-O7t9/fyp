@@ -51,7 +51,7 @@ const DataBody = props => {
     const getData = async () => {
       try {
         const deliverableRes = await axios.post(
-          "http://localhost:5000/api/deliverable/get-grp-submission",
+          "/api/deliverable/get-grp-submission",
           {
             deliverableId: deliverableId,
             groupId: groupId,
@@ -121,7 +121,7 @@ const DataBody = props => {
           return (
             <Button
               onClick={() => {
-                let url = "http://localhost:5000/" + value;
+                let url = " /" + value;
                 let win = window.open(url, "_blank");
                 win.focus();
               }}
@@ -169,7 +169,7 @@ const DataBody = props => {
           return value ? (
             <Button
               onClick={() => {
-                let url = "http://localhost:5000/" + value;
+                let url = " /" + value;
                 let win = window.open(url, "_blank");
                 win.focus();
               }}
@@ -197,10 +197,7 @@ const DataBody = props => {
     data.append("file", file);
     data.append("versionId", latestSub.id);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/sup-add-doc",
-        data
-      );
+      const res = await axios.post("/api/deliverable/sup-add-doc", data);
       console.log("file:", res.data);
       if (res.data.upload) setShowUploadModal(false);
       setFile({ name: "" });
@@ -213,13 +210,10 @@ const DataBody = props => {
   const handleAddComment = async () => {
     console.log(comment);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/deliverable/sup-add-comment",
-        {
-          versionId: latestSub.id,
-          comment: comment,
-        }
-      );
+      const res = await axios.post("/api/deliverable/sup-add-comment", {
+        versionId: latestSub.id,
+        comment: comment,
+      });
       console.log(res.data);
     } catch (err) {
       console.log(err);
@@ -232,7 +226,7 @@ const DataBody = props => {
     };
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/deliverable/sup-change-status",
+        "/api/deliverable/sup-change-status",
         data
       );
       console.log(response.data);
@@ -278,7 +272,7 @@ const DataBody = props => {
         <TableCell>
           <Button
             onClick={() => {
-              let url = "http://localhost:5000/" + latestSub.name;
+              let url = " /" + latestSub.name;
               let win = window.open(url, "_blank");
               win.focus();
             }}
@@ -351,8 +345,7 @@ const DataBody = props => {
                 {latestSub.commented_doc ? (
                   <Button
                     onClick={() => {
-                      let url =
-                        "http://localhost:5000/" + latestSub.commented_doc;
+                      let url = " /" + latestSub.commented_doc;
                       let win = window.open(url, "_blank");
                       win.focus();
                     }}
@@ -474,9 +467,7 @@ const SupervisorProposal = () => {
   useEffect(() => {
     const getGroupData = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/group/get/${groupId}`
-        );
+        const res = await axios.get(` /api/group/get/${groupId}`);
         setGroupInfo(res.data.group);
       } catch (err) {
         console.log(err);

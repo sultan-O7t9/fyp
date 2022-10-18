@@ -342,12 +342,8 @@ const AdminAllGroups = () => {
     const getData = async () => {
       setIsLoading(false);
       try {
-        const resGroup = await axios.get(
-          "http://localhost:5000/api/group/get-groups-admin"
-        );
-        const resDept = await axios.get(
-          "http://localhost:5000/api/dept/get-all"
-        );
+        const resGroup = await axios.get("/api/group/get-groups-admin");
+        const resDept = await axios.get("/api/dept/get-all");
         console.log(resGroup.data);
         console.log(resDept.data);
         setBody(resGroup.data.groups);
@@ -360,7 +356,7 @@ const AdminAllGroups = () => {
     };
     getData();
     // axios
-    //   .get("http://localhost:5000/api/group/get-all")
+    //   .get( "/api/group/get-all")
     //   .then(res => {
     //     setBody(res.data.groups);
     //   })

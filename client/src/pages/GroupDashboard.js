@@ -34,9 +34,7 @@ const DataBody = () => {
     const getData = async () => {
       try {
         console.log("sending request");
-        const projectRes = await axios.get(
-          "http://localhost:5000/api/project/get-grp/" + groupID
-        );
+        const projectRes = await axios.get("/api/project/get-grp/" + groupID);
         console.log(projectRes.data.project);
         localStorage.setItem(PROJECT_ID, projectRes.data.project.id);
         setProjectData(projectRes.data.project);
@@ -46,9 +44,7 @@ const DataBody = () => {
       }
     };
     const getDeliverablesData = async () => {
-      const delivRes = await axios.get(
-        "http://localhost:5000/api/deliverable/get-all"
-      );
+      const delivRes = await axios.get("/api/deliverable/get-all");
       console.log(delivRes.data);
       const proposal = delivRes.data.deliverables.filter(
         deliv => deliv.id == 1
@@ -188,9 +184,7 @@ const GroupDashboard = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/group/get/${groupID}`
-        );
+        const res = await axios.get(` /api/group/get/${groupID}`);
         console.log(res.data.group);
         setGroupData(res.data.group);
         localStorage.setItem(GROUP_NAME, res.data.group.name);

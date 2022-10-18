@@ -60,7 +60,7 @@ const ManageFaculty = props => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/dept/get-all")
+      .get("/api/dept/get-all")
       .then(res => {
         console.log(res.data.departments);
         setAllDepartments(res.data.departments);
@@ -85,31 +85,25 @@ const ManageFaculty = props => {
         faculty.hasOwnProperty("email") &&
         faculty.hasOwnProperty("department")
       ) {
-        const res = await axios.patch(
-          "http://localhost:5000/api/faculty/update",
-          {
-            id: faculty.id,
-            email: faculty.email,
-            name: name,
-            departmentId: department,
-            password: password,
-            designation: designation,
-          }
-        );
+        const res = await axios.patch("/api/faculty/update", {
+          id: faculty.id,
+          email: faculty.email,
+          name: name,
+          departmentId: department,
+          password: password,
+          designation: designation,
+        });
         console.log(res);
 
         setDisplay(false);
         return;
       }
-      const result = await axios.post(
-        "http://localhost:5000/api/faculty/register",
-        {
-          email,
-          password,
-          name,
-          departmentId: department,
-        }
-      );
+      const result = await axios.post("/api/faculty/register", {
+        email,
+        password,
+        name,
+        departmentId: department,
+      });
       console.log(result);
     } catch (err) {
       console.log(err);

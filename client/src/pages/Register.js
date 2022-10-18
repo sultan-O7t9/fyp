@@ -24,7 +24,7 @@ const Register = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/dept/get-all")
+      .get("/api/dept/get-all")
       .then(res => {
         console.log(res.data.departments);
         setAllDepartments(res.data.departments);
@@ -43,7 +43,7 @@ const Register = () => {
     // dispatch(registerUser(name, email, password, department));
     console.log(name, email, password, department);
     axios
-      .post("http://localhost:5000/api/faculty/register", {
+      .post("/api/faculty/register", {
         email,
         password,
         name,

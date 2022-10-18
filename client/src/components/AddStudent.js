@@ -41,9 +41,7 @@ const AddStudent = props => {
   useEffect(() => {
     const getDept = async () => {
       try {
-        const resDept = await axios.get(
-          "http://localhost:5000/api/dept/get-all"
-        );
+        const resDept = await axios.get("/api/dept/get-all");
         console.log(resDept.data);
         const dts = resDept.data.departments;
         setDepts(
@@ -67,8 +65,8 @@ const AddStudent = props => {
   //     const getData = async () => {
   //       try {
   //         const res = await axios.get(
-  //           "http://localhost:5000/api/committee/get-all"
-  //           //   "http://localhost:5000/api/group/get-all/" +
+  //            "/api/committee/get-all"
+  //           //    "/api/group/get-all/" +
   //           //     localStorage.getItem(USER_ID)
   //           );
   //         console.log("DETAILED GROUPS", res.data);
@@ -98,7 +96,7 @@ const AddStudent = props => {
       return;
     }
     try {
-      const res = await axios.post("http://localhost:5000/api/student/create", {
+      const res = await axios.post("/api/student/create", {
         name,
         rollNo,
         dept,
